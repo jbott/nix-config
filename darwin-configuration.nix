@@ -220,6 +220,10 @@ in
         rur = "!git remote update && git rebase -i origin/master";
         st = "status";
       };
+
+      extraConfig = {
+        init.defaultBranch = "main";
+      };
     };
 
     programs.dircolors = {
