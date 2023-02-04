@@ -170,12 +170,16 @@ in
         nnoremap <C-L>  <cmd>tabn<cr>
 
         nnoremap <C-P>  <cmd>lua require('telescope.builtin').find_files()<cr>
+
+        " Setup Plugins
+        lua require'nvim-lastplace'.setup{}
       '';
       plugins = with pkgs.vimPlugins;
         let
         in [
           vim-nix
           vim-challenger-deep-theme
+          nvim-lastplace
         ];
     };
 
