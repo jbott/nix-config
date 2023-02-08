@@ -19,9 +19,12 @@ in
   environment.systemPackages = with pkgs; [
     alacritty
     atuin
+    fd
     git
+    jq
     neovim
     python311
+    ripgrep
     starship
     tmux
     watch
@@ -67,8 +70,8 @@ in
       enable = true;
 
       shellAliases = {
-        l = "ls -tlr";
-        la = "ls -tlra";
+        l = "ls -tlr --color=auto";
+        la = "ls -tlra --color=auto";
         g = "git";
         cdg = "cd $HOME/src";
       };
@@ -209,6 +212,7 @@ in
 
       aliases = {
         cp = "cherry-pick";
+        cm = "commit -m";
         di = "diff";
         ds = "diff --staged";
         fc = "fzf-checkout";
@@ -231,6 +235,10 @@ in
     };
 
     programs.dircolors = {
+      enable = true;
+    };
+
+    programs.direnv = {
       enable = true;
     };
   };
