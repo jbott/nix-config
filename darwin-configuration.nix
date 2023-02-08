@@ -71,10 +71,11 @@ in
       enable = true;
 
       shellAliases = {
+        cdg = "cd $HOME/src";
+        g = "git";
         l = "ls -tlr --color=auto";
         la = "ls -tlra --color=auto";
-        g = "git";
-        cdg = "cd $HOME/src";
+        n = "nvim";
       };
 
       initExtra = ''
