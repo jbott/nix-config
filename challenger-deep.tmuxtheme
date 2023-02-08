@@ -1,11 +1,7 @@
 #
-# Powerline Double Orange - Tmux Theme
-# Created by Jim Myhrberg <contact@jimeh.me>.
+# Challenger Deep - Tmux Theme
 #
-# Inspired by vim-powerline: https://github.com/Lokaltog/powerline
-#
-# Requires terminal to be using a powerline compatible font, find one here:
-# https://github.com/Lokaltog/powerline-fonts
+# Vendored with fixups from https://github.com/challenger-deep-theme/tmux/commit/4bf714e0153c4eb30e0d8751cedae225b572db91
 #
 
 # Status update interval
@@ -22,7 +18,7 @@ set -g status-left "#[fg=colour0,bg=colour6,nobold] $#S #[fg=colour15,bg=colour0
 # Right side of status bar
 set -g status-right-style fg=colour15,bg=colour0
 set -g status-right-length 150
-set -g status-right "##[fg=colour0,bg=colour6]  W#I  P#P @#H "
+set -g status-right "#[fg=colour0,bg=colour6]  W#I  P#P @#H "
 
 # Window status
 set -g window-status-format "  #I:#W#F  "
@@ -39,7 +35,7 @@ set -g window-status-activity-style fg=colour8,bg=colour6
 set -g window-status-separator ""
 
 # Window status alignment
-set -g status-justify centre
+# set -g status-justify centre
 
 # Pane border
 set -g pane-border-style fg=colour8,bg=default
