@@ -191,9 +191,11 @@ in
       plugins = with pkgs.vimPlugins;
         let
         in [
-          vim-nix
-          vim-challenger-deep-theme
+          markdown-preview-nvim
           nvim-lastplace
+          vim-challenger-deep-theme
+          vim-elixir
+          vim-nix
         ];
     };
 
