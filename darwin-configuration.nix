@@ -28,6 +28,7 @@ in
     starship
     tmux
     watch
+    wget
     zsh
   ];
 
@@ -190,7 +191,7 @@ in
       enable = true;
       extraConfig = ''
         set -g mouse on
-      '';
+      '' + builtins.readFile ./challenger-deep.tmuxtheme;
       terminal = "tmux-256color";
     };
 
