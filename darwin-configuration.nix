@@ -194,6 +194,7 @@ in
         in [
           markdown-preview-nvim
           nvim-lastplace
+          telescope-nvim
           vim-challenger-deep-theme
           vim-elixir
           vim-nix
