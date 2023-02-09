@@ -29,6 +29,7 @@ in
     tmux
     watch
     wget
+    yubikey-manager
     zsh
   ];
 
