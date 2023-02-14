@@ -24,6 +24,7 @@ in
     git
     jq
     neovim
+    nmap
     nodePackages.prettier
     python311
     ripgrep
