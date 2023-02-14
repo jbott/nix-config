@@ -19,6 +19,7 @@ in
   environment.systemPackages = with pkgs; [
     alacritty
     atuin
+    darwin.iproute2mac
     fd
     git
     jq
