@@ -23,6 +23,7 @@ in
     git
     jq
     neovim
+    nodePackages.prettier
     python311
     ripgrep
     starship
@@ -199,6 +200,7 @@ in
           vim-challenger-deep-theme
           vim-elixir
           vim-nix
+          vim-prettier
         ];
     };
 
