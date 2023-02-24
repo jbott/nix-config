@@ -202,6 +202,7 @@ in
           telescope-nvim
           vim-challenger-deep-theme
           vim-elixir
+          vim-indent-object
           vim-nix
           vim-prettier
         ];
