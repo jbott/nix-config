@@ -24,6 +24,7 @@ in
     fd
     git
     jq
+    mtr
     neovim
     nmap
     nodePackages.prettier
