@@ -106,6 +106,11 @@ in
         bindkey '^[[3~' delete-char                     # Del / Fn delete
         bindkey '^[[1;3D' backward-word                 # Option Left-Arrow
         bindkey '^[[1;3C' forward-word                  # Option Right-Arrow
+
+        # Bind ctrl-v to editing the current command line in EDITOR
+        autoload -z edit-command-line
+        zle -N edit-command-line
+        bindkey "^V" edit-command-line
       '';
 
       sessionVariables = {
