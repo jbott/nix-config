@@ -42,6 +42,11 @@ in
   # $ darwin-rebuild switch -I darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix
   # environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
+  nixpkgs.config.permittedInsecurePackages = [
+    # Needed until https://github.com/NixOS/nixpkgs/issues/216207
+    "libressl-3.4.3"
+  ];
+
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
   nix.package = pkgs.nix;
