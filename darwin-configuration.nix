@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   vim-challenger-deep-theme = pkgs.vimUtils.buildVimPluginFrom2Nix {
@@ -17,6 +17,7 @@ in
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
+    _1password
     alacritty
     atuin
     cdrtools
@@ -45,6 +46,11 @@ in
   nixpkgs.config.permittedInsecurePackages = [
     # Needed until https://github.com/NixOS/nixpkgs/issues/216207
     "libressl-3.4.3"
+  ];
+
+  # Allow certain unfree packages
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "1password-cli"
   ];
 
   # Auto upgrade nix package and the daemon service.
