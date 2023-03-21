@@ -96,13 +96,6 @@ in
       };
 
       initExtra = ''
-        # Only bind ctrl-r to atuin
-        # TODO: rework once we get atuin v13
-        # Should be simplified to: eval "$(atuin init zsh --disable-up-arrow)"
-        export ATUIN_NOBIND="true"
-        eval "$(atuin init zsh)"
-        bindkey '^r' _atuin_search_widget
-
         # Bind keyboard control characters to useful functions
         # TODO: Understand why using zsh from nix breaks home / end / del
         bindkey '^[[1~' beginning-of-line               # Home / Fn Left-Arrow
@@ -252,7 +245,12 @@ in
 
     programs.atuin = {
       enable = true;
-      enableZshIntegration = false;
+      flags = [
+        "--disable-up-arrow"
+      ];
+      settings = {
+        update_check = false;
+      };
     };
 
     programs.zoxide = {
