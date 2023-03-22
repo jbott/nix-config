@@ -286,6 +286,14 @@ in
       extraConfig = {
         init.defaultBranch = "main";
       };
+
+      # Non-nix tracked configuration for per-repo identities
+      # TODO: Can I pull this into the repo in an encrypted state or something?
+      includes = [
+        {
+          path = "identities.gitconfig";
+        }
+      ];
     };
 
     programs.dircolors = {
