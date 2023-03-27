@@ -203,16 +203,19 @@ in
 
         " Setup Plugins
         lua require'nvim-lastplace'.setup{}
+
+        " Do not auto-open markdown composer
+        let g:markdown_composer_autostart = 0
       '';
       plugins = with pkgs.vimPlugins;
         let
         in [
-          markdown-preview-nvim
           nvim-lastplace
           telescope-nvim
           vim-challenger-deep-theme
           vim-elixir
-          vim-indent-object
+          vim-indent-object # NOTE: vii performs select at indent level
+          vim-markdown-composer
           vim-nix
           vim-prettier
         ];
