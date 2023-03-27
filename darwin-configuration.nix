@@ -29,7 +29,9 @@ in
     neovim
     nmap
     nodePackages.prettier
+    podman
     python311
+    qemu
     ripgrep
     starship
     tmux
