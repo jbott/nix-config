@@ -35,6 +35,7 @@ in
     ripgrep
     starship
     tmux
+    tree
     watch
     wget
     yubikey-manager
