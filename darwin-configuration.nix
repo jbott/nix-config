@@ -25,6 +25,7 @@ in
     fd
     git
     jq
+    minicom
     mtr
     neovim
     nmap
