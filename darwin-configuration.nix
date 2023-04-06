@@ -30,6 +30,7 @@ in
     nmap
     nodePackages.prettier
     podman
+    podman-compose
     python311
     qemu
     ripgrep
