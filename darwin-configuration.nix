@@ -20,6 +20,7 @@ in
     _1password
     alacritty
     atuin
+    black
     cdrtools
     darwin.iproute2mac
     fd
@@ -33,6 +34,7 @@ in
     podman
     podman-compose
     python311
+    python311Packages.pip-tools
     qemu
     ripgrep
     starship
