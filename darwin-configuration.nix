@@ -286,10 +286,10 @@ in
         poh = "push -u origin HEAD";
         pohfwl = "push -u origin HEAD --force-with-lease";
         ri = "rebase -i";
-        rim = "rebase -i origin/master";
-        rom = "rebase origin/master";
+        rim = "rebase -i origin/main";
+        rom = "rebase origin/main";
         rup = "remote update -p";
-        rur = "!git remote update && git rebase -i origin/master";
+        rur = "!git remote update && git rebase -i origin/main";
         st = "status";
       };
 
