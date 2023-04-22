@@ -97,6 +97,7 @@ in
 
       shellAliases = {
         cdg = "cd $HOME/src";
+        cdr = "cd $(git rev-parse --show-toplevel)";
         g = "git";
         l = "ls -tlr --color=auto";
         la = "ls -tlra --color=auto";
@@ -276,8 +277,9 @@ in
       userEmail = "john@johnott.us";
 
       aliases = {
-        cp = "cherry-pick";
         cm = "commit -m";
+        co = "checkout";
+        cp = "cherry-pick";
         di = "diff";
         ds = "diff --staged";
         fc = "fzf-checkout";
