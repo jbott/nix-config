@@ -10,6 +10,16 @@ let
       hash = "sha256-2lIPun5OjaoHSG2BdnX9ztw3k9whVlBa9eB2vS8Htbg=";
     };
   };
+  vim-black = pkgs.vimUtils.buildVimPluginFrom2Nix {
+    name = "vim-black";
+    path = "plugin";
+    src = pkgs.fetchFromGitHub {
+      owner = "psf";
+      repo = "black";
+      rev = "4bb6e4f64ab3820ab9fae6716cd59479d34b7edf";
+      hash = "sha256-2lIPun5OjaoHSG2BdnX9ztw3k9whVlBa9eB2vS8Htbg=";
+    };
+  };
 in
 {
   imports = [ <home-manager/nix-darwin> ];
@@ -222,6 +232,7 @@ in
           nvim-lastplace
           telescope-nvim
           vim-challenger-deep-theme
+          vim-black
           vim-elixir
           vim-indent-object # NOTE: vii performs select at indent level
           vim-markdown-composer
