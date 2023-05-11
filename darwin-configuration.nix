@@ -26,6 +26,7 @@ in
     docker-buildx
     fd
     git
+    gmailctl
     jq
     minicom
     mtr
