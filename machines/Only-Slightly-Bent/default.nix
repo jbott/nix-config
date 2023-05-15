@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./hardware-configuration.nix
+    ./zfs-tank.nix
   ];
 
   system.stateVersion = "22.11";
