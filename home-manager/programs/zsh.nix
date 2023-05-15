@@ -8,8 +8,8 @@
       darwin-switch = "darwin-rebuild switch --flake ~/src/nix-config#${currentSystemName}";
       nixos-switch = "sudo nixos-rebuild switch --flake /persist/etc/nix-config#${currentSystemName}";
       g = "git";
-      l = "ls -tlr --color=auto";
-      la = "ls -tlra --color=auto";
+      l = "ls -tlrh --color=auto";
+      la = "ls -tlrha --color=auto";
       n = "nvim";
     };
 
