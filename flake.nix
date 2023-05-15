@@ -24,11 +24,7 @@
     inherit (flake-utils.lib) eachDefaultSystem;
     inherit (nix-darwin.lib) darwinSystem;
 
-    currentSystemNameModule = name: {
-      config._module.args = {
-        currentSystemName = name;
-      };
-    };
+    currentSystemNameModule = name: { _module.args.currentSystemName = name; };
 
     allSystemsOutput = eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
