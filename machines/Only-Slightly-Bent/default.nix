@@ -6,6 +6,7 @@
   imports = [
     ./hardware-configuration.nix
     ./zfs-tank.nix
+    ../../common/linux/disk-spindown.nix
     ../../services/home-assistant.nix
   ];
 
