@@ -4,6 +4,7 @@
 
     users.jbo = {
       isNormalUser = true;
+      uid = 1000;
       name = "jbo";
       home = "/home/jbo";
       group = "jbo";
@@ -15,6 +16,8 @@
       ];
     };
 
-    groups.jbo = {};
+    groups.jbo = {
+      gid = 1000;
+    };
   };
 }
