@@ -23,8 +23,9 @@
   }: let
     inherit (flake-utils.lib) eachDefaultSystem;
     inherit (nix-darwin.lib) darwinSystem;
+    inherit (nixpkgs.lib) nixosSystem;
 
-    currentSystemNameModule = name: { _module.args.currentSystemName = name; };
+    currentSystemNameModule = name: {_module.args.currentSystemName = name;};
 
     allSystemsOutput = eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -42,7 +43,20 @@
             ./common
             ./common/darwin
             ./home-manager
-            ./machines/Just-Another-Victim-of-the-Ambient-Morality.nix
+            ./machines/Just-Another-Victim-of-the-Ambient-Morality
+          ];
+        };
+      };
+      nixosConfigurations = {
+        Only-Slightly-Bent = nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            (currentSystemNameModule "Only-Slightly-Bent")
+            home-manager.nixosModules.default
+            ./common
+            ./common/linux
+            ./home-manager
+            ./machines/Only-Slightly-Bent
           ];
         };
       };

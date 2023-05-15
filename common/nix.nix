@@ -1,8 +1,10 @@
 {pkgs, ...}: {
-  nix.package = pkgs.nix;
-  nix.settings.experimental-features = ["nix-command flakes"];
-  nix.distributedBuilds = true;
-  nix.extraOptions = ''
-    builders-use-substitutes = true
-  '';
+  nix = {
+    package = pkgs.nix;
+    settings.experimental-features = ["nix-command flakes"];
+    distributedBuilds = true;
+    extraOptions = ''
+      builders-use-substitutes = true
+    '';
+  };
 }

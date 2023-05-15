@@ -9,7 +9,6 @@
     atuin
     black
     cdrtools
-    darwin.iproute2mac
     docker-buildx
     fd
     git

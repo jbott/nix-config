@@ -6,6 +6,7 @@
       cdg = "cd $HOME/src";
       cdr = "cd $(git rev-parse --show-toplevel)";
       darwin-switch = "darwin-rebuild switch --flake ~/src/nix-config#${currentSystemName}";
+      nixos-switch = "sudo nixos-rebuild switch --flake /persist/etc/nix-config#${currentSystemName}";
       g = "git";
       l = "ls -tlr --color=auto";
       la = "ls -tlra --color=auto";
