@@ -9,6 +9,9 @@
 
   system.stateVersion = "22.11";
 
+  # Enable binfmt_misc emulation
+  boot.binfmt.emulatedSystems = ["aarch64-linux" "armv7l-linux"];
+
   # boot via systemd-boot
   boot.loader.systemd-boot = {
     enable = true;
