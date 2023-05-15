@@ -13,6 +13,7 @@
     fd
     git
     gmailctl
+    htop
     jq
     minicom
     mtr
