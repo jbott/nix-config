@@ -1,3 +1,3 @@
 {
-  boot.zfs.extraPools = [ "tank" ];
+  boot.zfs.extraPools = ["tank"];
 }
