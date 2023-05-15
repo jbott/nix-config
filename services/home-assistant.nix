@@ -9,7 +9,14 @@
       volumes = [
         "/persist/var/lib/home-assistant:/config"
       ];
-      ports = [ "8123:8123" ];
+      extraOptions = ["--network=host"];
     };
   };
+
+  # Enable homekit bridge on all interfaces
+  networking.firewall.allowedTCPPorts = [21212];
+  networking.firewall.allowedUDPPorts = [5353];
+
+  # Enable webui on tailscale only
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [8123];
 }
