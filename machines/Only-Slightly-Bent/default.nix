@@ -6,6 +6,7 @@
   imports = [
     ./hardware-configuration.nix
     ./zfs-tank.nix
+    ../../services/home-assistant.nix
   ];
 
   system.stateVersion = "22.11";
