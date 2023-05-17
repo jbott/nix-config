@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   nix = {
     package = pkgs.nix;
     settings = {
@@ -9,5 +13,7 @@
     extraOptions = ''
       builders-use-substitutes = true
     '';
+
+    registry.nixpkgs.flake = inputs.nixpkgs;
   };
 }
