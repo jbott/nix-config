@@ -20,7 +20,7 @@
     home-manager,
     nix-darwin,
     nixpkgs,
-  }: let
+  } @ inputs: let
     inherit (flake-utils.lib) eachDefaultSystem;
     inherit (nix-darwin.lib) darwinSystem;
     inherit (nixpkgs.lib) nixosSystem;
@@ -58,6 +58,7 @@
             ./home-manager
             ./machines/Only-Slightly-Bent
           ];
+          specialArgs = {inherit inputs;};
         };
       };
     }
