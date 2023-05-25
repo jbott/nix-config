@@ -16,6 +16,10 @@
         bind C-h previous-window
         bind C-l next-window
 
+        # Configure ctrl-pageup/pagedown keybindings for switching windows
+        bind -n C-Pageup previous-window
+        bind -n C-Pagedown next-window
+
         # Auto-rename panes
         set-option -g status-interval 2
         set-option -g automatic-rename on
