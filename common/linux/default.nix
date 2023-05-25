@@ -2,8 +2,9 @@
   imports = [
     ./hardware.nix
     ./openssh.nix
-    ./sudo.nix
+    ./packages.nix
     ./smartd.nix
+    ./sudo.nix
     ./tailscale.nix
     ./users.nix
   ];
