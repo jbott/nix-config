@@ -8,7 +8,10 @@
       name = "jbo";
       home = "/home/jbo";
       group = "jbo";
-      extraGroups = ["wheel"];
+      extraGroups = [
+        "dialout"
+        "wheel"
+      ];
       shell = pkgs.zsh;
       initialHashedPassword = "\$6\$QUiXYT6XzD39mklJ\$ZaA07XGXhcbaE7KB6WZBtKDpN0ZYRz/WayP038wxSDyU6E15zEOBpVCK3ChHCxvmokyeIDcc/3XkLBAZpHd5D0";
       openssh.authorizedKeys.keys = [
