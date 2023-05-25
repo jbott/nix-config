@@ -11,6 +11,7 @@
     cdrtools
     docker-buildx
     fd
+    fzf
     git
     gmailctl
     htop
