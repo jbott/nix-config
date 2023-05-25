@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+_gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
+_viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always %'"
+_viewGitLogLineUnfancy="$_gitLogLineToHash | xargs -I % sh -c 'git show %'"
+
+# gls - git commit browser with previews and vim integration
+gls() {
+    git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr% C(auto)%an" "$@" |
+        fzf --no-sort --reverse --tiebreak=index --no-multi \
+            --ansi --preview="$_viewGitLogLine" \
+                --header "enter to view, alt-y to copy hash, alt-v to open in vim" \
+                --bind "enter:execute:$_viewGitLogLine   | less -R" \
+                --bind "alt-v:execute:$_viewGitLogLineUnfancy | nvim -" \
+                --bind "alt-y:execute:$_gitLogLineToHash | xclip"
+}
+
+gls
