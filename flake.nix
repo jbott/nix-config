@@ -11,6 +11,11 @@
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-search-cli = {
+      url = "github:peterldowns/nix-search-cli";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
@@ -19,6 +24,7 @@
     flake-utils,
     home-manager,
     nix-darwin,
+    nix-search-cli,
     nixpkgs,
   } @ inputs: let
     inherit (flake-utils.lib) eachDefaultSystem;
@@ -26,6 +32,13 @@
     inherit (nixpkgs.lib) nixosSystem;
 
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
+    nixpkgsOverlaysModule = {
+      nixpkgs.overlays = [
+        (self: super: {
+          nix-search-cli = nix-search-cli.packages.${self.system}.default;
+        })
+      ];
+    };
 
     allSystemsOutput = eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -39,6 +52,7 @@
           system = "aarch64-darwin";
           modules = [
             (currentSystemNameModule "Just-Another-Victim-of-the-Ambient-Morality")
+            nixpkgsOverlaysModule
             home-manager.darwinModules.default
             ./common
             ./common/darwin
@@ -52,6 +66,7 @@
           system = "x86_64-linux";
           modules = [
             (currentSystemNameModule "Only-Slightly-Bent")
+            nixpkgsOverlaysModule
             home-manager.nixosModules.default
             ./common
             ./common/linux
@@ -64,6 +79,7 @@
           system = "x86_64-linux";
           modules = [
             (currentSystemNameModule "Just-Testing")
+            nixpkgsOverlaysModule
             home-manager.nixosModules.default
             ./common
             ./common/linux

@@ -19,6 +19,7 @@
     minicom
     mtr
     neovim
+    nix-search-cli
     nmap
     nodePackages.prettier
     podman
