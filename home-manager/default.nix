@@ -1,4 +1,8 @@
-{currentSystemName, pkgs, ...}: {
+{
+  currentSystemName,
+  pkgs,
+  ...
+}: {
   home-manager.users.jbo = {
     # Not sure when this should change
     home.stateVersion = "22.11";
@@ -27,7 +31,7 @@
         # should be on PATH to be in the bin folder of a derivation (I think
         # those are the right words, but someone needs to make a nix
         # dictionary).
-        paths = [ ./scripts ];
+        paths = [./scripts];
       })
     ];
   };
