@@ -4,6 +4,7 @@
 
     shellAliases = {
       cdg = "cd $HOME/src";
+      cdz = "cd $HOME/src/zelos-src";
       cdr = "cd $(git rev-parse --show-toplevel)";
       darwin-switch = "darwin-rebuild switch --flake ~/src/nix-config#${currentSystemName}";
       nixos-switch = "sudo nixos-rebuild switch --flake /persist/etc/nix-config#${currentSystemName}";
