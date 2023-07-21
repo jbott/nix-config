@@ -59,6 +59,7 @@ in {
       vim-challenger-deep-theme
       vim-elixir
       vim-indent-object # NOTE: vii performs select at indent level
+      vim-jinja
       vim-markdown-composer
       vim-nix
       vim-prettier
