@@ -7,6 +7,8 @@
     userEmail = "john@johnott.us";
 
     aliases = {
+      c = "commit";
+      cfp = "commit-for-project";
       cm = "commit -m";
       co = "checkout";
       cp = "cherry-pick";

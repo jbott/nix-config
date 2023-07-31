@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+parent-find() {
+  local file="$1"
+  local dir="$2"
+
+  test -e "$dir/$file" && echo "$dir" && return 0
+  [ '/' = "$dir" ] && return 1
+
+  parent-find "$file" "$(dirname "$dir")"
+}
+
+cwd=$(pwd -P 2>/dev/null)
+project_name_dir=$(parent-find .project-name "${cwd}")
+project_name=$(cat "${project_name_dir}/.project-name")
+git commit --edit --message "${project_name}: ${*}"
