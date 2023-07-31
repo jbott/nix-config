@@ -4,14 +4,15 @@
 
     shellAliases = {
       cdg = "cd $HOME/src";
-      cdz = "cd $HOME/src/zelos-src";
+      cdp = "cd $(get-project-dir)";
       cdr = "cd $(git rev-parse --show-toplevel)";
+      cdz = "cd $HOME/src/zelos-src";
       darwin-switch = "darwin-rebuild switch --flake ~/src/nix-config#${currentSystemName}";
-      nixos-switch = "sudo nixos-rebuild switch --flake /persist/etc/nix-config#${currentSystemName}";
       g = "git";
       l = "ls -tlrh --color=auto";
       la = "ls -tlrha --color=auto";
       n = "nvim";
+      nixos-switch = "sudo nixos-rebuild switch --flake /persist/etc/nix-config#${currentSystemName}";
     };
 
     initExtra = ''
