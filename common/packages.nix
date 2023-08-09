@@ -22,8 +22,6 @@
     nix-search-cli
     nmap
     nodePackages.prettier
-    podman
-    podman-compose
     python311
     python311Packages.pip-tools
     qemu
