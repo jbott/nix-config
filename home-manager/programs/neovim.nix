@@ -32,12 +32,18 @@ in {
       " 2 space tabs
       set sw=2 ts=2 expandtab
 
+      " Do not expand tabs on go files
+      autocmd FileType go setlocal noexpandtab
+
       " Disable infurating yaml behavior
       autocmd FileType yaml,yaml.ansible setlocal indentkeys-=0#
 
       " Show whitespace characters
       set list listchars=trail:~,tab:>-,nbsp:␣
-      hi Whitespace ctermbg=red guibg=red
+
+      " Highlight whitespace characters at EOL
+      match ExtraWhitespace /\s\+$/
+      hi ExtraWhitespace ctermbg=red guibg=red
 
       " Remaps
       nnoremap \w     <cmd>bd<cr>
