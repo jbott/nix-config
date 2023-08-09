@@ -6,7 +6,7 @@
       cdg = "cd $HOME/src";
       cdp = "cd $(get-project-dir)";
       cdr = "cd $(git rev-parse --show-toplevel)";
-      cdz = "cd $HOME/src/zelos-src";
+      cdz = "cd $HOME/src/zelos/src";
       darwin-switch = "darwin-rebuild switch --flake ~/src/nix-config#${currentSystemName}";
       g = "git";
       l = "ls -tlrh --color=auto";
