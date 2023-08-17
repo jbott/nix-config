@@ -37,6 +37,7 @@ in {
 
       " Disable infurating yaml behavior
       autocmd FileType yaml,yaml.ansible setlocal indentkeys-=0#
+      autocmd BufNewFile,BufRead *.yaml.j2 setlocal indentkeys-=0#
 
       " Show whitespace characters
       set list listchars=trail:~,tab:>-,nbsp:␣
