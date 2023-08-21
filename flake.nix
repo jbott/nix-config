@@ -59,6 +59,7 @@
             ./home-manager
             ./machines/Just-Another-Victim-of-the-Ambient-Morality
           ];
+          specialArgs = {inherit inputs;};
         };
       };
       nixosConfigurations = {
