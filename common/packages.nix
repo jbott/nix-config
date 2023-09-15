@@ -12,6 +12,7 @@
     docker-buildx
     fd
     fzf
+    gh
     git
     gmailctl
     htop
