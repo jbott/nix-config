@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  vim-challenger-deep-theme = pkgs.vimUtils.buildVimPluginFrom2Nix {
+  vim-challenger-deep-theme = pkgs.vimUtils.buildVimPlugin {
     name = "vim-challenger-deep-theme";
     src = pkgs.fetchFromGitHub {
       owner = "challenger-deep-theme";
