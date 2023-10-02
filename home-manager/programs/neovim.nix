@@ -84,6 +84,7 @@ in {
       vim-markdown-composer
       vim-nix
       vim-prettier
+      vim-terraform
     ];
   };
 }
