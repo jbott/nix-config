@@ -10,7 +10,21 @@ parent-find() {
   parent-find "$file" "$(dirname "$dir")"
 }
 
+# Find the project name file and read it
 cwd=$(pwd -P 2>/dev/null)
 project_name_dir=$(parent-find .project-name "${cwd}")
 project_name=$(cat "${project_name_dir}/.project-name")
-git commit --edit --message "${project_name}: ${*}"
+
+if [[ $# -eq 0 ]]; then
+  # If we have no args, drop us into $EDITOR with our prefix set
+  git commit --edit --message "${project_name}: "
+else
+  # Pull the message from the first arg. This means multi-word messages (most)
+  # need to be quoted
+  message=${1}
+  shift 1
+
+  # Create a single-line commit message, with all other args passed to the
+  # commit command
+  git commit --message "${project_name}: ${message}" ${@}
+fi
