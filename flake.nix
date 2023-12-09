@@ -76,19 +76,6 @@
           ];
           specialArgs = {inherit inputs;};
         };
-        Just-Testing = nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            (currentSystemNameModule "Just-Testing")
-            nixpkgsOverlaysModule
-            home-manager.nixosModules.default
-            ./common
-            ./common/linux
-            ./home-manager
-            ./machines/Just-Testing
-          ];
-          specialArgs = {inherit inputs;};
-        };
       };
     }
     // allSystemsOutput;
