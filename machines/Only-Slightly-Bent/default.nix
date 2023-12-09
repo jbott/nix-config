@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   currentSystemName,
   ...
 }: {
@@ -13,6 +14,7 @@
   system.stateVersion = "22.11";
 
   # Enable binfmt_misc emulation
+  environment.systemPackages = with pkgs; [qemu];
   boot.binfmt.emulatedSystems = ["aarch64-linux" "armv7l-linux"];
 
   # boot via systemd-boot

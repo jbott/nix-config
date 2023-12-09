@@ -25,7 +25,6 @@
     nodePackages.prettier
     python311
     python311Packages.pip-tools
-    qemu
     ripgrep
     starship
     tmux
