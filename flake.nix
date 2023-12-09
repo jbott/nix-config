@@ -34,6 +34,7 @@
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
     nixpkgsOverlaysModule = {
       nixpkgs.overlays = [
+        (import ./overlay)
         (self: super: {
           nix-search-cli = nix-search-cli.packages.${self.system}.default;
         })
