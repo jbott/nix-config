@@ -33,19 +33,24 @@
 
     allowUnfreeModule = {nixpkgs.config.allowUnfree = true;};
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
+
+    overlays = [
+      (import ./overlay)
+      (self: super: {
+        nix-search-cli = nix-search-cli.packages.${self.system}.default;
+      })
+    ];
     nixpkgsOverlaysModule = {
-      nixpkgs.overlays = [
-        (import ./overlay)
-        (self: super: {
-          nix-search-cli = nix-search-cli.packages.${self.system}.default;
-        })
-      ];
+      nixpkgs = {inherit overlays;};
     };
 
     allSystemsOutput = eachDefaultSystem (system: let
-      pkgs = import nixpkgs {inherit system;};
+      pkgs = import nixpkgs {inherit system overlays;};
     in {
       formatter = pkgs.alejandra;
+      packages = with pkgs; {
+        inherit deploy-nixos;
+      };
     });
   in
     {
