@@ -31,6 +31,7 @@
     inherit (nix-darwin.lib) darwinSystem;
     inherit (nixpkgs.lib) nixosSystem;
 
+    allowUnfreeModule = {nixpkgs.config.allowUnfree = true;};
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
     nixpkgsOverlaysModule = {
       nixpkgs.overlays = [
@@ -74,6 +75,20 @@
             ./common/linux
             ./home-manager
             ./machines/Only-Slightly-Bent
+          ];
+          specialArgs = {inherit inputs;};
+        };
+        Lapsed-Pacifist = nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            (currentSystemNameModule "Lapsed-Pacifist")
+            allowUnfreeModule
+            nixpkgsOverlaysModule
+            home-manager.nixosModules.default
+            ./common
+            ./common/linux
+            ./home-manager
+            ./machines/Lapsed-Pacifist
           ];
           specialArgs = {inherit inputs;};
         };
