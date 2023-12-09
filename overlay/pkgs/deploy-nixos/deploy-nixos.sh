@@ -32,6 +32,11 @@ if [[ "$build_remote" == "true" ]]; then
   extra_args+=("--build-host" "root@${host}")
 fi
 
+# nixos-rebuild creates a control socket path that's too long to be a unix
+# domain socket when TMPDIR is set by running in a nix shell
+# See: https://github.com/NixOS/nixpkgs/issues/84803
+unset TMPDIR
+
 # Invoke wrapped command
 PS4='[*] '
 set -x
