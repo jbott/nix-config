@@ -51,6 +51,11 @@
       packages = with pkgs; {
         inherit deploy-nixos;
       };
+      devShells = {
+        default = pkgs.mkShell {
+          buildInputs = with pkgs; [deploy-nixos];
+        };
+      };
     });
   in
     {
