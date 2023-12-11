@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "${0} user/repo"
+  exit 1
+fi
+
+# strip github.com/ prefix if it exists
+user_repo=${1#"github.com/"}
+
+# check that it contains at least one slash
+if [[ "${user_repo}" != *"/"*  ]]; then
+  echo "Must be in format user/repo"
+  exit 1
+fi
+
+# Run the clone command
+PS4="[*] "
+set -x
+gh repo clone "${user_repo}" "$HOME/src/third-party/${user_repo}"
