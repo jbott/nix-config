@@ -18,6 +18,7 @@
     htop
     jq
     minicom
+    mosh
     mtr
     neovim
     nix-search-cli
