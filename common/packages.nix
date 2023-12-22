@@ -32,6 +32,7 @@
     tree
     watch
     wget
+    yq
     yubikey-manager
     zsh
   ];
