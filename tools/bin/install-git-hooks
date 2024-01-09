@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+GIT_TOPLEVEL=$(git rev-parse --show-toplevel)
+GIT_DIR=$(git rev-parse --git-dir)
+
+set -x
+for f in "${GIT_TOPLEVEL}/tools/git-hooks/*"; do
+  ln -s ${f} "${GIT_DIR}/hooks/$(basename ${f})"
+done
