@@ -3,7 +3,7 @@
     enable = true;
     settings = {
       font = {
-        normal.family = "SauceCodePro Nerd Font";
+        normal.family = "SauceCodePro Nerd Font Mono";
         size = 14;
       };
 

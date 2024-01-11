@@ -11,6 +11,7 @@
     _module.args = {inherit currentSystemName;};
 
     imports = [
+      ./darwin/trampoline-apps
       ./programs/alacritty.nix
       ./programs/atuin.nix
       ./programs/dircolors.nix
