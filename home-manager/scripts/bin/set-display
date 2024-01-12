@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+# default to the port connected to my macbook most often
+target=${1:-usb-c}
+
+case ${target} in
+  displayport|dp)   id=15 ;;
+  displayport2|dp2) id=16 ;;
+  hdmi|hdmi1)       id=17 ;;
+  hdmi2)            id=18 ;;
+  usbc|usb-c|usb)   id=27 ;;
+  *)
+    echo "Unknown target: ${target}"
+    exit 1
+    ;;
+esac
+
+current_id=0
+count=0
+while [[ "${current_id}" == "0" ]]; do
+  current_id=$(m1ddc get input)
+  if [[ "${current_id}" == "${id}" ]]; then
+    echo "Input already set to ${target} (${id}), exiting"
+    exit 0
+  fi
+
+  count=$((count+1))
+  if [[ "${count}" -gt 5 ]]; then
+    echo "Timed out trying to get current input"
+    exit 2
+  fi
+done
+
+echo "Setting input to ${target}"
+PS4="[*] "
+set -x
+m1ddc set input "${id}"
