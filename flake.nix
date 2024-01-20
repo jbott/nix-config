@@ -17,6 +17,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -26,6 +30,7 @@
     nix-darwin,
     nix-search-cli,
     nixpkgs,
+    treefmt-nix,
   } @ inputs: let
     inherit (flake-utils.lib) eachDefaultSystem;
     inherit (nix-darwin.lib) darwinSystem;
@@ -46,8 +51,12 @@
 
     allSystemsOutput = eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system overlays;};
+      treefmtEval = treefmt-nix.lib.evalModule pkgs ./tools/treefmt.nix;
     in {
-      formatter = pkgs.alejandra;
+      formatter = treefmtEval.config.build.wrapper;
+      checks = {
+        formatting = treefmtEval.config.build.check self;
+      };
       packages = with pkgs; {
         inherit deploy-nixos;
       };
