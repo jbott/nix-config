@@ -17,6 +17,7 @@
     gmailctl
     htop
     jq
+    just
     minicom
     mosh
     mtr
