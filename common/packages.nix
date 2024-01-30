@@ -18,6 +18,7 @@
     htop
     jq
     just
+    just
     minicom
     mosh
     mtr

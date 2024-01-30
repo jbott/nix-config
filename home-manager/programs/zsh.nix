@@ -10,6 +10,7 @@
       cdz = "cd $HOME/src/zelos/src";
       darwin-switch = "darwin-rebuild switch --flake ~/src/nix-config#${currentSystemName}";
       g = "git";
+      j = "just";
       l = "ls -tlrh --color=auto";
       la = "ls -tlrha --color=auto";
       n = "nvim";

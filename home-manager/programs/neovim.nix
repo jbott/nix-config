@@ -81,6 +81,7 @@ in {
       vim-elixir
       vim-indent-object # NOTE: vii performs select at indent level
       vim-jinja
+      vim-just
       vim-markdown-composer
       vim-nix
       vim-prettier
