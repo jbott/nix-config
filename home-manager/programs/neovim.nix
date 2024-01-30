@@ -26,8 +26,8 @@ in {
       " Configure no backups or swap files
       set nobackup noswapfile
 
-      " Text width to 80
-      set tw=80
+      " Text width to 120
+      set tw=120
 
       " 2 space tabs
       set sw=2 ts=2 expandtab
