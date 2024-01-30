@@ -27,6 +27,7 @@
     nodePackages.prettier
     python311
     python311Packages.pip-tools
+    rclone
     ripgrep
     starship
     tmux
