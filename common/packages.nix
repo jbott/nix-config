@@ -40,11 +40,6 @@
     zsh
   ];
 
-  nixpkgs.config.permittedInsecurePackages = [
-    # Needed until https://github.com/NixOS/nixpkgs/issues/216207
-    "libressl-3.4.3"
-  ];
-
   # Allow certain unfree packages
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
