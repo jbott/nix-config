@@ -15,6 +15,7 @@
     gh
     git
     gmailctl
+    graphite-cli
     htop
     jq
     just
@@ -44,5 +45,6 @@
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
       "1password-cli"
+      "graphite-cli"
     ];
 }
