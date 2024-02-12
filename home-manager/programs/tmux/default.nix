@@ -24,6 +24,9 @@
         set-option -g status-interval 2
         set-option -g automatic-rename on
         set-option -g automatic-rename-format '#{b:pane_current_path}'
+
+        # long scrollback
+        set-option -g history-limit 50000
       ''
       + builtins.readFile ./challenger-deep.tmuxtheme;
     terminal = "tmux-256color";
