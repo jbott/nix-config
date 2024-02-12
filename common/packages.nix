@@ -34,6 +34,7 @@
     tmux
     tree
     watch
+    watchexec
     wget
     yq
     yubikey-manager
