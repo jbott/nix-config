@@ -15,6 +15,11 @@ cwd=$(pwd -P 2>/dev/null)
 project_name_dir=$(parent-find .project-name "${cwd}")
 project_name=$(cat "${project_name_dir}/.project-name")
 
+if [[ -z "${project_name}" ]]; then
+  echo "No project name found! Aborting..."
+  exit 1
+fi
+
 if [[ $# -eq 0 ]]; then
   # If we have no args, drop us into $EDITOR with our prefix set
   git commit --edit --message "${project_name}: "
