@@ -11,6 +11,7 @@
       darwin-switch = "darwin-rebuild switch --flake ~/src/nix-config#${currentSystemName}";
       g = "git";
       j = "just";
+      jw = "watchexec just";
       l = "ls -tlrh --color=auto";
       la = "ls -tlrha --color=auto";
       n = "nvim";
