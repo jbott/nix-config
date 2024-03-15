@@ -1,0 +1,14 @@
+#!/bin/sh
+
+
+if [ $# -lt 1 ]; then
+  echo "usage: r PACKAGE [ARGS]"
+  exit 1
+fi
+
+program=${1}
+shift 1
+
+PS4="[*] "
+set -x
+nix run "nixpkgs#${program}" -- "${*}"

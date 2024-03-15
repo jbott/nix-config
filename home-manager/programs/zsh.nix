@@ -21,6 +21,9 @@
     };
 
     initExtra = ''
+      # Disable 'r' for running the last command
+      disable r
+
       # Bind keyboard control characters to useful functions
       # TODO: Understand why using zsh from nix breaks home / end / del
       bindkey '^[[1~' beginning-of-line               # Home / Fn Left-Arrow
