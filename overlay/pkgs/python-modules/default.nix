@@ -1,3 +1,5 @@
 self: super: {
-  pip = self.callPackage ./pip {};
+  pip-tools = super.pip-tools.overridePythonAttrs {
+    patches = [];
+  };
 }
