@@ -11,4 +11,4 @@ shift 1
 
 PS4="[*] "
 set -x
-nix run "nixpkgs#${program}" -- "${*}"
+nix run "nixpkgs#${program}" -- "${@}"
