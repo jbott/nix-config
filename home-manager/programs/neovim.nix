@@ -77,6 +77,7 @@ in {
     in [
       nvim-lastplace
       telescope-nvim
+      vim-astro
       vim-challenger-deep-theme
       vim-elixir
       vim-indent-object # NOTE: vii performs select at indent level
