@@ -80,6 +80,7 @@ in {
       vim-astro
       vim-challenger-deep-theme
       vim-elixir
+      vim-fugitive
       vim-indent-object # NOTE: vii performs select at indent level
       vim-jinja
       vim-just
