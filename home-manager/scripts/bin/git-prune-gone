@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+gone_refs=$(git for-each-ref --format '%(refname:short) %(upstream:track)' | awk '$2 == "[gone]" {print $1}')
+
+if [[ -z "${gone_refs}" ]]; then
+  echo "No refs to delete"
+  exit 0
+fi
+
+echo "Removing refs:"
+echo "${gone_refs}"
+echo
+
+read -p "Confirm? [yN] " confirm
+if [[ $confirm =~ ^[yY]$ ]]; then
+  echo "Deleting..."
+  echo "${gone_refs}" | xargs -r git branch -D
+else
+  echo "Cancelled"
+fi
