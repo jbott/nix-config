@@ -16,6 +16,7 @@
       la = "ls -tlrha --color=auto";
       n = "nvim";
       nixos-switch = "sudo nixos-rebuild switch --flake /persist/etc/nix-config#${currentSystemName}";
+      pip-compile = "uv pip compile";
       ta = "tmux -u attach";
       tf = "terraform";
     };
