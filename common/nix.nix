@@ -15,10 +15,13 @@
     '';
 
     registry.nixpkgs.flake = inputs.nixpkgs;
-    registry.nix-config.to = {
-      type = "github";
-      owner = "jbott";
-      repo = "nix-config";
+    registry.nix-config = {
+      to = {
+        type = "github";
+        owner = "jbott";
+        repo = "nix-config";
+      };
+      exact = false;
     };
   };
 }
