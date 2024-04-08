@@ -39,6 +39,19 @@
           white = "0xa6b3cc";
         };
       };
+
+      keyboard.bindings = [
+        {
+          key = "W";
+          mods = "Command";
+          action = "None";
+        }
+        {
+          key = "T";
+          mods = "Command";
+          action = "None";
+        }
+      ];
     };
   };
 }
