@@ -6,6 +6,6 @@ nix-flake-update:
     nix flake update --commit-lock-file --commit-lockfile-summary "nix: flake update"
 
 diff attr:
-    nvd diff $(nix build --no-link --print-out-paths "nix-config#{{ attr }}" ".#{{ attr }}")
+    nvd diff $(nix build --no-link --print-out-paths "nix-config/main#{{ attr }}" ".#{{ attr }}")
 
 diff-laptop: (diff "darwinConfigurations.Just-Another-Victim-of-the-Ambient-Morality.config.system.build.toplevel")
