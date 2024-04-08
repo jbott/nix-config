@@ -27,6 +27,7 @@
     nix-search-cli
     nmap
     nodePackages.prettier
+    nvd
     python311
     rclone
     ripgrep

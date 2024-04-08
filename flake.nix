@@ -62,7 +62,10 @@
       };
       devShells = {
         default = pkgs.mkShell {
-          buildInputs = with pkgs; [deploy-nixos];
+          buildInputs = with pkgs; [
+            deploy-nixos
+            nvd
+          ];
         };
       };
     });
