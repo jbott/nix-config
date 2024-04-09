@@ -47,11 +47,13 @@ in {
       hi ExtraWhitespace ctermbg=red guibg=red
 
       " Remaps
-      nnoremap \w     <cmd>bd<cr>
+      nnoremap <leader>w     <cmd>bd<cr>
+      nnoremap <leader>f     <cmd>!just fmt<cr>
       nnoremap <C-H>  <cmd>tabp<cr>
       nnoremap <C-L>  <cmd>tabn<cr>
 
       nnoremap <C-P>  <cmd>lua require('telescope.builtin').find_files()<cr>
+      nnoremap <C-F>  <cmd>lua require('telescope.builtin').live_grep()<cr>
 
       " Setup Plugins
       lua require'nvim-lastplace'.setup{}
