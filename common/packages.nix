@@ -35,6 +35,7 @@
     tmux
     tree
     uv
+    vimv
     watch
     watchexec
     wget
