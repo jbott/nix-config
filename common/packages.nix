@@ -31,6 +31,7 @@
     python311
     rclone
     ripgrep
+    rust-analyzer
     starship
     tmux
     tree

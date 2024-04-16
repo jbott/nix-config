@@ -86,6 +86,7 @@ in {
       nvim-lastplace
       nvim-lspconfig
       plenary-nvim
+      rustaceanvim
       telescope-nvim
       typescript-tools-nvim
       vim-astro
