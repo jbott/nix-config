@@ -23,6 +23,10 @@ in {
       set termguicolors
       colorscheme challenger_deep
 
+      " Configure the number column and display signs in the number column, and highlight it better
+      set number signcolumn=number
+      highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
+
       " Configure no backups or swap files
       set nobackup noswapfile
 
