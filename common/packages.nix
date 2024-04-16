@@ -36,6 +36,7 @@
     tree
     uv
     vimv
+    vscode-langservers-extracted
     watch
     watchexec
     wget

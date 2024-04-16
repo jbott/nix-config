@@ -56,6 +56,7 @@ in {
       nnoremap <C-F>  <cmd>lua require('telescope.builtin').live_grep()<cr>
 
       " Setup Plugins
+      lua require'lspconfig'.eslint.setup{}
       lua require'nvim-lastplace'.setup{}
       lua require'typescript-tools'.setup {}
 
