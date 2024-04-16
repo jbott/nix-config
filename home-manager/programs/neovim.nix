@@ -57,6 +57,7 @@ in {
 
       " Setup Plugins
       lua require'nvim-lastplace'.setup{}
+      lua require'typescript-tools'.setup {}
 
       " Do not auto-open markdown composer
       let g:markdown_composer_autostart = 0
@@ -78,7 +79,10 @@ in {
     plugins = with pkgs.vimPlugins; let
     in [
       nvim-lastplace
+      nvim-lspconfig
+      plenary-nvim
       telescope-nvim
+      typescript-tools-nvim
       vim-astro
       vim-challenger-deep-theme
       vim-elixir
