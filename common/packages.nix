@@ -32,6 +32,7 @@
     rclone
     ripgrep
     rust-analyzer
+    rustfmt
     starship
     tmux
     tree
