@@ -12,6 +12,7 @@
       g = "git";
       j = "just";
       jw = "watchexec just";
+      jwr = "watchexec --restart just";
       l = "ls -tlrh --color=auto";
       la = "ls -tlrha --color=auto";
       n = "nvim";
