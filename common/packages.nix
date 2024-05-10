@@ -36,6 +36,7 @@
     starship
     tmux
     tree
+    uhubctl
     uv
     vimv
     vscode-langservers-extracted
