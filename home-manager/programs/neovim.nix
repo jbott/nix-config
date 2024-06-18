@@ -78,6 +78,9 @@ in {
     '';
 
     extraLuaConfig = ''
+      -- Enable built in features
+      vim.lsp.inlay_hint.enable()
+
       -- Setup Plugins
       require('lspconfig').eslint.setup{}
       require('nvim-lastplace').setup{}
@@ -124,6 +127,18 @@ in {
           end, opts)
         end,
       })
+
+      -- Configure rustaceanvim
+      vim.g.rustaceanvim = {
+        inlay_hints = {
+          highlight = "NonText",
+        },
+        tools = {
+          hover_actions = {
+            auto_focus = true,
+          },
+        },
+      }
     '';
 
     plugins = with pkgs.vimPlugins; [
