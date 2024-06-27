@@ -17,6 +17,7 @@
       ./programs/dircolors.nix
       ./programs/direnv.nix
       ./programs/git.nix
+      ./programs/less.nix
       ./programs/neovim.nix
       ./programs/starship.nix
       ./programs/tmux
