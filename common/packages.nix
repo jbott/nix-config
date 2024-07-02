@@ -17,7 +17,7 @@
     graphite-cli
     htop
     jq
-    just
+    jujutsu
     just
     minicom
     mosh
