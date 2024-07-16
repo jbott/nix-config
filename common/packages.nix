@@ -13,6 +13,7 @@
     fzf
     gh
     git
+    git-absorb
     gmailctl
     graphite-cli
     htop
