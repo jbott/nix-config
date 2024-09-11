@@ -8,4 +8,4 @@ nix-flake-update:
 diff attr:
     nvd diff $(nix build --no-link --print-out-paths "nix-config/main#{{ attr }}" ".#{{ attr }}")
 
-diff-laptop: (diff "darwinConfigurations.Just-Another-Victim-of-the-Ambient-Morality.config.system.build.toplevel")
+diff-laptop: (diff "darwinConfigurations.jmbp.config.system.build.toplevel")

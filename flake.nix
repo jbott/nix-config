@@ -72,16 +72,16 @@
   in
     {
       darwinConfigurations = {
-        Just-Another-Victim-of-the-Ambient-Morality = darwinSystem {
+        jmbp = darwinSystem {
           system = "aarch64-darwin";
           modules = [
-            (currentSystemNameModule "Just-Another-Victim-of-the-Ambient-Morality")
+            (currentSystemNameModule "jmbp")
             nixpkgsOverlaysModule
             home-manager.darwinModules.default
             ./common
             ./common/darwin
             ./home-manager
-            ./machines/Just-Another-Victim-of-the-Ambient-Morality
+            ./machines/jmbp
           ];
           specialArgs = {inherit inputs;};
         };
