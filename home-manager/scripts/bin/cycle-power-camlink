@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -eux -o pipefail
 
-uhubctl --search "Elgato Cam Link" -a cycle
+uhubctl -l 2-2.2 -a cycle
