@@ -82,7 +82,7 @@ in {
       vim.lsp.inlay_hint.enable()
 
       -- Setup Plugins
-      require('lspconfig').eslint.setup{}
+      require('lspconfig').biome.setup{}
       require('nvim-lastplace').setup{}
       require('typescript-tools').setup {}
 
