@@ -1,4 +1,4 @@
-{
+{pkgs, ...}: {
   programs.tmux = {
     enable = true;
     extraConfig =
@@ -27,6 +27,11 @@
 
         # long scrollback
         set-option -g history-limit 50000
+
+        # Clear the default command set by tmux-sensible. It's version of reattach-to-user-namespace
+        # breaks launching zsh. It also does not work correctly for sudo, and tmux includes this
+        # functionality for pbcopy / pbpaste already.
+        set-option -g default-command ""
       ''
       + builtins.readFile ./challenger-deep.tmuxtheme;
     terminal = "tmux-256color";
