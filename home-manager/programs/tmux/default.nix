@@ -34,6 +34,6 @@
         set-option -g default-command ""
       ''
       + builtins.readFile ./challenger-deep.tmuxtheme;
-    terminal = "tmux-256color";
+    terminal = "screen-256color";
   };
 }
