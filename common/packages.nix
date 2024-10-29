@@ -21,7 +21,6 @@
     jujutsu
     just
     minicom
-    mosh
     mtr
     neovim
     nix-output-monitor
