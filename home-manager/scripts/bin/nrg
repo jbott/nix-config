@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
-nvim -p $(rg -l "${@}")
+nvim -p "$(rg -l "${@}")"

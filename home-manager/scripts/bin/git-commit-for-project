@@ -31,5 +31,5 @@ else
 
   # Create a single-line commit message, with all other args passed to the
   # commit command
-  git commit --message "${project_name}: ${message}" ${@}
+  git commit --message "${project_name}: ${message}" "${@}"
 fi

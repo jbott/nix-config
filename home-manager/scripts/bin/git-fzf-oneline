@@ -14,4 +14,4 @@ gls() {
                 --bind "alt-y:execute:$_gitLogLineToHash | xclip"
 }
 
-gls
+gls "$@"

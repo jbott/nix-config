@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Utilities not in nixpkgs.
 plutil="/usr/bin/plutil"
 killall="/usr/bin/killall"
@@ -45,7 +47,7 @@ function copy_paths() {
   temp_dir=$(mktemp -d)
   trap 'rm -rf "$temp_dir"' EXIT
 
-  pushd $temp_dir >/dev/null
+  pushd "$temp_dir" >/dev/null || exit
 
   cp "$from" "orig"
   chmod u+w "orig"
@@ -60,7 +62,7 @@ function copy_paths() {
   $plutil -convert xml1 -- "final"
 
   cp "final" "$to"
-  popd >/dev/null
+  popd >/dev/null || exit
 }
 
 function sync_dock() {

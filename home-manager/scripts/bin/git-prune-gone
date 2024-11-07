@@ -12,7 +12,7 @@ echo "Removing refs:"
 echo "${gone_refs}"
 echo
 
-read -p "Confirm? [yN] " confirm
+read -rp "Confirm? [yN] " confirm
 if [[ $confirm =~ ^[yY]$ ]]; then
   echo "Deleting..."
   echo "${gone_refs}" | xargs -r git branch -D
