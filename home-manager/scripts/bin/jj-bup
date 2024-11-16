@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+LAST_BOOKMARK=$( \
+  jj log -r 'bookmarks()-..@' --no-graph -T 'bookmarks ++ "\n"' \
+  | grep -oh '^[^*]*' \
+  | head -n1 \
+)
+LAST_NON_EMPTY=$( \
+  jj log -r 'bookmarks()-..@' --no-graph -T 'empty ++ " " ++ commit_id ++ "\n"' \
+  | grep false \
+  | head -n1 \
+  | cut -d' ' -f 2 \
+)
+
+echo "Moving ${LAST_BOOKMARK} to commit ${LAST_NON_EMPTY}"
+jj log -r "${LAST_BOOKMARK}::${LAST_NON_EMPTY}"
+
+set -x
+jj bookmark move "${LAST_BOOKMARK}" --to "${LAST_NON_EMPTY}"
