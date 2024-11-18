@@ -54,8 +54,10 @@
     allSystemsOutput = eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system overlays;};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./tools/treefmt.nix;
+
+      treefmt = treefmtEval.config.build.wrapper;
     in {
-      formatter = treefmtEval.config.build.wrapper;
+      formatter = treefmt;
       checks = {
         formatting = treefmtEval.config.build.check self;
       };
@@ -67,6 +69,7 @@
           buildInputs = with pkgs; [
             deploy-nixos
             nvd
+            treefmt
           ];
         };
       };
