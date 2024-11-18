@@ -18,7 +18,9 @@
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
+      # TODO(jbott): return to upstream once my fix for justfiles has been merged
+      # https://github.com/numtide/treefmt-nix/pull/263
+      url = "github:numtide/treefmt-nix/6c192fa600aa91f4fa75b9d335a91e943e9931d6";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
