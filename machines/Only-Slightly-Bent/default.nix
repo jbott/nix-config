@@ -10,6 +10,7 @@
     ../../common/linux/disk-spindown.nix
     ../../common/linux/smartd.nix
     ../../services/home-assistant.nix
+    ../../services/scrutiny.nix
   ];
 
   system.stateVersion = "22.11";
