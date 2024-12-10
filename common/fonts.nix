@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   fonts.packages = with pkgs; [
     recursive
-    (nerdfonts.override {fonts = ["SourceCodePro"];})
+    nerd-fonts.sauce-code-pro
   ];
 }
