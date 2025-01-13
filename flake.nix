@@ -117,6 +117,20 @@
           ];
           specialArgs = {inherit inputs;};
         };
+        performance-artist = nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            (currentSystemNameModule "performance-artist")
+            allowUnfreeModule
+            nixpkgsOverlaysModule
+            home-manager.nixosModules.default
+            ./common
+            ./common/linux
+            ./home-manager
+            ./machines/performance-artist
+          ];
+          specialArgs = {inherit inputs;};
+        };
       };
     }
     // allSystemsOutput;
