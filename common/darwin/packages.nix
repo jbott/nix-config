@@ -4,10 +4,8 @@
       blueutil
       colima
       docker-client
+      iproute2mac
       m1ddc
       utm
-    ])
-    ++ (with pkgs.darwin; [
-      iproute2mac
     ]);
 }
