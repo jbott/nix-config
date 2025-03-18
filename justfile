@@ -1,5 +1,5 @@
 fmt:
-    nix fmt
+    treefmt
 
 nix-flake-update:
     @git diff-index --quiet --cached HEAD || (echo "Repo has files staged! Aborting..." && exit 1)
