@@ -29,7 +29,7 @@ shift 1
 # Add extra args to command from flags
 extra_args=()
 if [[ "$build_remote" == "true" ]]; then
-  extra_args+=("--build-host" "root@${host}")
+  extra_args+=("--build-host" "${host}")
 fi
 
 # nixos-rebuild creates a control socket path that's too long to be a unix
@@ -43,6 +43,7 @@ set -x
 nixos-rebuild switch \
   --fast \
   --flake ".#${host}" \
-  --target-host "root@${host}" \
+  --target-host "${host}" \
+  --use-remote-sudo \
   "${extra_args[@]}" \
   "${@}"
