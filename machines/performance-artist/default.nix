@@ -25,4 +25,7 @@
 
   # Do not compress with zstd since I normally build this locally
   sdImage.compressImage = false;
+
+  # Enable auto gc
+  nix.gc.automatic = true;
 }
