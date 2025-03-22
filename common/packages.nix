@@ -7,6 +7,7 @@
     alacritty
     atuin
     black
+    btop
     cdrtools
     docker-buildx
     fd
