@@ -2,6 +2,10 @@
   description = "NixOS flake-based config by github.com/jbott";
 
   inputs = {
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -25,6 +29,7 @@
 
   outputs = {
     self,
+    disko,
     flake-utils,
     home-manager,
     nix-darwin,
@@ -110,6 +115,7 @@
             allowUnfreeModule
             nixpkgsOverlaysModule
             home-manager.nixosModules.default
+            disko.nixosModules.disko
             ./common
             ./common/linux
             ./home-manager

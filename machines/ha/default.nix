@@ -5,10 +5,17 @@
   ...
 }: {
   imports = [
-    ../../services/deconz.nix
+    ./disko-config.nix
   ];
 
   system.stateVersion = "25.05";
+
+  # boot via systemd-boot
+  boot.loader.systemd-boot = {
+    enable = true;
+    configurationLimit = 120;
+  };
+  boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = currentSystemName;
   networking.hostId = "befff1e1";
