@@ -103,17 +103,17 @@
           ];
           specialArgs = {inherit inputs;};
         };
-        Lapsed-Pacifist = nixosSystem {
-          system = "aarch64-linux";
+        ha = nixosSystem {
+          system = "x86_64-linux";
           modules = [
-            (currentSystemNameModule "Lapsed-Pacifist")
+            (currentSystemNameModule "ha")
             allowUnfreeModule
             nixpkgsOverlaysModule
             home-manager.nixosModules.default
             ./common
             ./common/linux
             ./home-manager
-            ./machines/Lapsed-Pacifist
+            ./machines/ha
           ];
           specialArgs = {inherit inputs;};
         };
