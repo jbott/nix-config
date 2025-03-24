@@ -6,6 +6,8 @@
 }: {
   imports = [
     ./disko-config.nix
+    ../../services/home-assistant.nix
+    ../../services/homebridge.nix
   ];
 
   system.stateVersion = "25.05";
