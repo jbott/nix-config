@@ -8,6 +8,7 @@
     ./disko-config.nix
     ../../services/home-assistant.nix
     ../../services/homebridge.nix
+    ../../services/zigbee2mqtt.nix
   ];
 
   system.stateVersion = "25.05";
