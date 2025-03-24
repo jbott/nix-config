@@ -1,8 +1,8 @@
 {pkgs, ...}: let
   imageName = "ghcr.io/home-assistant/home-assistant";
-  imageTag = "2024.1.2";
-  imageDigest = "sha256:59c89e5b6c0db63b8a7705f82fcb12dfda41b1c94a63ad9430b70f55106706d8";
-  sha256 = "sha256-MrreRklXYrBONIAfN8ShFcMiELL1aBpYuylOJ+MlUa4=";
+  imageTag = "2025.3.3";
+  imageDigest = "sha256:f34de69aff7b21c7d7d474b86bef4dbce9613668b8d4a936e6c93b3844611505";
+  sha256 = "sha256-cHwl7KPTHq2M5P33LzWZjthr2OcvzhDgDoY3ib4GtXg=";
 
   image = "${imageName}:${imageTag}";
   imageFile = pkgs.dockerTools.pullImage {
@@ -11,7 +11,6 @@
   };
 in {
   virtualisation.oci-containers = {
-    backend = "podman";
     containers.home-assistant = {
       inherit image imageFile;
       environment = {
@@ -25,7 +24,9 @@ in {
   };
 
   # Enable homekit bridge on all interfaces
-  networking.firewall.allowedTCPPorts = [21212];
+  networking.firewall.allowedTCPPorts = [21064];
+
+  # Enable mDNS on all interfaces
   networking.firewall.allowedUDPPorts = [5353];
 
   # Enable webui on tailscale only
