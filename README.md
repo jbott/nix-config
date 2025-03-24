@@ -7,3 +7,9 @@ My nix config, now flake based.
 ```console
 ./tools/bin/install-git-hooks
 ```
+
+## Installing remote machine
+
+```console
+nix run github:nix-community/nixos-anywhere -- --flake .#ha --target-host nixos@IP
+```
