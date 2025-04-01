@@ -10,6 +10,7 @@
       group = "jbo";
       extraGroups = [
         "dialout"
+        "systemd-journal"
         "wheel"
       ];
       shell = pkgs.zsh;
