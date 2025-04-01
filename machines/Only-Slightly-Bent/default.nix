@@ -29,7 +29,7 @@
   networking.hostId = "e486d79d"; # Hardcoded for zfs
 
   # source: https://grahamc.com/blog/erase-your-darlings
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
+  boot.initrd.postResumeCommands = lib.mkAfter ''
     zfs rollback -r rpool/local/root@blank
   '';
 

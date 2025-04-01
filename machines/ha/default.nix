@@ -24,7 +24,7 @@
   networking.hostId = "befff1e1";
 
   # source: https://grahamc.com/blog/erase-your-darlings
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
+  boot.initrd.postResumeCommands = lib.mkAfter ''
     zfs rollback -r rpool/local/root@blank
   '';
 
