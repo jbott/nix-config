@@ -11,6 +11,7 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    impermanence.url = "github:nix-community/impermanence";
     nix-darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,6 +33,7 @@
     disko,
     flake-utils,
     home-manager,
+    impermanence,
     nix-darwin,
     nix-search-cli,
     nixpkgs,
@@ -114,8 +116,13 @@
             (currentSystemNameModule "ha")
             allowUnfreeModule
             nixpkgsOverlaysModule
-            home-manager.nixosModules.default
+
+            # Flake Modules
             disko.nixosModules.disko
+            home-manager.nixosModules.default
+            impermanence.nixosModules.impermanence
+
+            # First-party config
             ./common
             ./common/linux
             ./home-manager
