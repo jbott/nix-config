@@ -23,12 +23,12 @@ in {
     };
   };
 
-  # Enable homekit bridge on all interfaces
-  networking.firewall.allowedTCPPorts = [21064];
+  networking.firewall.allowedTCPPorts = [
+    8123 # webui
+    21064 # homekit bridge
+  ];
 
-  # Enable mDNS on all interfaces
-  networking.firewall.allowedUDPPorts = [5353];
-
-  # Enable webui on tailscale only
-  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [8123];
+  networking.firewall.allowedUDPPorts = [
+    5353 # mdns
+  ];
 }
