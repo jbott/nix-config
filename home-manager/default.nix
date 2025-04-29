@@ -1,4 +1,5 @@
 {
+  cfg,
   currentSystemName,
   pkgs,
   ...
@@ -11,7 +12,6 @@
     _module.args = {inherit currentSystemName;};
 
     imports = [
-      ./darwin/trampoline-apps
       ./programs/alacritty.nix
       ./programs/atuin.nix
       ./programs/dircolors.nix
@@ -23,7 +23,10 @@
       ./programs/tmux
       ./programs/zoxide.nix
       ./programs/zsh.nix
-    ];
+    ] ++ (pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+      ./darwin/trampoline-apps
+      ./darwin/colima
+    ]);
 
     home.packages = [
       (pkgs.buildEnv {
