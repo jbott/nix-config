@@ -22,7 +22,7 @@
       tf = "terraform";
     };
 
-    initExtra = ''
+    initContent = ''
       # Disable 'r' for running the last command
       disable r
 
