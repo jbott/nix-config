@@ -21,8 +21,6 @@ in
       ./01-ioregistry-apple_sdk_11_0.patch
     ];
 
-    buildInputs = with darwin.apple_sdk_11_0.frameworks; [CoreDisplay Foundation];
-
     installPhase = ''
       install -Dt $out/bin m1ddc
     '';
