@@ -11,22 +11,24 @@
     # Pass the extra args to all home-manager modules too
     _module.args = {inherit currentSystemName;};
 
-    imports = [
-      ./programs/alacritty.nix
-      ./programs/atuin.nix
-      ./programs/dircolors.nix
-      ./programs/direnv.nix
-      ./programs/git.nix
-      ./programs/less.nix
-      ./programs/neovim.nix
-      ./programs/starship.nix
-      ./programs/tmux
-      ./programs/zoxide.nix
-      ./programs/zsh.nix
-    ] ++ (pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-      ./darwin/trampoline-apps
-      ./darwin/colima
-    ]);
+    imports =
+      [
+        ./programs/alacritty.nix
+        ./programs/atuin.nix
+        ./programs/dircolors.nix
+        ./programs/direnv.nix
+        ./programs/git.nix
+        ./programs/less.nix
+        ./programs/neovim.nix
+        ./programs/starship.nix
+        ./programs/tmux
+        ./programs/zoxide.nix
+        ./programs/zsh.nix
+      ]
+      ++ (pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+        ./darwin/trampoline-apps
+        ./darwin/colima
+      ]);
 
     home.packages = [
       (pkgs.buildEnv {
