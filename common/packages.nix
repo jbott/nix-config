@@ -10,6 +10,7 @@
     btop
     cdrtools
     docker-buildx
+    fastmod
     fd
     fzf
     gh
