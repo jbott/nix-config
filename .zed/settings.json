@@ -1,0 +1,9 @@
+{
+  "formatter": {
+    "external": {
+      "command": "treefmt",
+      "arguments": ["--stdin", "{buffer_path}"]
+    }
+  },
+  "preferred_line_length": 120
+}
