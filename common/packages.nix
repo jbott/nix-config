@@ -19,6 +19,7 @@
     gmailctl
     graphite-cli
     htop
+    jjui
     jq
     jujutsu
     just
