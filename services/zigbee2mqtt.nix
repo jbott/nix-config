@@ -6,6 +6,7 @@
   services.zigbee2mqtt = {
     enable = true;
     settings = {
+      frontend.enabled = true;
       homeassistant.enable = true;
 
       serial = {
@@ -20,4 +21,7 @@
     device = "/persist/var/lib/zigbee2mqtt";
     options = ["bind"];
   };
+
+  # Open the firewall for the web ui
+  networking.firewall.allowedTCPPorts = [8080];
 }
