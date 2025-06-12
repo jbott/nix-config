@@ -86,6 +86,7 @@
           system = "aarch64-darwin";
           modules = [
             (currentSystemNameModule "jmbp")
+            allowUnfreeModule
             nixpkgsOverlaysModule
             home-manager.darwinModules.default
             ./common
