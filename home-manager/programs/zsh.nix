@@ -3,7 +3,6 @@
     enable = true;
 
     shellAliases = {
-      b = "bazel";
       cdg = "cd $HOME/src";
       cdp = "cd $(get-project-dir)";
       cdr = "cd $(git rev-parse --show-toplevel)";
