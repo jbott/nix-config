@@ -1,0 +1,7 @@
+[files]
+extend-exclude = [
+    "home-manager/programs/git.nix"
+]
+
+[default.extend-identifiers]
+mosquitto = "mosquitto"
