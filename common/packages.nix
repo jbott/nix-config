@@ -9,6 +9,7 @@
     black
     btop
     cdrtools
+    claude-code
     docker-buildx
     fastmod
     fd
