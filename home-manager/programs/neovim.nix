@@ -166,7 +166,7 @@ in {
       vim-indent-object # NOTE: vii performs select at indent level
       vim-jinja
       vim-just
-      vim-markdown-composer
+      # vim-markdown-composer NOTE: broken as of 2025-07-09
       vim-nix
       vim-prettier
       vim-terraform
