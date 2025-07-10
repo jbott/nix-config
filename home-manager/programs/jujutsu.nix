@@ -19,9 +19,12 @@
       };
 
       git = {
-        push-bookmark-prefix = "jbott-";
         abandon-unreachable-commits = false;
         write-change-id-header = true;
+      };
+
+      templates = {
+        git_push_bookmark = "\"jbott-\" ++ change_id.short()";
       };
 
       fix.tools.treefmt = {
