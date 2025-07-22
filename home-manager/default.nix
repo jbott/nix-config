@@ -23,6 +23,7 @@
         ./programs/neovim.nix
         ./programs/starship.nix
         ./programs/tmux
+        ./programs/zed
         ./programs/zoxide.nix
         ./programs/zsh.nix
       ]

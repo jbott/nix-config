@@ -1,0 +1,50 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+      "cmd-`": "workspace::ToggleBottomDock",
+      // "ctrl-p": "file_finder::Toggle"
+      "cmd-0": "zed::NoAction",
+      "cmd-1": "zed::NoAction",
+      "cmd-2": "zed::NoAction",
+      "cmd-3": "zed::NoAction",
+      "cmd-4": "zed::NoAction",
+      "cmd-5": "zed::NoAction",
+      "cmd-6": "zed::NoAction",
+      "cmd-7": "zed::NoAction",
+      "cmd-8": "zed::NoAction",
+      "cmd-9": "zed::NoAction"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      // "j k": ["workspace::SendKeystrokes", "escape"]
+      // "ctrl-p": "file_finder::Toggle"
+    }
+  },
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "ctrl-h": "pane::ActivatePrevItem",
+      "ctrl-l": "pane::ActivateNextItem"
+    }
+  },
+
+  // Disable the infuriating completion behavior where pressing enter will confirm the completion
+  {
+    "context": "Editor && showing_completions",
+    "bindings": {
+      "enter": "editor::Newline",
+      "tab": "editor::ConfirmCompletion"
+    }
+  }
+]
