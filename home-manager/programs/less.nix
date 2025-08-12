@@ -1,7 +1,7 @@
 {
   programs.less = {
     enable = true;
-    keys = ''
+    config = ''
       s invalid
     '';
   };
