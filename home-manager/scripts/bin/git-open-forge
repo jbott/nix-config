@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+open_url() {
+    local url="$1"
+    if command -v open >/dev/null 2>&1; then
+        open "$url"
+    elif command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$url"
+    elif command -v start >/dev/null 2>&1; then
+        start "$url"
+    else
+        echo "Error: No suitable command found to open URL. Please install 'open', 'xdg-open', or 'start'." >&2
+        exit 1
+    fi
+}
+
+main() {
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        echo "Error: Not in a git repository." >&2
+        exit 1
+    fi
+
+    local origin_url
+    origin_url=$(git config --get remote.origin.url 2>/dev/null || true)
+
+    if [[ -z "$origin_url" ]]; then
+        echo "Error: No origin remote found." >&2
+        exit 1
+    fi
+
+    local web_url="$origin_url"
+
+    # Convert SSH URLs to HTTPS
+    if [[ "$origin_url" =~ ^git@([^:]+):(.+)\.git$ ]]; then
+        local host="${BASH_REMATCH[1]}"
+        local path="${BASH_REMATCH[2]}"
+        web_url="https://${host}/${path}"
+    elif [[ "$origin_url" =~ ^git@([^:]+):(.+)$ ]]; then
+        local host="${BASH_REMATCH[1]}"
+        local path="${BASH_REMATCH[2]}"
+        web_url="https://${host}/${path}"
+    fi
+
+    # Remove .git suffix if present
+    web_url="${web_url%.git}"
+
+    echo "Opening: $web_url"
+    open_url "$web_url"
+}
+
+main "$@"
