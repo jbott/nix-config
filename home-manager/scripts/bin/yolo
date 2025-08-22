@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 exec claude \
     --allowedTools "Write Edit MultiEdit WebFetch WebSearch" \
     --dangerously-skip-permissions \
