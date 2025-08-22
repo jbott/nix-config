@@ -67,7 +67,6 @@ jobs:
           om ci run --systems "${{ matrix.system }}" ".#${{ matrix.subflake }}"
 
       - name: Push to S3 cache
-        if: vars.S3_BUCKET_NAME != '' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
           echo "Pushing to S3 cache with all dependencies..."
