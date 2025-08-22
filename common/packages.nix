@@ -18,7 +18,6 @@
     git
     git-absorb
     gmailctl
-    graphite-cli
     htop
     jjui
     jq
@@ -52,9 +51,9 @@
     zsh
   ];
 
-  # Allow certain unfree packages
+  # Allow unfree packages
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
-      "graphite-cli"
+      "claude-code"
     ];
 }
