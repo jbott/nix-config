@@ -55,6 +55,7 @@
   # Allow certain unfree packages
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
+      "claude-code"
       "graphite-cli"
     ];
 }
