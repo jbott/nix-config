@@ -61,6 +61,19 @@ jobs:
       - name: Install Omnix
         run: nix profile add nixpkgs#omnix
 
+      - name: Check cache info
+        if: vars.S3_BUCKET_NAME != ''
+        run: |
+          set -euo pipefail
+          echo "Checking nix-cache-info from S3 cache..."
+          
+          # Try to fetch nix-cache-info file from the cache
+          if aws s3 cp "s3://${{ env.S3_BUCKET_NAME }}/nix-cache-info" - --endpoint-url "https://${{ env.S3_ENDPOINT }}" 2>/dev/null; then
+            echo "✅ Cache info found and readable"
+          else
+            echo "⚠️  No nix-cache-info found or cache is empty - this is normal for first run"
+          fi
+
       - name: Build all flake outputs
         run: |
           echo "Building flake output for ${{ matrix.system }}: ${{ matrix.subflake }}"
