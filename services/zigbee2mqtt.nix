@@ -1,4 +1,4 @@
-{
+{lib, ...}: {
   # Enable mosquitto mqtt server
   services.mosquitto.enable = true;
 
@@ -7,7 +7,7 @@
     enable = true;
     settings = {
       frontend.enabled = true;
-      homeassistant.enable = true;
+      homeassistant = lib.mkForce true;
 
       serial = {
         port = "/dev/serial/by-id/usb-dresden_elektronik_ingenieurtechnik_GmbH_ConBee_II_DE2250332-if00";
