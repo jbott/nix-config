@@ -11,6 +11,7 @@
     cdrtools
     claude-code
     docker-buildx
+    dotslash
     fastmod
     fd
     fzf
