@@ -25,6 +25,7 @@
     jq
     jujutsu
     just
+    kubectl
     minicom
     mtr
     neovim
