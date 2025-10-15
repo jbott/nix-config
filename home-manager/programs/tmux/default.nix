@@ -28,6 +28,9 @@
         # long scrollback
         set-option -g history-limit 50000
 
+        # Use vim keybindings in copy mode
+        setw -g mode-keys vi
+
         # Wheel scrolling in copy mode
         bind -T copy-mode WheelUpPane send -N1 -X scroll-up
         bind -T copy-mode WheelDownPane send -N1 -X scroll-down
