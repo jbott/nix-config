@@ -11,6 +11,7 @@
       aliases = {
         rom = ["rebase" "-d" "main" "--skip-emptied"];
         tug = ["bookmark" "move" "--from" "heads(::@- & bookmarks())" "--to" "@-"];
+        poh = ["git" "push" "--revisions" "@" "--allow-new"];
       };
 
       ui = {
