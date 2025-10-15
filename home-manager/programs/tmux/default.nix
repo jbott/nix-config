@@ -28,6 +28,12 @@
         # long scrollback
         set-option -g history-limit 50000
 
+        # Wheel scrolling in copy mode
+        bind -T copy-mode WheelUpPane send -N1 -X scroll-up
+        bind -T copy-mode WheelDownPane send -N1 -X scroll-down
+        bind-key -T copy-mode-vi WheelUpPane send -N1 -X scroll-up
+        bind-key -T copy-mode-vi WheelDownPane send -N1 -X scroll-down
+
         # Clear the default command set by tmux-sensible. It's version of reattach-to-user-namespace
         # breaks launching zsh. It also does not work correctly for sudo, and tmux includes this
         # functionality for pbcopy / pbpaste already.
