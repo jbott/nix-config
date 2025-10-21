@@ -1,0 +1,82 @@
+# Fix for docker compose "buildx not installed", remove once merged upstream
+# Upstream issue: https://github.com/nixos/nixpkgs/issues/424333
+# Upstream PR: https://github.com/NixOS/nixpkgs/pull/450849
+
+From 625ceffaa51679360e443cb828cd6b75ed99afcf Mon Sep 17 00:00:00 2001
+From: Danil Suetin <suetin085@proton.me>
+Date: Sun, 12 Oct 2025 17:27:34 +0200
+Subject: [PATCH] docker-compose: add plugin support
+
+---
+ .../virtualization/docker/compose.nix             | 14 +++++++++++++-
+ .../virtualization/docker/default.nix             | 15 ++++++++++++---
+ 2 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/pkgs/applications/virtualization/docker/compose.nix b/pkgs/applications/virtualization/docker/compose.nix
+index c02b5817bb1f30..cdd7708ec84189 100644
+--- a/pkgs/applications/virtualization/docker/compose.nix
++++ b/pkgs/applications/virtualization/docker/compose.nix
+@@ -2,8 +2,15 @@
+   lib,
+   buildGoModule,
+   fetchFromGitHub,
++  symlinkJoin,
++  extraPlugins ? [ ],
+ }:
+-
++let
++  pluginsRef = symlinkJoin {
++    name = "docker-plugins";
++    paths = extraPlugins;
++  };
++in
+ buildGoModule rec {
+   pname = "docker-compose";
+   version = "2.39.4";
+@@ -20,6 +27,11 @@ buildGoModule rec {
+     rm -rf pkg/e2e/
+   '';
+ 
++  preBuild = lib.optionalString (extraPlugins != [ ]) ''
++    substituteInPlace vendor/github.com/docker/cli/cli-plugins/manager/manager_unix.go \
++      --replace-fail /usr/libexec/docker/cli-plugins "${pluginsRef}/libexec/docker/cli-plugins"
++  '';
++
+   vendorHash = "sha256-Uqzul9BiXHAJ1BxlOtRS68Tg71SDva6kg3tv7c6ar2E=";
+ 
+   ldflags = [
+diff --git a/pkgs/applications/virtualization/docker/default.nix b/pkgs/applications/virtualization/docker/default.nix
+index 26754231051b22..2ca40fee36d7bd 100644
+--- a/pkgs/applications/virtualization/docker/default.nix
++++ b/pkgs/applications/virtualization/docker/default.nix
+@@ -18,6 +18,7 @@ let
+       composeSupport ? true,
+       sbomSupport ? false,
+       initSupport ? false,
++      extraPlugins ? [ ],
+       # package dependencies
+       stdenv,
+       fetchFromGitHub,
+@@ -246,11 +247,19 @@ let
+         }
+       );
+ 
+-      plugins =
++      # compose is added later to avoid infinite recursion, since this list is
++      # also passed to compose derivation
++      pluginsWithoutCompose =
+         lib.optionals buildxSupport [ docker-buildx ]
+-        ++ lib.optionals composeSupport [ docker-compose ]
+         ++ lib.optionals sbomSupport [ docker-sbom ]
+-        ++ lib.optionals initSupport [ docker-init ];
++        ++ lib.optionals initSupport [ docker-init ]
++        ++ extraPlugins;
++
++      plugins =
++        pluginsWithoutCompose
++        ++ lib.optionals composeSupport [
++          (docker-compose.override { extraPlugins = pluginsWithoutCompose; })
++        ];
+ 
+       pluginsRef = symlinkJoin {
+         name = "docker-plugins";
