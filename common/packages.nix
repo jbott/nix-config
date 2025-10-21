@@ -2,7 +2,9 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  docker-compose = pkgs.writeShellScriptBin "docker-compose" "exec ${pkgs.docker}/bin/docker compose \"\$@\"";
+in {
   environment.systemPackages = with pkgs; [
     alacritty
     atuin
@@ -10,7 +12,9 @@
     btop
     cdrtools
     claude-code
+    docker
     docker-buildx
+    docker-compose
     dotslash
     fastmod
     fd
