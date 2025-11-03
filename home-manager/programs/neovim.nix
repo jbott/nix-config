@@ -82,7 +82,7 @@ in {
       vim.lsp.inlay_hint.enable()
 
       -- Setup Plugins
-      require('lspconfig').biome.setup{}
+      vim.lsp.config['biome'] = {}
       require('nvim-lastplace').setup{}
       require('typescript-tools').setup {}
 
@@ -154,7 +154,6 @@ in {
 
     plugins = with pkgs.vimPlugins; [
       nvim-lastplace
-      nvim-lspconfig
       plenary-nvim
       rustaceanvim
       telescope-nvim
