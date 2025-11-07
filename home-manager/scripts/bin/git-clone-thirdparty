@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "${0} <repo-url>"
+  echo "Examples:"
+  echo "  ${0} https://github.com/aspect-build/rules_py.git"
+  echo "  ${0} https://gitlab.com/owner/repo.git"
+  echo "  ${0} git@github.com:aspect-build/rules_py.git"
+  echo "  ${0} aspect-build/rules_py  (assumes GitHub)"
+  exit 1
+fi
+
+repo_input="$1"
+target_path=""
+
+# Parse different URL formats
+if [[ "$repo_input" =~ ^https://([^/]+)/([^/]+)/(.+)(\.git)?$ ]]; then
+  # HTTPS URL: https://host.com/owner/repo.git or https://host.com/owner/repo
+  host="${BASH_REMATCH[1]}"
+  owner="${BASH_REMATCH[2]}"
+  repo="${BASH_REMATCH[3]}"
+  # Strip .git suffix if present
+  repo="${repo%.git}"
+  target_path="${host}/${owner}/${repo}"
+elif [[ "$repo_input" =~ ^git@([^:]+):([^/]+)/(.+)$ ]]; then
+  # SSH URL: git@host.com:owner/repo.git
+  host="${BASH_REMATCH[1]}"
+  owner="${BASH_REMATCH[2]}"
+  repo="${BASH_REMATCH[3]}"
+  # Strip .git suffix if present
+  repo="${repo%.git}"
+  target_path="${host}/${owner}/${repo}"
+elif [[ "$repo_input" =~ ^([^/]+)/([^/]+)$ ]]; then
+  # Short format: owner/repo (assumes GitHub)
+  owner="${BASH_REMATCH[1]}"
+  repo="${BASH_REMATCH[2]}"
+  # Strip .git suffix if present
+  repo="${repo%.git}"
+  target_path="github.com/${owner}/${repo}"
+  # Convert short format to full URL for cloning
+  repo_input="https://github.com/${owner}/${repo}.git"
+else
+  echo "Error: Could not parse repository URL: $repo_input"
+  echo "Expected format: https://host.com/owner/repo.git or owner/repo"
+  exit 1
+fi
+
+# Create target directory path
+target_dir="$HOME/src/third-party/${target_path}"
+
+# Run the clone command
+PS4="[*] "
+set -x
+git clone "$repo_input" "$target_dir"
