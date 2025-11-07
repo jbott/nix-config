@@ -16,11 +16,6 @@
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-search-cli = {
-      url = "github:peterldowns/nix-search-cli";
-      inputs.flake-utils.follows = "flake-utils";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -35,7 +30,6 @@
     home-manager,
     impermanence,
     nix-darwin,
-    nix-search-cli,
     nixpkgs,
     treefmt-nix,
   } @ inputs: let
@@ -60,9 +54,6 @@
 
     overlays = [
       (import ./overlay)
-      (self: super: {
-        nix-search-cli = nix-search-cli.packages.${self.system}.default;
-      })
     ];
     nixpkgsOverlaysModule = system: {
       nixpkgs = {

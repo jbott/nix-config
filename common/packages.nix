@@ -34,7 +34,6 @@ in {
     mtr
     neovim
     nix-output-monitor
-    nix-search-cli
     nmap
     nodePackages.prettier
     nvd
