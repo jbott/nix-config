@@ -19,6 +19,10 @@
         pager = "less -FXR";
       };
 
+      revsets = {
+        log = "present(@) | ancestors(immutable_heads().., 50) | trunk()";
+      };
+
       git = {
         abandon-unreachable-commits = false;
         write-change-id-header = true;
