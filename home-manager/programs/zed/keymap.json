@@ -26,9 +26,10 @@
   },
   {
     "context": "Editor",
+    "use_key_equivalents": true,
     "bindings": {
-      // "j k": ["workspace::SendKeystrokes", "escape"]
-      // "ctrl-p": "file_finder::Toggle"
+      // Disable toggling line numbers
+      "cmd-;": "zed::NoAction"
     }
   },
   {
