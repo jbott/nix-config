@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+# Change to repository root if in a jj or git repository
+root=$(jj workspace root 2>/dev/null) || root=$(git rev-parse --show-toplevel 2>/dev/null) || true
+if [[ -n "${root:-}" ]]; then
+    cd "$root"
+fi
+
 exec claude \
     --allowedTools "Write Edit MultiEdit WebFetch WebSearch" \
     --dangerously-skip-permissions \
