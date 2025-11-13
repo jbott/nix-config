@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# tmux attach or create session
+# Usage: ta [session_name]
+# If no session name provided, defaults to "main"
+
+session_name="${1:-main}"
+tmux -u new-session -A -s "$session_name"
