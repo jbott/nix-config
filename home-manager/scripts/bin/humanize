@@ -1,0 +1,25 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = [
+#   "humanize",
+# ]
+# ///
+"""Humanize file sizes.
+
+Usage: humanize <bytes>
+Example: humanize 21209134938375
+"""
+
+import sys
+import humanize
+
+if len(sys.argv) != 2:
+    print("Usage: humanize <bytes>", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    size = int(sys.argv[1])
+    print(humanize.naturalsize(size))
+except ValueError:
+    print(f"Error: '{sys.argv[1]}' is not a valid number", file=sys.stderr)
+    sys.exit(1)
