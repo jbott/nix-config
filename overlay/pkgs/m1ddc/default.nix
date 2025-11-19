@@ -17,10 +17,6 @@ in
       hash = "sha256-obs2qQvSkIDsWhCXJOF1Geiqqy19KDf0InyxRVod4hk=";
     };
 
-    patches = [
-      ./01-ioregistry-apple_sdk_11_0.patch
-    ];
-
     installPhase = ''
       install -Dt $out/bin m1ddc
     '';
