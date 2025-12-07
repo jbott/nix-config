@@ -21,5 +21,8 @@ in {
       "tools/bin/*"
       "tools/git-hooks/*"
     ];
+    formatter.shellcheck.excludes = [
+      "home-manager/scripts/bin/humanize"
+    ];
   };
 }
