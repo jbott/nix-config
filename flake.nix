@@ -37,33 +37,18 @@
     inherit (nix-darwin.lib) darwinSystem;
     inherit (nixpkgs.lib) nixosSystem;
 
-    # Apply patches to nixpkgs
-    patchedNixpkgs = system: let
-      pkgs = import nixpkgs {inherit system;};
-    in
-      pkgs.applyPatches {
-        name = "nixpkgs-patched";
-        src = nixpkgs;
-        patches = [
-          ./overlay/patches/450849.patch
-        ];
-      };
-
     allowUnfreeModule = {nixpkgs.config.allowUnfree = true;};
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
 
     overlays = [
       (import ./overlay)
     ];
-    nixpkgsOverlaysModule = system: {
-      nixpkgs = {
-        inherit overlays;
-        source = patchedNixpkgs system;
-      };
+    nixpkgsOverlaysModule = {
+      nixpkgs = {inherit overlays;};
     };
 
     allSystemsOutput = eachDefaultSystem (system: let
-      pkgs = import (patchedNixpkgs system) {inherit system overlays;};
+      pkgs = import nixpkgs {inherit system overlays;};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./tools/treefmt.nix;
 
       treefmt = treefmtEval.config.build.wrapper;
@@ -93,7 +78,7 @@
           modules = [
             (currentSystemNameModule "jmbp")
             allowUnfreeModule
-            (nixpkgsOverlaysModule "aarch64-darwin")
+            nixpkgsOverlaysModule
             home-manager.darwinModules.default
             ./common
             ./common/darwin
@@ -108,7 +93,7 @@
           system = "x86_64-linux";
           modules = [
             (currentSystemNameModule "Only-Slightly-Bent")
-            (nixpkgsOverlaysModule "x86_64-linux")
+            nixpkgsOverlaysModule
             home-manager.nixosModules.default
             ./common
             ./common/linux
@@ -122,7 +107,7 @@
           modules = [
             (currentSystemNameModule "ha")
             allowUnfreeModule
-            (nixpkgsOverlaysModule "x86_64-linux")
+            nixpkgsOverlaysModule
 
             # Flake Modules
             disko.nixosModules.disko
@@ -142,7 +127,7 @@
           modules = [
             (currentSystemNameModule "performance-artist")
             allowUnfreeModule
-            (nixpkgsOverlaysModule "aarch64-linux")
+            nixpkgsOverlaysModule
             home-manager.nixosModules.default
             ./common
             ./common/linux
