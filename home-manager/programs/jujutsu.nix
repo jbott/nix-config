@@ -20,7 +20,7 @@
       };
 
       revsets = {
-        log = "present(@) | ancestors(immutable_heads().., 50) | trunk()";
+        log = "@ | ancestors(trunk()..(visible_heads() & mine()), 50) | ancestors(trunk()..tracked_remote_bookmarks(), 50) | trunk()";
       };
 
       git = {
