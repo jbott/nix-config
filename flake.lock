@@ -96,16 +96,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1765489523,
-        "narHash": "sha256-wI4UMsDnvwMzIBuliBsIkuQJlPH3Q/0hbzJm0ud7dLQ=",
-        "owner": "jbott",
+        "lastModified": 1765779637,
+        "narHash": "sha256-KJ2wa/BLSrTqDjbfyNx70ov/HdgNBCBBSQP3BIzKnv4=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "af225d5d72bbe2821447f126d148a99d7b658a4d",
+        "rev": "1306659b587dc277866c7b69eb97e5f07864d8c4",
         "type": "github"
       },
       "original": {
-        "owner": "jbott",
-        "ref": "jbott-docker-plugins-fix",
+        "owner": "nixos",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
