@@ -1,6 +1,14 @@
 {currentSystemName, ...}: {
   programs.zsh = {
     enable = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting = {
+      enable = true;
+      styles = {
+        single-hyphen-option = "fg=yellow";
+        double-hyphen-option = "fg=yellow";
+      };
+    };
 
     shellAliases = {
       cdg = "cd $HOME/src";
