@@ -34,6 +34,10 @@
       bindkey '^[[4~' end-of-line                     # End / Fn Right-Arrow
       bindkey '^[[6~' end-of-buffer-or-history        # Page-down / Fn Down-Arrow
       bindkey '^[[3~' delete-char                     # Del / Fn delete
+      # Make word navigation stop at all boundaries (bash-style)
+      autoload -U select-word-style
+      select-word-style bash
+
       bindkey '^[[1;3D' backward-word                 # Option Left-Arrow
       bindkey '^[[1;3C' forward-word                  # Option Right-Arrow
 
