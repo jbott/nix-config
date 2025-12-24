@@ -41,9 +41,9 @@ unset TMPDIR
 PS4='[*] '
 set -x
 nixos-rebuild switch \
-  --fast \
+  --no-reexec \
   --flake ".#${host}" \
   --target-host "${host}" \
-  --use-remote-sudo \
+  --sudo \
   "${extra_args[@]}" \
   "${@}"
