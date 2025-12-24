@@ -9,6 +9,7 @@
     ../../common/linux/zfs-impermanence.nix
     ../../services/home-assistant.nix
     ../../services/homebridge.nix
+    ../../services/samba.nix
     ../../services/zigbee2mqtt.nix
   ];
 
