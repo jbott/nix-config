@@ -37,14 +37,16 @@
     inherit (nix-darwin.lib) darwinSystem;
     inherit (nixpkgs.lib) nixosSystem;
 
-    allowUnfreeModule = {nixpkgs.config.allowUnfree = true;};
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
 
     overlays = [
       (import ./overlay)
     ];
     nixpkgsOverlaysModule = {
-      nixpkgs = {inherit overlays;};
+      nixpkgs = {
+        inherit overlays;
+        config.allowUnfree = true;
+      };
     };
 
     allSystemsOutput = eachDefaultSystem (system: let
@@ -77,7 +79,6 @@
           system = "aarch64-darwin";
           modules = [
             (currentSystemNameModule "jmbp")
-            allowUnfreeModule
             nixpkgsOverlaysModule
             home-manager.darwinModules.default
             ./common
@@ -106,7 +107,6 @@
           system = "x86_64-linux";
           modules = [
             (currentSystemNameModule "ha")
-            allowUnfreeModule
             nixpkgsOverlaysModule
 
             # Flake Modules
@@ -126,7 +126,6 @@
           system = "aarch64-linux";
           modules = [
             (currentSystemNameModule "performance-artist")
-            allowUnfreeModule
             nixpkgsOverlaysModule
             home-manager.nixosModules.default
             ./common
