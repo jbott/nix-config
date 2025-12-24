@@ -64,6 +64,13 @@
               "com.sun:auto-snapshot" = "true";
             };
           };
+          "safe/backups" = {
+            type = "zfs_fs";
+            mountpoint = "/backups";
+            options = {
+              "com.sun:auto-snapshot" = "false";
+            };
+          };
         };
       };
     };
@@ -88,5 +95,10 @@
     device = "rpool/safe/persist";
     fsType = "zfs";
     neededForBoot = true;
+  };
+
+  fileSystems."/backups" = {
+    device = "rpool/safe/backups";
+    fsType = "zfs";
   };
 }
