@@ -5,23 +5,24 @@
 }: {
   services.spotifyd = {
     enable = true;
-    config = ''
-      [global]
-      zeroconf_port = 5354
+    settings = {
+      global = {
+        zeroconf_port = 5354;
 
-      device_type = "speaker"
-      device_name = "Living Room Speaker"
+        device_type = "speaker";
+        device_name = "Living Room Speaker";
 
-      # Set audio bitrate to the max
-      bitrate = 320
+        # Set audio bitrate to the max
+        bitrate = 320;
 
-      # This is background, not graphical, so disable attempting to use D-Bus
-      use_mpris = false
+        # This is background, not graphical, so disable attempting to use D-Bus
+        use_mpris = false;
 
-      # We use alsa
-      backend = "alsa"
-      volume_controller = "alsa"
-    '';
+        # We use alsa
+        backend = "alsa";
+        volume_controller = "alsa";
+      };
+    };
   };
 
   # Create a non-dynamic user for this service
