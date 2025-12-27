@@ -19,6 +19,7 @@ in {
     fastmod
     fd
     fzf
+    gemini-cli
     gh
     git
     git-absorb
