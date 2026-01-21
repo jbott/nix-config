@@ -25,6 +25,7 @@ in {
     gh
     git
     git-absorb
+    glab
     gmailctl
     graphite-cli
     htop
