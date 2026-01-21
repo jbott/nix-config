@@ -12,6 +12,7 @@ in {
     btop
     cdrtools
     claude-code
+    difftastic
     docker
     docker-buildx
     docker-compose
