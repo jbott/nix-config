@@ -7,6 +7,7 @@ in {
   programs = {
     alejandra.enable = true;
     just.enable = true;
+    keep-sorted.enable = true;
     shellcheck.enable = true;
     typos.enable = true;
   };

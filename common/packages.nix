@@ -6,6 +6,7 @@
   docker-compose = pkgs.writeShellScriptBin "docker-compose" "exec ${pkgs.docker}/bin/docker compose \"\$@\"";
 in {
   environment.systemPackages = with pkgs; [
+    # keep-sorted start
     alacritty
     atuin
     black
@@ -57,11 +58,14 @@ in {
     yq
     yubikey-manager
     zsh
+    # keep-sorted end
   ];
 
   # Allow certain unfree packages
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
+      # keep-sorted start
       "graphite-cli"
+      # keep-sorted end
     ];
 }
