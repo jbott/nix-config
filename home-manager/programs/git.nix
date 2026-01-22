@@ -1,7 +1,8 @@
-{
+{pkgs, ...}: {
   programs.git = {
     enable = true;
     lfs.enable = true;
+    package = pkgs.git-jj-wrapper;
 
     # Global ignores for Claude Code sandbox phantom files
     # See: https://github.com/anthropics/claude-code/issues/17087
