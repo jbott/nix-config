@@ -4,6 +4,9 @@
   pkgs,
   ...
 }: {
+  # Use the system's pkgs (with overlays) instead of home-manager's own instance
+  home-manager.useGlobalPkgs = true;
+
   home-manager.users.jbo = {
     # Not sure when this should change
     home.stateVersion = "22.11";
