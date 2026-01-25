@@ -8,5 +8,5 @@ if [[ -n "${root:-}" ]]; then
 fi
 
 exec claude \
-    --settings '{"sandbox": {"enabled": true, "autoAllowBashIfSandboxed": true}}' \
+    --dangerously-skip-permissions \
     "$@"
