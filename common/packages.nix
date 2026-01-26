@@ -27,7 +27,6 @@ in {
     git-absorb
     glab
     gmailctl
-    graphite-cli
     htop
     jjui
     jq
@@ -61,12 +60,4 @@ in {
     zsh
     # keep-sorted end
   ];
-
-  # Allow certain unfree packages
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      # keep-sorted start
-      "graphite-cli"
-      # keep-sorted end
-    ];
 }
