@@ -16,8 +16,8 @@
 
     imports =
       [
-        ./programs/alacritty.nix
         ./programs/atuin.nix
+        ./programs/claude-code.nix
         ./programs/dircolors.nix
         ./programs/direnv.nix
         ./programs/git.nix
