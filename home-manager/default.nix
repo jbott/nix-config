@@ -31,7 +31,6 @@
         ./programs/zsh.nix
       ]
       ++ (pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-        ./darwin/trampoline-apps
         ./darwin/colima
       ]);
 

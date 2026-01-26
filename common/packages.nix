@@ -7,7 +7,6 @@
 in {
   environment.systemPackages = with pkgs; [
     # keep-sorted start
-    alacritty
     atuin
     black
     btop
