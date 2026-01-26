@@ -77,7 +77,7 @@ in {
       augroup END
     '';
 
-    extraLuaConfig = ''
+    initLua = ''
       -- Enable built in features
       vim.lsp.inlay_hint.enable()
 
