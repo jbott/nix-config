@@ -7,6 +7,10 @@ if [[ -n "${root:-}" ]]; then
     cd "$root"
 fi
 
+# Bash is excluded from allowedTools so unsandboxed commands still prompt for approval.
+# Sandboxed bash is auto-allowed via autoAllowBashIfSandboxed.
 exec claude \
     --settings '{"sandbox": {"enabled": true, "autoAllowBashIfSandboxed": true}}' \
+    --permission-mode acceptEdits \
+    --allowedTools "Edit,Read,Write,Glob,Grep,WebFetch,WebSearch,Skill,Task,TaskOutput,TodoWrite,NotebookEdit,KillShell,AskUserQuestion,EnterPlanMode,ExitPlanMode" \
     "$@"
