@@ -11,7 +11,7 @@
       aliases = {
         rom = ["rebase" "-d" "main" "--skip-emptied"];
         tug = ["bookmark" "move" "--from" "heads(::@- & bookmarks())" "--to" "@-"];
-        poh = ["git" "push" "--revisions" "@-" "--revisions" "@" "--allow-new"];
+        push = ["git" "push" "-r" "::@ & bookmarks()"];
       };
 
       ui = {
@@ -28,8 +28,8 @@
         write-change-id-header = true;
       };
 
-      remotes.origin.auto-track-bookmarks = "jbott-*|john/*";
-      remotes.upstream.auto-track-bookmarks = "main";
+      remotes.origin.auto-track-bookmarks = "exact:main | exact:master | exact:trunk | glob:john/*";
+      remotes.upstream.auto-track-bookmarks = "exact:main | exact:master | exact:trunk";
 
       fix.tools.treefmt = {
         command = ["treefmt" "--no-cache" "--stdin" "$path"];
