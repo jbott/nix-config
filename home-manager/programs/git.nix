@@ -16,6 +16,7 @@
       ".mcp.json"
       ".profile"
       ".ripgreprc"
+      ".venv"
       ".vscode"
       ".zprofile"
       ".zshrc"
