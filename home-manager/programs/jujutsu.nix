@@ -31,10 +31,6 @@
       remotes.origin.auto-track-bookmarks = "jbott-*|john/*";
       remotes.upstream.auto-track-bookmarks = "main";
 
-      templates = {
-        git_push_bookmark = "\"jbott-\" ++ change_id.short()";
-      };
-
       fix.tools.treefmt = {
         command = ["treefmt" "--stdin" "$path"];
         patterns = ["glob:'**/*'"];
