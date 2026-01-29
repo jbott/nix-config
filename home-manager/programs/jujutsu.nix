@@ -32,7 +32,7 @@
       remotes.upstream.auto-track-bookmarks = "exact:main | exact:master | exact:trunk";
 
       fix.tools.treefmt = {
-        command = ["treefmt" "--no-cache" "--stdin" "$path"];
+        command = ["treefmt" "--quiet" "--no-cache" "--stdin" "$path"];
         patterns = ["glob:'**/*'"];
       };
     };
