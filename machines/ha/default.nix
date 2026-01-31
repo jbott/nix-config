@@ -40,6 +40,27 @@
     };
   };
   environment.systemPackages = [ pkgs.gvisor ];
+  environment.etc."cni/net.d/10-containerd-net.conflist".text = builtins.toJSON {
+    cniVersion = "1.0.0";
+    name = "containerd-net";
+    plugins = [
+      {
+        type = "bridge";
+        bridge = "cni0";
+        isGateway = true;
+        ipMasq = true;
+        ipam = {
+          type = "host-local";
+          ranges = [ [{ subnet = "172.20.0.0/16"; }] ];
+          routes = [{ dst = "0.0.0.0/0"; }];
+        };
+      }
+      {
+        type = "portmap";
+        capabilities.portMappings = true;
+      }
+    ];
+  };
   environment.persistence."/persist".directories = [
     "/var/lib/containerd"
   ];
