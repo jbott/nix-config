@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   currentSystemName,
   modulesPath,
   ...
@@ -27,6 +28,14 @@
 
   # Enable auto gc
   nix.gc.automatic = true;
+
+  virtualisation.containerd.enable = true;
+  virtualisation.containerd.settings = {
+    plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runsc = {
+      runtime_type = "io.containerd.runsc.v1";
+    };
+  };
+  environment.systemPackages = [ pkgs.gvisor ];
 
   # ===== Hacky config for some HAP thing I don't want to fully codify yet ===== #
   # HAP advertising port
