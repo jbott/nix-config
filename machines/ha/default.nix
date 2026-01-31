@@ -33,6 +33,8 @@
   virtualisation.containerd.enable = true;
   virtualisation.containerd.settings = {
     grpc.gid = config.users.groups.wheel.gid;
+    plugins."io.containerd.cri.v1.images".snapshotter = "overlayfs";
+    plugins."io.containerd.grpc.v1.cri".containerd.snapshotter = "overlayfs";
     plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runsc = {
       runtime_type = "io.containerd.runsc.v1";
     };
