@@ -10,7 +10,7 @@ fi
 # Bash is excluded from allowedTools so unsandboxed commands still prompt for approval.
 # Sandboxed bash is auto-allowed via autoAllowBashIfSandboxed.
 exec claude \
-    --settings '{"sandbox": {"enabled": true, "autoAllowBashIfSandboxed": true}}' \
+    --settings '{"sandbox": {"enabled": true, "autoAllowBashIfSandboxed": true}, "permissions": {"allow": ["WebFetch"]}}' \
     --permission-mode acceptEdits \
     --allowedTools "Edit,Read,Write,Glob,Grep,WebFetch,WebSearch,Skill,Task,TaskOutput,TodoWrite,NotebookEdit,KillShell,AskUserQuestion,EnterPlanMode,ExitPlanMode" \
     "$@"
