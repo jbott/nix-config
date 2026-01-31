@@ -40,6 +40,9 @@
     };
   };
   environment.systemPackages = [ pkgs.gvisor ];
+  environment.persistence."/persist".directories = [
+    "/var/lib/containerd"
+  ];
 
   # ===== Hacky config for some HAP thing I don't want to fully codify yet ===== #
   # HAP advertising port
