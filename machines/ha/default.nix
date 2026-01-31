@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   currentSystemName,
@@ -31,6 +32,7 @@
 
   virtualisation.containerd.enable = true;
   virtualisation.containerd.settings = {
+    grpc.gid = config.users.groups.wheel.gid;
     plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runsc = {
       runtime_type = "io.containerd.runsc.v1";
     };
