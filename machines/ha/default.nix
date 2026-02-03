@@ -68,6 +68,7 @@
   # ===== Hacky config for some HAP thing I don't want to fully codify yet ===== #
   # HAP advertising port
   networking.firewall.allowedTCPPorts = [51926];
+  networking.firewall.allowedUDPPortRanges = [{ from = 60000; to = 61000; }];
 
   # Avahi to enable HAP discovery
   services.avahi.enable = true;
