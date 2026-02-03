@@ -37,6 +37,7 @@ in {
     just
     kubectl
     minicom
+    mosh
     mtr
     neovim
     nix-output-monitor
