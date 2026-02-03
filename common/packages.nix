@@ -33,6 +33,7 @@ in {
     llm-agents.claude-code
     llm-agents.gemini-cli
     minicom
+    mosh
     mtr
     neovim
     nix-output-monitor
