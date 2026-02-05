@@ -44,29 +44,29 @@ case "$1" in
                 length="${1#--short=}"
                 shift
                 if [ "$1" = "HEAD" ]; then
-                    jj_silent log -r @ --no-graph -T "commit_id.short($length)"
+                    jj_silent log -r @- --no-graph -T "commit_id.short($length)"
                 else
                     # Handle arbitrary revisions
-                    jj_silent log -r "${1:-@}" --no-graph -T "commit_id.short($length)"
+                    jj_silent log -r "${1:-@-}" --no-graph -T "commit_id.short($length)"
                 fi
                 ;;
             --short)
                 shift
                 if [ "$1" = "HEAD" ]; then
-                    jj_silent log -r @ --no-graph -T 'commit_id.short(7)'
+                    jj_silent log -r @- --no-graph -T 'commit_id.short(7)'
                 else
-                    jj_silent log -r "${1:-@}" --no-graph -T 'commit_id.short(7)'
+                    jj_silent log -r "${1:-@-}" --no-graph -T 'commit_id.short(7)'
                 fi
                 ;;
             HEAD)
-                jj_silent log -r @ --no-graph -T 'commit_id'
+                jj_silent log -r @- --no-graph -T 'commit_id'
                 ;;
             *)
                 # Try to parse as a revision
                 if [ -n "$1" ]; then
                     jj_silent log -r "$1" --no-graph -T 'commit_id' 2>/dev/null || echo "$1"
                 else
-                    jj_silent log -r @ --no-graph -T 'commit_id'
+                    jj_silent log -r @- --no-graph -T 'commit_id'
                 fi
                 ;;
         esac
@@ -94,8 +94,7 @@ case "$1" in
         shift
         # Parse common git log flags
         format=""
-        revision="@"
-        num_commits=""
+        revision="@-"
 
         while [ $# -gt 0 ]; do
             case "$1" in
@@ -104,7 +103,7 @@ case "$1" in
                     shift
                     ;;
                 -1)
-                    num_commits="1"
+                    # Ignored - jj log -r shows single revision by default
                     shift
                     ;;
                 *)
@@ -142,7 +141,7 @@ case "$1" in
         shift
         if [ "$1" = "--tags" ] && [ "$2" = "--exact-match" ]; then
             # Machine-readable: check for tags on current commit
-            tags=$(jj_silent log -r @ --no-graph -T 'tags')
+            tags=$(jj_silent log -r @- --no-graph -T 'tags')
             if [ -n "$tags" ] && [ "$tags" != "@│~" ]; then
                 echo "$tags"
             else
