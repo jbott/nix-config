@@ -10,9 +10,11 @@
 
       aliases = {
         dt = ["diff" "--from" "latest(heads(::@ & ::trunk()))" "--to" "@"];
+        lt = ["log" "-r" "roots(trunk()..@)-::@"];
+        push = ["git" "push" "-r" "::@ & bookmarks()"];
+        restack = ["rebase" "-o" "trunk()" "-s" "roots(trunk()..) & mutable()"];
         rom = ["rebase" "-d" "main" "--skip-emptied"];
         tug = ["bookmark" "move" "--from" "heads(::@- & bookmarks())" "--to" "@-"];
-        push = ["git" "push" "-r" "::@ & bookmarks()"];
       };
 
       ui = {
