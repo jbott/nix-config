@@ -11,7 +11,6 @@ in {
     black
     btop
     cdrtools
-    claude-code
     difftastic
     docker
     docker-buildx
@@ -20,7 +19,6 @@ in {
     fastmod
     fd
     fzf
-    gemini-cli
     gh
     git
     git-absorb
@@ -32,6 +30,8 @@ in {
     jujutsu
     just
     kubectl
+    llm-agents.claude-code
+    llm-agents.gemini-cli
     minicom
     mtr
     neovim

@@ -12,6 +12,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence.url = "github:nix-community/impermanence";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
     nix-darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,6 +34,7 @@
     flake-utils,
     home-manager,
     impermanence,
+    llm-agents,
     nix-darwin,
     nixpkgs,
     treefmt-nix,
@@ -41,6 +47,7 @@
 
     overlays = [
       (import ./overlay)
+      llm-agents.overlays.default
     ];
     nixpkgsOverlaysModule = {
       nixpkgs = {
