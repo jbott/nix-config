@@ -9,6 +9,7 @@
       };
 
       aliases = {
+        dt = ["diff" "--from" "latest(heads(::@ & ::trunk()))" "--to" "@"];
         rom = ["rebase" "-d" "main" "--skip-emptied"];
         tug = ["bookmark" "move" "--from" "heads(::@- & bookmarks())" "--to" "@-"];
         push = ["git" "push" "-r" "::@ & bookmarks()"];
