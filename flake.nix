@@ -21,6 +21,10 @@
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/remove-options-compat";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -36,6 +40,7 @@
     impermanence,
     llm-agents,
     nix-darwin,
+    nixos-raspberrypi,
     nixpkgs,
     treefmt-nix,
   } @ inputs: let
@@ -139,6 +144,26 @@
             ./common/linux
             ./home-manager
             ./machines/performance-artist
+          ];
+          specialArgs = {inherit inputs;};
+        };
+        vacuum-tube = nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            # nixos-raspberrypi modules (using our nixpkgs via follows)
+            nixos-raspberrypi.lib.inject-overlays
+            nixos-raspberrypi.nixosModules.nixpkgs-rpi
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.display-vc4
+            nixos-raspberrypi.nixosModules.sd-image
+
+            (currentSystemNameModule "vacuum-tube")
+            nixpkgsOverlaysModule
+            home-manager.nixosModules.default
+            ./common
+            ./common/linux
+            ./home-manager
+            ./machines/vacuum-tube
           ];
           specialArgs = {inherit inputs;};
         };
