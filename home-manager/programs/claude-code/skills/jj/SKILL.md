@@ -1,142 +1,114 @@
 ---
 name: jj
-description: Reference guide for jj (Jujutsu) version control operations
+description: "jj version control: /jj commit, /jj describe, /jj bookmark, /jj split, /jj squash"
 ---
 
 # jj Reference Guide
 
-Reference for common jj operations, conventions, and patterns used in this codebase.
+Reference and operations for jj (Jujutsu) version control.
+
+## Usage
+
+Invoked as `/jj <command>`:
+- `/jj commit` - Create a commit from working copy changes
+- `/jj describe` - Generate and set a description for a commit
+- `/jj bookmark` - Create a bookmark for the current commit
+- `/jj split` - Split a commit into multiple commits by function
+- `/jj squash` - Squash working copy changes into ancestor commits
 
 ## Commit Description Format
 
-All commit descriptions MUST be a single line following this format:
+All commit descriptions MUST be a single line: `<project-prefix>: <short description>`
 
-```
-<project-prefix>: <short description>
-```
+**IMPORTANT**: Never use multi-line descriptions or bullet points.
 
-**IMPORTANT**: Always use a one-line commit message. Never use multi-line descriptions or bullet points.
+- **Project prefix**: descriptive folder path for the subsystem (e.g., `src/auth`, `lib/utils`, `services/api`)
+- **Description**: starts with a lowercase verb: add, update, fix, refactor, remove, etc.
 
-**Project prefix** is the descriptive folder path identifying the subsystem (e.g., `src/auth`, `lib/utils`, `services/api`).
-
-**Description** starts with a lowercase verb: add, update, fix, refactor, remove, etc.
-
-### Examples
-
-```
-src/auth: add JWT token refresh logic
-lib/utils: fix date parsing for ISO formats
-services/api: add rate limiting middleware
-db/migrations: add users table
-docs: update installation instructions
-tests/integration: add checkout flow tests
-```
+Examples: `src/auth: add JWT token refresh logic`, `lib/utils: fix date parsing for ISO formats`, `db/migrations: add users table`
 
 ## Analyzing Changes
 
-### Overview Commands
-
 ```bash
-# Files changed with change type (modified/added/deleted)
-jj diff --summary
-jj show <rev> --summary
-
-# Lines changed per file histogram
-jj diff --stat
-jj diff -r <rev> --stat
-
-# Full diff
-jj diff
-jj diff -r <rev>
+jj diff --summary          # files changed with change type
+jj diff --stat             # lines changed per file histogram
+jj diff --git              # full diff in git patch format
+jj show <rev> --summary    # for a specific revision
+jj diff -r <rev> --stat    # stats for a specific revision
+jj show <rev> --git        # full diff for a revision in git patch format
 ```
 
-### Size-Based Approach
+Always use `--git` when reading diffs (not the default jj diff format).
 
 - **Small changes** (≤5 files, ≤200 lines): read the diff directly
-- **Large changes** (>5 files or >200 lines): use `/jj-context` to get a structured summary
+- **Large changes** (>5 files or >200 lines): use the Task tool with `model=haiku` to run the diff command and summarize the changes
 
-## Common Operations
+## Operations
 
-### Creating a Commit (`jj commit`)
+### `/jj commit`
 
-Creates a new commit from working copy changes:
-
-```bash
-jj commit -m "<project-prefix>: <description>"
-```
+1. Run `jj diff --summary` and `jj diff --stat` for overview
+2. Analyze changes (small: `jj diff --git` directly; large: use haiku subagent to summarize)
+3. Determine project prefix from file paths
+4. Generate one-line description
+5. Run `jj commit -m "<description>"`
 
 After committing, `@` becomes an empty working copy on top of the new commit.
 
-### Describing a Commit (`jj describe`)
+### `/jj describe`
 
-Sets or updates the description of an existing commit:
+1. Run `jj show <rev> --summary` and `jj diff -r <rev> --stat` (use `@-` for parent)
+2. Analyze changes (small: `jj diff -r <rev> --git` directly; large: use haiku subagent to summarize)
+3. Determine project prefix from file paths
+4. Generate one-line description
+5. Run `jj describe <rev> -m "<description>"`
 
-```bash
-# Describe parent commit (most common)
-jj describe @- -m "<project-prefix>: <description>"
+### `/jj bookmark`
 
-# Describe any commit
-jj describe <rev> -m "<description>"
-```
+1. Run `jj log -r ::@ --limit 10` to see recent commits and understand the work theme
+2. Generate a 2-4 word kebab-case name describing the work
+3. Create bookmark:
+   - If `@` is empty: `jj bookmark create john/<name> -r @-`
+   - If `@` has changes: `jj bookmark create john/<name>`
 
-### Creating a Bookmark (`jj bookmark`)
+Naming examples: `john/s3-inventory-download`, `john/fix-auth-refresh`, `john/refactor-poller-config`
 
-Bookmarks use `john/<descriptive-name>` format with kebab-case:
+### `/jj split`
 
-```bash
-# On parent commit (if @ is empty)
-jj bookmark create john/<name> -r @-
-
-# On current commit
-jj bookmark create john/<name>
-
-# List bookmarks
-jj bookmark list
-```
-
-**Naming**: Use 2-4 word kebab-case names describing the work:
-- `john/s3-inventory-download`
-- `john/fix-auth-refresh`
-- `john/refactor-poller-config`
-
-### Splitting a Commit (`jj split`)
-
-Splits a commit into multiple commits by file:
-
-```bash
-# Split specific files into a new commit
-jj split -r <rev> -m "<description>" path/to/file1 path/to/file2
-
-# Last group: just describe the remainder
-jj describe -r @- -m "<description>"
-```
+1. Run `jj status` to check if splitting `@` (has changes) or `@-` (working copy empty)
+2. Run `jj show <rev> --summary` and `jj diff -r <rev> --stat` for overview
+3. Analyze changes (small: `jj diff -r <rev> --git` directly; large: use haiku subagent to summarize)
+4. Propose functional groups (feature+tests together, config separate, migrations separate, refactoring separate)
+5. **Ask user for approval via AskUserQuestion**
+6. Execute splits:
+   ```bash
+   jj split -r <rev> -m "<description>" file1 file2
+   ```
+7. Describe the last group (no split needed):
+   ```bash
+   jj describe -r @- -m "<description>"
+   ```
 
 **Note**: After each split, the revision ID changes. Use `@-` to refer to the result.
 
-**Grouping suggestions**:
-- Core feature + its tests together
-- Configuration/infrastructure separate
-- Database migrations separate
-- Refactoring/cleanup separate
+### `/jj squash`
 
-### Squashing Changes (`jj squash`)
+1. Run `jj diff --summary` and `jj diff --stat` for overview
+2. Run `jj log -r ::@- --limit 15` to see candidate ancestor commits
+3. Analyze changes (small: `jj diff --git` directly; large: use haiku subagent to summarize)
+4. **Match changes to ancestor commits by path and commit descriptions**
+5. Execute squashes
 
-Moves changes from working copy into ancestor commits.
+**Basic**: `jj squash` moves all changes from `@` into `@-`.
 
-Without options, squashes all changes from `@` into its parent (`@-`):
-```bash
-jj squash  # @ → @-
-```
-
-With `--into` (or `-t`), squash into a specific commit:
+**Targeted**:
 ```bash
 jj squash --into <change-id> path/to/file.py  # specific files
 jj squash --into <change-id> "src/**/*.py"    # glob pattern
 jj squash --into @--                           # grandparent
 ```
 
-**For sub-file chunks** (specific hunks, not whole files):
-
+**Sub-file chunks** (specific hunks, not whole files):
 1. Save original @ change ID: `jj log -r @ --no-graph -T 'change_id'`
 2. Create intermediate: `jj new --insert-before @`
 3. Write only the hunks for target commit
@@ -164,7 +136,7 @@ jj squash --into @--                           # grandparent
 
 ## Working Copy Behavior
 
-- In jj, `@` (working copy) is often an empty commit on top of your actual work
+- `@` (working copy) is often an empty commit on top of your actual work
 - Check `jj log` for "(empty)" to know if @ has changes
 - `jj commit` creates commit and leaves @ empty
 - `jj describe` modifies existing commit, doesn't change @
