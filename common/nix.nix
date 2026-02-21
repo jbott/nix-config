@@ -8,6 +8,12 @@
     settings = {
       experimental-features = ["nix-command flakes"];
       trusted-users = ["jbo"];
+      download-buffer-size = 128 * 1024 * 1024; # 128 MiB
+      max-jobs = "auto";
+      auto-optimise-store = true;
+      http-connections = 128;
+      max-substitution-jobs = 128;
+      warn-dirty = false;
     };
     distributedBuilds = true;
     extraOptions = ''
