@@ -265,6 +265,30 @@ case "$1" in
         jj_user git "$cmd" "$@"
         ;;
 
+    remote)
+        shift
+        case "$1" in
+            -v|--verbose)
+                # Reformat jj output to match git remote -v format
+                jj_silent git remote list | while read -r name url; do
+                    printf '%s\t%s (fetch)\n' "$name" "$url"
+                    printf '%s\t%s (push)\n' "$name" "$url"
+                done
+                ;;
+            "")
+                # List remote names only
+                jj_silent git remote list | while read -r name _; do
+                    echo "$name"
+                done
+                ;;
+            *)
+                echo "Error: This is a jj workspace at: $(jj_silent workspace root)" >&2
+                echo "git remote $1 is not supported. Use 'jj git remote' instead" >&2
+                exit 1
+                ;;
+        esac
+        ;;
+
     diff)
         shift
         jj_user diff "$@"
