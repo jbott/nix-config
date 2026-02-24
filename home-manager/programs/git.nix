@@ -9,7 +9,7 @@
     ignores = [
       ".bash_profile"
       ".bashrc"
-      ".claude/"
+      ".claude/settings.local.json"
       ".gitconfig"
       ".gitmodules"
       ".idea"
