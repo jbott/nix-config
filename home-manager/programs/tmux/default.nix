@@ -6,6 +6,10 @@
         # Mauuuuuse
         set -g mouse on
 
+        # Split panes in the same directory
+        bind '"' split-window -v -c "#{pane_current_path}"
+        bind %   split-window -h -c "#{pane_current_path}"
+
         # Configure vim keybindings for switching panes
         bind h select-pane -L
         bind j select-pane -D
