@@ -32,6 +32,7 @@
       ]
       ++ (pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
         ./darwin/colima
+        ./programs/ghostty.nix
       ]);
 
     home.packages = [
