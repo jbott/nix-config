@@ -39,6 +39,7 @@ in {
     nmap
     nodePackages.prettier
     nvd
+    poppler-utils
     python311
     rclone
     ripgrep
