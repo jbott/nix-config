@@ -45,6 +45,8 @@ Always use `--git` when reading diffs (not the default jj diff format).
 
 ## Operations
 
+**Always provide `-m "<description>"`** to all commands that accept it — without it, jj opens an interactive editor which will hang. Since descriptions are always single-line, pass them directly as `-m "the message"` — do NOT use heredocs or `cat <<EOF`.
+
 ### `/jj commit`
 
 1. Run `jj diff --summary` and `jj diff --stat` for overview
@@ -101,12 +103,27 @@ Naming examples: `john/s3-inventory-download`, `john/fix-auth-refresh`, `john/re
 
 **Basic**: `jj squash` moves all changes from `@` into `@-`.
 
-**Targeted**:
+**Squashing a revision into its parent** (`-r`):
 ```bash
-jj squash --into <change-id> path/to/file.py  # specific files
-jj squash --into <change-id> "src/**/*.py"    # glob pattern
-jj squash --into @--                           # grandparent
+jj squash -r <change-id> -m "<combined description>"
 ```
+`-r <rev>` squashes that revision into its parent.
+
+**IMPORTANT**: `-r` is incompatible with `--from`/`--into`. Use `-r` to squash a revision into its parent. Use `--from`/`--into` for flexible source→destination squashing.
+
+**Squashing into a specific destination** (`--into`):
+```bash
+jj squash --into <change-id> -m "<description>"                   # all of @ into target
+jj squash --into <change-id> -m "<description>" path/to/file.py   # specific files from @
+jj squash --into <change-id> -m "<description>" "src/**/*.py"     # glob pattern from @
+```
+
+**Squashing from a specific source** (`--from`):
+```bash
+jj squash --from <change-id> -m "<description>"                              # squash source into @ (default --into @)
+jj squash --from <change-id> --into <change-id> -m "<description>"           # arbitrary source → destination
+```
+`--from` is useful when you want to pull changes from a non-adjacent commit or combine `--from` with `--into` to squash between any two commits.
 
 **Sub-file chunks** (specific hunks, not whole files):
 1. Save original @ change ID: `jj log -r @ --no-graph -T 'change_id'`
