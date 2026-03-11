@@ -30,13 +30,13 @@ Examples: `src/auth: add JWT token refresh logic`, `lib/utils: fix date parsing 
 ## Analyzing Changes
 
 ```bash
-jj diff --summary          # files changed with change type
-jj diff --stat             # lines changed per file histogram
-jj diff --git              # full diff in git patch format
-jj show <rev> --summary    # for a specific revision
-jj diff -r <rev> --stat    # stats for a specific revision
-jj show <rev> --git        # full diff for a revision in git patch format
+jj diff --stat             # working copy: file names and line counts
+jj diff --git              # working copy: full diff in git patch format
+jj show <rev> --stat       # specific revision: file names and line counts
+jj show <rev> --git        # specific revision: full diff in git patch format
 ```
+
+Use `jj diff` for working copy (`@`), `jj show` for specific revisions.
 
 Always use `--git` when reading diffs (not the default jj diff format).
 
@@ -49,7 +49,7 @@ Always use `--git` when reading diffs (not the default jj diff format).
 
 ### `/jj commit`
 
-1. Run `jj diff --summary` and `jj diff --stat` for overview
+1. Run `jj diff --stat` for overview (shows file names and line counts)
 2. Analyze changes (small: `jj diff --git` directly; large: use haiku subagent to summarize)
 3. Determine project prefix from file paths
 4. Generate one-line description
@@ -59,8 +59,8 @@ After committing, `@` becomes an empty working copy on top of the new commit.
 
 ### `/jj describe`
 
-1. Run `jj show <rev> --summary` and `jj diff -r <rev> --stat` (use `@-` for parent)
-2. Analyze changes (small: `jj diff -r <rev> --git` directly; large: use haiku subagent to summarize)
+1. Run `jj show <rev> --stat` for overview (use `@-` for parent)
+2. Analyze changes (small: `jj show <rev> --git` directly; large: use haiku subagent to summarize)
 3. Determine project prefix from file paths
 4. Generate one-line description
 5. Run `jj describe <rev> -m "<description>"`
@@ -78,8 +78,8 @@ Naming examples: `john/s3-inventory-download`, `john/fix-auth-refresh`, `john/re
 ### `/jj split`
 
 1. Run `jj status` to check if splitting `@` (has changes) or `@-` (working copy empty)
-2. Run `jj show <rev> --summary` and `jj diff -r <rev> --stat` for overview
-3. Analyze changes (small: `jj diff -r <rev> --git` directly; large: use haiku subagent to summarize)
+2. Run `jj show <rev> --stat` for overview
+3. Analyze changes (small: `jj show <rev> --git` directly; large: use haiku subagent to summarize)
 4. Propose functional groups (feature+tests together, config separate, migrations separate, refactoring separate)
 5. **Ask user for approval via AskUserQuestion**
 6. Execute splits:
@@ -95,7 +95,7 @@ Naming examples: `john/s3-inventory-download`, `john/fix-auth-refresh`, `john/re
 
 ### `/jj squash`
 
-1. Run `jj diff --summary` and `jj diff --stat` for overview
+1. Run `jj diff --stat` for overview (shows file names and line counts)
 2. Run `jj log -r ::@- --limit 15` to see candidate ancestor commits
 3. Analyze changes (small: `jj diff --git` directly; large: use haiku subagent to summarize)
 4. **Match changes to ancestor commits by path and commit descriptions**
