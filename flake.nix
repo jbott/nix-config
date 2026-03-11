@@ -51,9 +51,13 @@
 
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
 
+    jjStarshipOverlay = final: _prev: {
+      jj-starship = jj-starship.packages.${final.stdenv.hostPlatform.system}.jj-starship;
+    };
+
     overlays = [
       (import ./overlay)
-      jj-starship.overlays.default
+      jjStarshipOverlay
       llm-agents.overlays.default
     ];
     nixpkgsOverlaysModule = {
