@@ -12,6 +12,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence.url = "github:nix-community/impermanence";
+    jj-starship = {
+      url = "github:dmmulroy/jj-starship";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -34,6 +39,7 @@
     flake-utils,
     home-manager,
     impermanence,
+    jj-starship,
     llm-agents,
     nix-darwin,
     nixpkgs,
@@ -47,6 +53,7 @@
 
     overlays = [
       (import ./overlay)
+      jj-starship.overlays.default
       llm-agents.overlays.default
     ];
     nixpkgsOverlaysModule = {
