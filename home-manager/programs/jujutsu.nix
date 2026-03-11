@@ -12,7 +12,7 @@
         dt = ["diff" "--from" "latest(heads(::@ & ::trunk()))" "--to" "@"];
         lt = ["log" "-r" "trunk()..@"];
         push = ["git" "push" "-r" "::@ & bookmarks()"];
-        restack = ["rebase" "--onto" "trunk()" "--source" "roots(trunk()..) & mutable()" "--skip-emptied" "--simplify-parents"];
+        restack = ["rebase" "--onto" "trunk()" "--source" "mutable_roots() ~ ::(working_copies() ~ @)" "--skip-emptied" "--simplify-parents"];
         rom = ["rebase" "--onto" "trunk()" "--skip-emptied" "--simplify-parents"];
         tug = ["bookmark" "advance" "--to" "latest(::@ ~ empty())"];
       };
@@ -20,6 +20,10 @@
       ui = {
         editor = "nvim";
         pager = "less -FXR";
+      };
+
+      revset-aliases = {
+        "mutable_roots()" = "roots(trunk()..) & mutable()";
       };
 
       revsets = {
