@@ -40,6 +40,21 @@ case "$1" in
             --show-toplevel)
                 jj_silent workspace root
                 ;;
+            --abbrev-ref)
+                shift
+                rev="${1:-HEAD}"
+                if [ "$rev" = "HEAD" ]; then
+                    rev="@-"
+                fi
+                # Get bookmark names on the revision; fall back to "HEAD" (detached)
+                bookmarks=$(jj_silent log -r "$rev" --no-graph -T 'bookmarks.map(|b| b.name()).join(" ")')
+                if [ -n "$bookmarks" ]; then
+                    # Return the first bookmark
+                    echo "${bookmarks%% *}"
+                else
+                    echo "HEAD"
+                fi
+                ;;
             --short=*)
                 length="${1#--short=}"
                 shift
