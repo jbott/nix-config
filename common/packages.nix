@@ -31,7 +31,6 @@ in {
     just
     kubectl
     llm-agents.claude-code
-    llm-agents.gemini-cli
     minicom
     mtr
     neovim
