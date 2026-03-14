@@ -7,7 +7,7 @@
 
     settings = {
       includeCoAuthoredBy = false;
-      model = "opus";
+      model = "opus[1m]";
       alwaysThinkingEnabled = true;
       spinnerTipsEnabled = false;
       env = {
