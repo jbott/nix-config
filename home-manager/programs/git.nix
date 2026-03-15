@@ -7,6 +7,7 @@
     # Global ignores for Claude Code sandbox phantom files
     # See: https://github.com/anthropics/claude-code/issues/17087
     ignores = [
+      ".DS_Store"
       ".bash_profile"
       ".bashrc"
       ".claude/settings.local.json"
