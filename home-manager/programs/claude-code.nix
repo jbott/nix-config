@@ -9,6 +9,7 @@
       includeCoAuthoredBy = false;
       model = "opus[1m]";
       alwaysThinkingEnabled = true;
+      skipDangerousModePermissionPrompt = true;
       spinnerTipsEnabled = false;
       env = {
         CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
