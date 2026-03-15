@@ -40,7 +40,7 @@ in {
     nodePackages.prettier
     nvd
     poppler-utils
-    python311
+    python3
     rclone
     ripgrep
     rust-analyzer
