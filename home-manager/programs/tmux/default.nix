@@ -1,4 +1,22 @@
-{pkgs, ...}: {
+{pkgs, ...}:
+let
+  tmux-jj-title = pkgs.writeShellScript "tmux-jj-title" ''
+    dir="$1"
+    if root=$(cd "$dir" && ${pkgs.jujutsu}/bin/jj workspace root --ignore-working-copy 2>/dev/null); then
+      root=$(realpath "$root")
+      base=$(basename "$dir")
+      repo=$(basename "$root")
+      if [ "$dir" = "$root" ]; then
+        printf '[%s]' "$repo"
+      else
+        printf '[%s] %s' "$repo" "$base"
+      fi
+    else
+      printf '%s' "$(basename "$dir")"
+    fi
+  '';
+in
+{
   programs.tmux = {
     enable = true;
     extraConfig =
@@ -27,7 +45,7 @@
         # Auto-rename panes
         set-option -g status-interval 2
         set-option -g automatic-rename on
-        set-option -g automatic-rename-format '#{b:pane_current_path}'
+        set-option -g automatic-rename-format '#(${tmux-jj-title} #{pane_current_path})'
 
         # long scrollback
         set-option -g history-limit 50000
