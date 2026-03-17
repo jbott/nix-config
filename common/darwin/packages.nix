@@ -4,6 +4,7 @@
     blueutil
     colima
     docker-client
+    finicky
     gen-firefox-profile-launchers
     iproute2mac
     m1ddc

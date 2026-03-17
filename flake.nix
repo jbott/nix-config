@@ -78,7 +78,7 @@
         formatting = treefmtEval.config.build.check self;
       };
       packages = with pkgs; {
-        inherit deploy-nixos;
+        inherit deploy-nixos finicky;
       };
       devShells = {
         default = pkgs.mkShell {
