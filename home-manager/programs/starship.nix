@@ -25,6 +25,56 @@ in
       # Disable nix shell indicator — always shows "impure" which isn't useful
       nix_shell.disabled = true;
 
+      # Disable all language/runtime indicators
+      buf.disabled = true;
+      bun.disabled = true;
+      c.disabled = true;
+      cmake.disabled = true;
+      cobol.disabled = true;
+      crystal.disabled = true;
+      daml.disabled = true;
+      dart.disabled = true;
+      deno.disabled = true;
+      dotnet.disabled = true;
+      elixir.disabled = true;
+      elm.disabled = true;
+      erlang.disabled = true;
+      fennel.disabled = true;
+      fortran.disabled = true;
+      gleam.disabled = true;
+      golang.disabled = true;
+      gradle.disabled = true;
+      haskell.disabled = true;
+      haxe.disabled = true;
+      java.disabled = true;
+      julia.disabled = true;
+      kotlin.disabled = true;
+      lua.disabled = true;
+      meson.disabled = true;
+      mojo.disabled = true;
+      nim.disabled = true;
+      nodejs.disabled = true;
+      ocaml.disabled = true;
+      odin.disabled = true;
+      opa.disabled = true;
+      package.disabled = true;
+      perl.disabled = true;
+      php.disabled = true;
+      purescript.disabled = true;
+      python.disabled = true;
+      quarto.disabled = true;
+      raku.disabled = true;
+      red.disabled = true;
+      rlang.disabled = true;
+      ruby.disabled = true;
+      rust.disabled = true;
+      scala.disabled = true;
+      solidity.disabled = true;
+      swift.disabled = true;
+      typst.disabled = true;
+      vlang.disabled = true;
+      zig.disabled = true;
+
       # Replace directory module with jj-aware version
       # Placing ${custom.dir} explicitly excludes it from $all, avoiding duplication
       format = "\${custom.dir}$all";
