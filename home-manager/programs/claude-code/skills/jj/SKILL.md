@@ -1,6 +1,6 @@
 ---
 name: jj
-description: "jj version control: /jj commit, /jj describe, /jj bookmark, /jj split, /jj squash"
+description: "jj version control — use when asked to commit, describe, bookmark, split, or squash changes. Triggers: commit changes, create a commit, save my work, describe this commit, split commit, squash commits. Commands: /jj commit, /jj describe, /jj bookmark, /jj split, /jj squash"
 ---
 
 # jj Reference Guide
@@ -22,10 +22,10 @@ All commit descriptions MUST be a single line: `<project-prefix>: <short descrip
 
 **IMPORTANT**: Never use multi-line descriptions or bullet points.
 
-- **Project prefix**: descriptive folder path for the subsystem (e.g., `src/auth`, `lib/utils`, `services/api`)
+- **Project prefix**: path from the repo root to the most specific common directory of the changed files (e.g., `src/auth`, `lib/utils`, `services/api`)
 - **Description**: starts with a lowercase verb: add, update, fix, refactor, remove, etc.
 
-Examples: `src/auth: add JWT token refresh logic`, `lib/utils: fix date parsing for ISO formats`, `db/migrations: add users table`
+Examples: `src/auth: add JWT token refresh logic`, `lib/utils: fix date parsing for ISO formats`, `services/api: remove delay on sidebar tooltips`
 
 ## Analyzing Changes
 
@@ -73,7 +73,7 @@ After committing, `@` becomes an empty working copy on top of the new commit.
    - If `@` is empty: `jj bookmark create john/<name> -r @-`
    - If `@` has changes: `jj bookmark create john/<name>`
 
-Naming examples: `john/s3-inventory-download`, `john/fix-auth-refresh`, `john/refactor-poller-config`
+Naming examples: `john/add-search-api`, `john/fix-login-redirect`, `john/refactor-db-queries`
 
 ### `/jj split`
 
