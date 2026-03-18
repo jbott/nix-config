@@ -134,7 +134,7 @@ jj squash --from <change-id> --into <change-id> -m "<description>"           # a
 6. Remove duplicated hunks
 7. Restore working copy: `jj new`
 
-**Always use change IDs** (e.g., `ksrmwuon`) not commit IDs - they're stable across rewrites.
+**Prefer bookmark names** (e.g., `john/app-deploy`) when a revision has one — they're human-readable and stable across rewrites. Fall back to **change IDs** (e.g., `ksrmwuon`) for revisions without bookmarks. Never use commit IDs — they change on every rewrite.
 
 ## Revision Syntax
 
@@ -149,7 +149,8 @@ jj squash --from <change-id> --into <change-id> -m "<description>"           # a
 | `x::` | All descendants of x, including x |
 | `x..y` | Ancestors of y that are NOT ancestors of x |
 | `x::y` | Descendants of x that are also ancestors of y |
-| `<change-id>` | Specific commit by change ID (e.g., `ksrmwuon`) |
+| `<bookmark>` | Revision by bookmark name (e.g., `john/app-deploy`) — preferred |
+| `<change-id>` | Revision by change ID (e.g., `ksrmwuon`) — fallback |
 
 ## Working Copy Behavior
 
