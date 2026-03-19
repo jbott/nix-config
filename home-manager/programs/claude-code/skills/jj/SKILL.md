@@ -152,6 +152,10 @@ jj squash --from <change-id> --into <change-id> -m "<description>"           # a
 | `<bookmark>` | Revision by bookmark name (e.g., `john/app-deploy`) — preferred |
 | `<change-id>` | Revision by change ID (e.g., `ksrmwuon`) — fallback |
 
+## Divergent Commits
+
+When a change ID has divergent copies (shown as `<change-id>/0`, `<change-id>/1`), **always inspect both commits before taking action**. Run `jj show <change-id>/0 --git` and `jj show <change-id>/1 --git` to compare their contents. Only then decide which to abandon or how to resolve the divergence.
+
 ## Working Copy Behavior
 
 - `@` (working copy) is often an empty commit on top of your actual work
