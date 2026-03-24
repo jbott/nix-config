@@ -30,10 +30,10 @@ Examples: `src/auth: add JWT token refresh logic`, `lib/utils: fix date parsing 
 ## Analyzing Changes
 
 ```bash
-jj diff --stat             # working copy: file names and line counts
+jj diff --summary          # working copy: file names and change types
 jj diff --git              # working copy: full diff in git patch format
-jj show <rev> --stat       # specific revision: file names and line counts
-jj show <rev> --git        # specific revision: full diff in git patch format
+jj show --summary -r <rev> # specific revision: file names and change types
+jj show --git -r <rev>     # specific revision: full diff in git patch format
 ```
 
 Use `jj diff` for working copy (`@`), `jj show` for specific revisions.
@@ -49,7 +49,7 @@ Always use `--git` when reading diffs (not the default jj diff format).
 
 ### `/jj commit`
 
-1. Run `jj diff --stat` for overview (shows file names and line counts)
+1. Run `jj diff --summary` for overview (shows file names and change types)
 2. Analyze changes (small: `jj diff --git` directly; large: use haiku subagent to summarize)
 3. Determine project prefix from file paths
 4. Generate one-line description
@@ -59,8 +59,8 @@ After committing, `@` becomes an empty working copy on top of the new commit.
 
 ### `/jj describe`
 
-1. Run `jj show <rev> --stat` for overview (use `@-` for parent)
-2. Analyze changes (small: `jj show <rev> --git` directly; large: use haiku subagent to summarize)
+1. Run `jj show --summary -r <rev>` for overview (use `@-` for parent)
+2. Analyze changes (small: `jj show --git -r <rev>` directly; large: use haiku subagent to summarize)
 3. Determine project prefix from file paths
 4. Generate one-line description
 5. Run `jj describe <rev> -m "<description>"`
@@ -78,8 +78,8 @@ Naming examples: `john/add-search-api`, `john/fix-login-redirect`, `john/refacto
 ### `/jj split`
 
 1. Run `jj status` to check if splitting `@` (has changes) or `@-` (working copy empty)
-2. Run `jj show <rev> --stat` for overview
-3. Analyze changes (small: `jj show <rev> --git` directly; large: use haiku subagent to summarize)
+2. Run `jj show --summary -r <rev>` for overview
+3. Analyze changes (small: `jj show --git -r <rev>` directly; large: use haiku subagent to summarize)
 4. Propose functional groups (feature+tests together, config separate, migrations separate, refactoring separate)
 5. **Ask user for approval via AskUserQuestion**
 6. Execute splits:
@@ -95,7 +95,7 @@ Naming examples: `john/add-search-api`, `john/fix-login-redirect`, `john/refacto
 
 ### `/jj squash`
 
-1. Run `jj diff --stat` for overview (shows file names and line counts)
+1. Run `jj diff --summary` for overview (shows file names and change types)
 2. Run `jj log -r ::@- --limit 15` to see candidate ancestor commits
 3. Analyze changes (small: `jj diff --git` directly; large: use haiku subagent to summarize)
 4. **Match changes to ancestor commits by path and commit descriptions**
@@ -154,7 +154,7 @@ jj squash --from <change-id> --into <change-id> -m "<description>"           # a
 
 ## Divergent Commits
 
-When a change ID has divergent copies (shown as `<change-id>/0`, `<change-id>/1`), **always inspect both commits before taking action**. Run `jj show <change-id>/0 --git` and `jj show <change-id>/1 --git` to compare their contents. Only then decide which to abandon or how to resolve the divergence.
+When a change ID has divergent copies (shown as `<change-id>/0`, `<change-id>/1`), **always inspect both commits before taking action**. Run `jj show --git -r <change-id>/0` and `jj show --git -r <change-id>/1` to compare their contents. Only then decide which to abandon or how to resolve the divergence.
 
 ## Working Copy Behavior
 
