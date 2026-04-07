@@ -8,8 +8,7 @@
   home-manager.useGlobalPkgs = true;
 
   home-manager.users.jbo = {
-    # Not sure when this should change
-    home.stateVersion = "22.11";
+    home.stateVersion = "26.05";
 
     # Pass the extra args to all home-manager modules too
     _module.args = {inherit currentSystemName;};
