@@ -37,7 +37,6 @@ in {
     neovim
     nix-output-monitor
     nmap
-    nodePackages.prettier
     nvd
     poppler-utils
     python3
