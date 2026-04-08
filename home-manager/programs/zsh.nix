@@ -34,6 +34,10 @@
       # Configure zle in emacs mode
       bindkey -e
 
+      # Force block cursor (ZLE can switch it to a bar)
+      zle-line-init() { printf '\e[2 q'; }
+      zle -N zle-line-init
+
       # Bind keyboard control characters to useful functions
       # TODO: Understand why using zsh from nix breaks home / end / del
       bindkey '^[[1~' beginning-of-line               # Home / Fn Left-Arrow
