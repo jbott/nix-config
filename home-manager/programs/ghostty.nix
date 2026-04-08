@@ -6,6 +6,7 @@
       background = "#121212";
       foreground = "#f7f7f8";
       cursor-color = "#7de486";
+      cursor-style = "block";
       selection-background = "#7de486";
       selection-foreground = "#121212";
       palette = [

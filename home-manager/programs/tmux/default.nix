@@ -59,8 +59,8 @@ in
         bind-key -T copy-mode-vi WheelUpPane send -N1 -X scroll-up
         bind-key -T copy-mode-vi WheelDownPane send -N1 -X scroll-down
 
-        # Enable hyperlinks (OSC 8) passthrough to the outer terminal
-        set -as terminal-features ',xterm-ghostty:hyperlinks'
+        # Enable full terminal features for ghostty
+        set -as terminal-features ',xterm-ghostty:clipboard:ccolour:cstyle:focus:title:hyperlinks'
 
         # Clear the default command set by tmux-sensible. It's version of reattach-to-user-namespace
         # breaks launching zsh. It also does not work correctly for sudo, and tmux includes this
