@@ -41,7 +41,7 @@
         path = "/backups";
         "valid users" = "backup";
         "guest ok" = "no";
-        writeable = "yes";
+        writable = "yes";
         "force user" = "backup";
         "force group" = "backup";
         "fruit:time machine" = "yes";

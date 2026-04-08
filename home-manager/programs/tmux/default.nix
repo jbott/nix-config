@@ -1,5 +1,4 @@
-{pkgs, ...}:
-let
+{pkgs, ...}: let
   tmux-jj-title = pkgs.writeShellScript "tmux-jj-title" ''
     dir="$1"
     if root=$(cd "$dir" && ${pkgs.jujutsu}/bin/jj workspace root --ignore-working-copy 2>/dev/null); then
@@ -15,8 +14,7 @@ let
       printf '%s' "$(basename "$dir")"
     fi
   '';
-in
-{
+in {
   programs.tmux = {
     enable = true;
     extraConfig =

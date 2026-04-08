@@ -1,5 +1,4 @@
-{pkgs, ...}:
-let
+{pkgs, ...}: let
   starship-jj-dir = pkgs.writeShellScript "starship-jj-dir" ''
     if root=$(realpath "$(${pkgs.jujutsu}/bin/jj workspace root 2>/dev/null)"); then
       cwd=$(realpath "$PWD")
@@ -10,8 +9,7 @@ let
       printf '%s' "''${PWD/#$HOME/~}"
     fi
   '';
-in
-{
+in {
   home.packages = [pkgs.jj-starship];
 
   programs.starship = {
