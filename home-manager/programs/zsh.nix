@@ -28,6 +28,22 @@
     };
 
     initContent = ''
+      # Create a jj workspace with convention: ../w-<name>, bookmark john/<name>
+      jjw() {
+        if [[ $# -lt 1 ]]; then
+          echo "Usage: jjw <branch-title>" >&2
+          return 1
+        fi
+        local name="$1"
+        local root
+        root=$(jj workspace root 2>/dev/null) || { echo "Not in a jj repo" >&2; return 1; }
+        local ws_dir="$(dirname "$root")/w-$name"
+        jj workspace add "$ws_dir" && \
+        cd "$ws_dir" && \
+        jj new -r main && \
+        jj bookmark create "john/$name"
+      }
+
       # Disable 'r' for running the last command
       disable r
 
