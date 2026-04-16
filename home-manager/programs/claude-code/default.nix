@@ -28,6 +28,7 @@ in {
     settings = {
       includeCoAuthoredBy = false;
       model = "opus[1m]";
+      autoCompactWindow = 400000;
       alwaysThinkingEnabled = true;
       skipDangerousModePermissionPrompt = true;
       spinnerTipsEnabled = false;
