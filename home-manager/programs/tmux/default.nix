@@ -58,7 +58,14 @@ in {
         bind-key -T copy-mode-vi WheelDownPane send -N1 -X scroll-down
 
         # Enable full terminal features for ghostty
-        set -as terminal-features ',xterm-ghostty:clipboard:ccolour:cstyle:focus:title:hyperlinks'
+        set -as terminal-features ',xterm-ghostty:clipboard:ccolour:cstyle:focus:sync:title:hyperlinks'
+
+        # Forward focus events to programs (used by claude-code notifications, etc.)
+        set -g focus-events on
+
+        # Let programs passthrough escape sequences to the outer terminal
+        # (OSC notifications, iTerm2/Kitty/Ghostty popups, progress bar)
+        set -g allow-passthrough on
 
         # Clear the default command set by tmux-sensible. It's version of reattach-to-user-namespace
         # breaks launching zsh. It also does not work correctly for sudo, and tmux includes this
