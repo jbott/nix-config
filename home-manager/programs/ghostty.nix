@@ -3,6 +3,10 @@
     enable = true;
     package = pkgs.ghostty-bin;
     settings = {
+      # Left Option = macOS modifier (en-dash, em-dash, etc.)
+      # Right Option = Alt (for terminal keybinds like Alt+f, Alt+b)
+      macos-option-as-alt = "right";
+
       background = "#121212";
       foreground = "#f7f7f8";
       cursor-color = "#7de486";
