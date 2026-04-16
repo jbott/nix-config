@@ -15,3 +15,6 @@ diff attr:
     nvd diff $(nix build --no-link --print-out-paths "nix-config/main#{{ attr }}" ".#{{ attr }}")
 
 diff-laptop: (diff "darwinConfigurations.jmbp.config.system.build.toplevel")
+
+update-claude-code:
+    nix run '.#claude-code.updateScript' -- overlay/pkgs/claude-code/hashes.json

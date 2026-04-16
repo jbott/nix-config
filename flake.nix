@@ -17,11 +17,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.treefmt-nix.follows = "treefmt-nix";
-    };
     nix-darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,7 +35,6 @@
     home-manager,
     impermanence,
     jj-starship,
-    llm-agents,
     nix-darwin,
     nixpkgs,
     treefmt-nix,
@@ -58,7 +52,6 @@
     overlays = [
       (import ./overlay)
       jjStarshipOverlay
-      llm-agents.overlays.default
     ];
     nixpkgsOverlaysModule = {
       nixpkgs = {
@@ -78,7 +71,7 @@
         formatting = treefmtEval.config.build.check self;
       };
       packages = with pkgs; {
-        inherit deploy-nixos finicky;
+        inherit claude-code deploy-nixos finicky;
       };
       devShells = {
         default = pkgs.mkShell {

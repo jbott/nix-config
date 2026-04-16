@@ -12,6 +12,7 @@ in {
     black
     btop
     cdrtools
+    claude-code
     difftastic
     docker
     docker-buildx
@@ -31,7 +32,6 @@ in {
     jujutsu
     just
     kubectl
-    llm-agents.claude-code
     minicom
     mtr
     neovim
