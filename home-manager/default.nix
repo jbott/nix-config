@@ -16,7 +16,7 @@
     imports =
       [
         ./programs/atuin.nix
-        ./programs/claude-code.nix
+        ./programs/claude-code
         ./programs/dircolors.nix
         ./programs/direnv.nix
         ./programs/git.nix

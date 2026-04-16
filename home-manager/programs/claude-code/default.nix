@@ -3,7 +3,9 @@
     enable = true;
     package = pkgs.llm-agents.claude-code;
 
-    skillsDir = ./claude-code/skills;
+    skills = {
+      jj = ./skills/jj;
+    };
 
     settings = {
       includeCoAuthoredBy = false;
