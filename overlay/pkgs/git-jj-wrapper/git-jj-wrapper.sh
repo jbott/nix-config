@@ -9,6 +9,12 @@ if [[ "$parent_comm" == "jj" ]]; then
     exec @git@ "$@"
 fi
 
+# `git clone` creates a new repo somewhere else; it's unrelated to the
+# current jj workspace, so always pass through to real git.
+if [[ "$1" == "clone" ]]; then
+    exec @git@ "$@"
+fi
+
 # Check if we're in a directory with a real .git directory
 # If so, use real git (this includes colocated jj+git repos)
 if @git@ rev-parse --git-dir &>/dev/null; then
@@ -265,12 +271,6 @@ case "$1" in
         echo "git stash is not supported. In jj, changes are automatically tracked in @" >&2
         echo "Use 'jj new' to start a new commit instead" >&2
         exit 1
-        ;;
-
-    clone)
-        # Forward to jj git clone
-        shift
-        jj_user git clone "$@"
         ;;
 
     push|pull|fetch)
