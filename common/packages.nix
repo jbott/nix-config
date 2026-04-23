@@ -27,6 +27,7 @@ in {
     glab
     gmailctl
     htop
+    jj-hunk-tool
     jjui
     jq
     jujutsu

@@ -71,7 +71,7 @@
         formatting = treefmtEval.config.build.check self;
       };
       packages = with pkgs; {
-        inherit claude-code deploy-nixos finicky;
+        inherit claude-code deploy-nixos finicky jj-hunk-tool;
       };
       devShells = {
         default = pkgs.mkShell {

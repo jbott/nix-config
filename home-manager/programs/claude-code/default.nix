@@ -23,6 +23,7 @@ in {
 
     skills = {
       jj = ./skills/jj;
+      jj-surgeon = "${pkgs.jj-hunk-tool.src}/skills/jj-surgeon";
     };
 
     settings = {
