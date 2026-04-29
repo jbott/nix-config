@@ -38,6 +38,14 @@ jj_silent() {
     @jj@ "$@"
 }
 
+# Strip leading `-c key=value` config-override flags before the subcommand.
+# Tools like glab pass these to set transport/credential options that don't
+# apply to jj — drop them so we dispatch on the real subcommand.
+while [[ "$1" == "-c" ]]; do
+    shift  # drop -c
+    shift  # drop the key=value
+done
+
 # We're in a jj workspace, translate commands
 case "$1" in
     rev-parse)
@@ -156,6 +164,36 @@ case "$1" in
                 jj_user log -r "$revision"
                 ;;
         esac
+        ;;
+
+    symbolic-ref)
+        # Read the symbolic ref HEAD via jj. Mirrors `rev-parse --abbrev-ref`
+        # but uses symbolic-ref's output format (refs/heads/<name>) and
+        # exit conventions (exit 1 on detached HEAD, not echo "HEAD").
+        shift
+        short=0
+        quiet=0
+        while [[ "$1" == --* || "$1" == -q ]]; do
+            case "$1" in
+                --short) short=1 ;;
+                --quiet|-q) quiet=1 ;;
+            esac
+            shift
+        done
+        rev="${1:-HEAD}"
+        [ "$rev" = "HEAD" ] && rev="@-"
+        bookmarks=$(jj_silent log -r "$rev" --no-graph -T 'bookmarks.map(|b| b.name()).join(" ")')
+        bm="${bookmarks%% *}"
+        if [ -n "$bm" ]; then
+            if [ "$short" -eq 1 ]; then
+                echo "$bm"
+            else
+                echo "refs/heads/$bm"
+            fi
+        else
+            [ "$quiet" -eq 0 ] && echo "fatal: ref HEAD is not a symbolic ref" >&2
+            exit 1
+        fi
         ;;
 
     describe)
