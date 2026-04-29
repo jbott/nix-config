@@ -9,8 +9,8 @@
       };
 
       aliases = {
-        dt = ["diff" "--from" "latest(heads(::@ & ::trunk()))" "--to" "@"];
-        lt = ["log" "-r" "trunk()..@"];
+        dt = ["diff" "--git" "--from" "latest(heads(::@ & ::trunk()))" "--to" "@"];
+        lt = ["log" "-r" "trunk()..@" "--summary"];
         push = ["git" "push" "-r" "::@ & bookmarks()"];
         restack = ["rebase" "--onto" "trunk()" "--source" "mutable_roots() ~ ::(working_copies() ~ @)" "--skip-emptied" "--simplify-parents"];
         rom = ["rebase" "--onto" "trunk()" "--skip-emptied" "--simplify-parents"];
