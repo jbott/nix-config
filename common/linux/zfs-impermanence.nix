@@ -1,9 +1,17 @@
 # Config to rollback zfs filesystems on boot
 # Inspired by https://grahamc.com/blog/erase-your-darlings
 {lib, ...}: {
-  boot.initrd.postResumeCommands = lib.mkAfter ''
-    zfs rollback -r rpool/local/root@blank
-  '';
+  boot.initrd.systemd.services.rollback-root = {
+    description = "Rollback ZFS root filesystem to blank snapshot";
+    wantedBy = ["initrd.target"];
+    after = ["zfs-import-rpool.service"];
+    before = ["sysroot.mount"];
+    unitConfig.DefaultDependencies = "no";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      zfs rollback -r rpool/local/root@blank
+    '';
+  };
 
   # Set noop scheduler for zfs partitions
   # source: https://github.com/cole-h/nixos-config/blob/3589d53515921772867065150c6b5a500a5b9a6b/hosts/scadrial/modules/services.nix#L70
