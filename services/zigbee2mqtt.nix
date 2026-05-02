@@ -19,6 +19,7 @@
   # Use a bind mount to map data onto /persist
   fileSystems."/var/lib/zigbee2mqtt" = {
     device = "/persist/var/lib/zigbee2mqtt";
+    fsType = "none";
     options = ["bind"];
   };
 
