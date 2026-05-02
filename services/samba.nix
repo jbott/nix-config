@@ -53,6 +53,7 @@
   # Use bind mounts to map Samba state onto /persist
   fileSystems."/var/lib/samba" = {
     device = "/persist/var/lib/samba";
+    fsType = "none";
     options = ["bind"];
   };
 
