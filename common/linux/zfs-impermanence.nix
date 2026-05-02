@@ -1,11 +1,14 @@
 # Config to rollback zfs filesystems on boot
 # Inspired by https://grahamc.com/blog/erase-your-darlings
-{lib, ...}: {
+{lib, config, ...}: {
+  boot.zfs.forceImportRoot = false;
+
   boot.initrd.systemd.services.rollback-root = {
     description = "Rollback ZFS root filesystem to blank snapshot";
     wantedBy = ["initrd.target"];
     after = ["zfs-import-rpool.service"];
     before = ["sysroot.mount"];
+    path = [config.boot.zfs.package];
     unitConfig.DefaultDependencies = "no";
     serviceConfig.Type = "oneshot";
     script = ''

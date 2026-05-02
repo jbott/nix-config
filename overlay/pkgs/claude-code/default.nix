@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   makeWrapper,
+  autoPatchelfHook,
   writeShellApplication,
   versionCheckHook,
   bubblewrap,
@@ -43,7 +44,7 @@ in
     dontUnpack = true;
     dontStrip = true; # bun runtime; stripping breaks it
 
-    nativeBuildInputs = [makeWrapper];
+    nativeBuildInputs = [makeWrapper] ++ lib.optionals stdenv.hostPlatform.isLinux [autoPatchelfHook];
 
     installPhase = ''
       runHook preInstall
