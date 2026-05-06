@@ -8,7 +8,6 @@
 in {
   environment.systemPackages = with pkgs; [
     # keep-sorted start
-    atuin
     bitwarden-cli
     black
     btop
