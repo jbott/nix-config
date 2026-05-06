@@ -41,7 +41,7 @@
             options = {
               "com.sun:auto-snapshot" = "false";
             };
-            postCreateHook = "zfs snapshot rpool/local/root@blank";
+            postCreateHook = "zfs list -t snapshot rpool/local/root@blank >/dev/null 2>&1 || zfs snapshot rpool/local/root@blank";
           };
           "local/nix" = {
             type = "zfs_fs";
