@@ -181,6 +181,27 @@ case "$1" in
             shift
         done
         rev="${1:-HEAD}"
+
+        # glab and similar tools query refs/remotes/origin/HEAD to discover
+        # the remote's default branch. jj clones don't create that symref,
+        # so without this branch glab falls back to its hardcoded `master`
+        # and `glab mr create` fails on main-default repos. Resolve via
+        # jj's remote bookmarks, preferring main and falling back to master.
+        if [ "$rev" = "refs/remotes/origin/HEAD" ]; then
+            for candidate in main master; do
+                if jj_silent log -r "${candidate}@origin" --no-graph -T 'commit_id' &>/dev/null; then
+                    if [ "$short" -eq 1 ]; then
+                        echo "origin/$candidate"
+                    else
+                        echo "refs/remotes/origin/$candidate"
+                    fi
+                    exit 0
+                fi
+            done
+            [ "$quiet" -eq 0 ] && echo "fatal: ref refs/remotes/origin/HEAD is not a symbolic ref" >&2
+            exit 1
+        fi
+
         [ "$rev" = "HEAD" ] && rev="@-"
         bookmarks=$(jj_silent log -r "$rev" --no-graph -T 'bookmarks.map(|b| b.name()).join(" ")')
         bm="${bookmarks%% *}"
@@ -217,7 +238,20 @@ case "$1" in
         shift
         # Handle git config operations selectively
         case "$1" in
-            --get|--get-all|--list|--get-regexp)
+            --get|--get-all)
+                # glab caches the resolved remote under
+                # `remote.<name>.glab-resolved`. In a real git checkout it
+                # writes the value on first use; in a jj workspace the
+                # write would fail, so glab keeps trying. Return the
+                # canonical value here so glab sees the cache as already
+                # populated and skips the write.
+                if [[ "$2" == remote.*.glab-resolved ]]; then
+                    echo "head"
+                    exit 0
+                fi
+                exec @git@ config "$@"
+                ;;
+            --list|--get-regexp)
                 # Read-only operations, proxy to real git
                 exec @git@ config "$@"
                 ;;
