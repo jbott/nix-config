@@ -1,6 +1,10 @@
 # Config to rollback zfs filesystems on boot
 # Inspired by https://grahamc.com/blog/erase-your-darlings
-{lib, config, ...}: {
+{
+  lib,
+  config,
+  ...
+}: {
   boot.zfs.forceImportRoot = false;
 
   boot.initrd.systemd.services.rollback-root = {
