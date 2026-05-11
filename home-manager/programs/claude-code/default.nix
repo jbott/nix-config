@@ -26,6 +26,13 @@ in {
       jj-surgeon = "${pkgs.jj-hunk-tool.src}/skills/jj-surgeon";
     };
 
+    plugins = with pkgs.ed3d-plugins.plugins; [
+      basic-agents
+      plan-and-execute
+      research-agents
+      extending-claude
+    ];
+
     settings = {
       includeCoAuthoredBy = false;
       model = "opus[1m]";
