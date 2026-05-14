@@ -16,6 +16,42 @@
       echo "$model"
     fi
   '';
+
+  # WorktreeCreate hook: claude pipes `{"name": "..."}` on stdin; we create
+  # a jj workspace at $CLAUDE_PROJECT_DIR/.claude/worktrees/<name> and print
+  # the absolute path on stdout for claude to cd into. If a workspace with
+  # that name already exists, reuse it so `yolo --worktree <name>` resumes.
+  # Source: https://github.com/kawaz/jj-worktree/issues/1
+  worktreeCreateHook = pkgs.writeShellScript "claude-code-hook-WorktreeCreate" ''
+    set -euo pipefail
+    input=$(cat)
+    name=$(${pkgs.jq}/bin/jq -r '.name' <<< "$input")
+    worktree_path="$CLAUDE_PROJECT_DIR/.claude/worktrees/$name"
+    jj="${pkgs.jujutsu}/bin/jj -R $CLAUDE_PROJECT_DIR"
+    if $jj workspace list -T 'name ++ "\n"' | grep -Fxq "$name"; then
+      if [ ! -d "$worktree_path" ]; then
+        echo "Error: jj workspace '$name' is tracked but $worktree_path is missing." >&2
+        echo "Run 'jj workspace forget $name' to drop the stale entry, then retry." >&2
+        exit 1
+      fi
+      echo "Reusing existing jj workspace '$name' at $worktree_path" >&2
+    else
+      mkdir -p "$(dirname "$worktree_path")"
+      $jj workspace add "$worktree_path" >&2
+    fi
+    echo "$worktree_path"
+  '';
+
+  worktreeRemoveHook = pkgs.writeShellScript "claude-code-hook-WorktreeRemove" ''
+    set -euo pipefail
+    input=$(cat)
+    worktree_path=$(${pkgs.jq}/bin/jq -r '.worktree_path' <<< "$input")
+    workspace_name=$(basename "$worktree_path")
+    if [ -d "$worktree_path" ]; then
+      ${pkgs.jujutsu}/bin/jj -R "$CLAUDE_PROJECT_DIR" workspace forget "$workspace_name" 2>/dev/null || true
+      rm -rf "$worktree_path"
+    fi
+  '';
 in {
   programs.claude-code = {
     enable = true;
@@ -43,6 +79,29 @@ in {
       statusLine = {
         type = "command";
         command = "${statusLine}";
+      };
+      hooks = {
+        WorktreeCreate = [
+          {
+            hooks = [
+              {
+                type = "command";
+                command = "${worktreeCreateHook}";
+                timeout = 60;
+              }
+            ];
+          }
+        ];
+        WorktreeRemove = [
+          {
+            hooks = [
+              {
+                type = "command";
+                command = "${worktreeRemoveHook}";
+              }
+            ];
+          }
+        ];
       };
       env = {
         CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
