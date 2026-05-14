@@ -21,6 +21,10 @@
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-rosetta-builder = {
+      url = "github:cpick/nix-rosetta-builder";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -36,6 +40,7 @@
     impermanence,
     jj-starship,
     nix-darwin,
+    nix-rosetta-builder,
     nixpkgs,
     treefmt-nix,
   } @ inputs: let
@@ -92,6 +97,7 @@
             (currentSystemNameModule "jmbp")
             nixpkgsOverlaysModule
             home-manager.darwinModules.default
+            nix-rosetta-builder.darwinModules.default
             ./common
             ./common/darwin
             ./home-manager
