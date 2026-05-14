@@ -13,6 +13,7 @@ in {
     btop
     cdrtools
     claude-code
+    claude-code-modes
     difftastic
     docker
     docker-buildx

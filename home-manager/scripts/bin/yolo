@@ -7,6 +7,22 @@ if [[ -n "${root:-}" ]]; then
     cd "$root"
 fi
 
+# Pull a leading `--mode <preset>` off the arg list and dispatch to
+# claude-code-modes (`claude-mode`) instead of claude. Anything after the
+# preset is forwarded to the underlying `claude` invocation by claude-mode.
+mode=
+if [[ $# -ge 2 && "$1" == "--mode" ]]; then
+    mode=$2
+    shift 2
+fi
+
+if [[ -n "$mode" ]]; then
+    # claude-mode parses its own flags; anything for claude must come after `--`.
+    exec claude-mode "$mode" -- \
+        --dangerously-skip-permissions \
+        "$@"
+fi
+
 exec claude \
     --dangerously-skip-permissions \
     "$@"
