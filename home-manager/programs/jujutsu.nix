@@ -38,6 +38,13 @@ in {
         rom = ["rebase" "--onto" "trunk()" "--skip-emptied" "--simplify-parents"];
         tug = ["bookmark" "advance" "--to" "latest(::@ ~ empty())"];
         wsrm = ["util" "exec" "--" "${wsrmScript}" "jj wsrm"];
+        # Megamerge workflow (see https://isaaccorbrey.com/notes/jujutsu-megamerges-for-fun-and-profit):
+        # - `jj stack <rev>` inserts <rev> as a new sibling parent of the
+        #   closest ancestor merge — i.e. attaches a branch to the megamerge.
+        # - `jj stage` folds all non-empty commits made on top of the megamerge
+        #   back into the merge as additional branches in one step.
+        stack = ["rebase" "--after" "trunk()" "--before" "closest_merge(@)" "--revisions"];
+        stage = ["stack" "closest_merge(@)+:: ~ empty()"];
       };
 
       ui = {
@@ -47,6 +54,9 @@ in {
 
       revset-aliases = {
         "mutable_roots()" = "roots(trunk()..) & mutable()";
+        # Topmost merge commit that is an ancestor of `to`. Backs the
+        # megamerge `stack` / `stage` aliases (see jujutsu.nix aliases).
+        "closest_merge(to)" = "heads(::to & merges())";
       };
 
       revsets = {

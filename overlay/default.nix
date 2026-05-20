@@ -9,6 +9,7 @@
   gen-firefox-profile-launchers = self.callPackage ./pkgs/gen-firefox-profile-launchers {};
   git-jj-wrapper = self.callPackage ./pkgs/git-jj-wrapper {};
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
+  jj-skill = self.callPackage ../skills/jj {};
   m1ddc = self.callPackage ./pkgs/m1ddc {};
   uhubctl = super.uhubctl.overrideAttrs (final: prev: {
     buildInputs =

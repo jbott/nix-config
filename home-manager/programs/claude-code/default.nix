@@ -42,6 +42,19 @@
     echo "$worktree_path"
   '';
 
+  # Structural guard: jj reads JJ_EDITOR (cli/src/config.rs) and uses it as the
+  # description editor. Claude has no terminal, so any interactive editor hangs.
+  # Point JJ_EDITOR at a script that errors with a clear hint instead.
+  # Note: this does NOT cover the diff editor (ui.diff-editor / :builtin TUI);
+  # those traps are documented in the jj skill.
+  jjEditorTrap = pkgs.writeShellScript "claude-code-jj-editor-trap" ''
+    cat >&2 <<'EOF'
+    jj invoked the description editor, but Claude cannot use interactive editors.
+    Re-run the command with -m "<message>" (or --stdin for multi-line).
+    EOF
+    exit 1
+  '';
+
   worktreeRemoveHook = pkgs.writeShellScript "claude-code-hook-WorktreeRemove" ''
     set -euo pipefail
     input=$(cat)
@@ -58,8 +71,7 @@ in {
     package = pkgs.claude-code;
 
     skills = {
-      jj = ./skills/jj;
-      jj-surgeon = "${pkgs.jj-hunk-tool.src}/skills/jj-surgeon";
+      jj = "${pkgs.jj-skill}";
     };
 
     plugins = with pkgs.ed3d-plugins.plugins; [
@@ -108,6 +120,7 @@ in {
         CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = "1";
         DISABLE_AUTOUPDATER = "1";
         DISABLE_INSTALLATION_CHECKS = "1";
+        JJ_EDITOR = "${jjEditorTrap}";
       };
     };
   };
