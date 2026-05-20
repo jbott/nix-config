@@ -12,6 +12,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence.url = "github:nix-community/impermanence";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,6 +37,7 @@
     flake-utils,
     home-manager,
     impermanence,
+    llm-agents,
     nix-darwin,
     nix-rosetta-builder,
     nixpkgs,
@@ -44,8 +49,13 @@
 
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
 
+    llmAgentsOverlay = final: _prev: {
+      agent-browser = llm-agents.packages.${final.stdenv.hostPlatform.system}.agent-browser;
+    };
+
     overlays = [
       (import ./overlay)
+      llmAgentsOverlay
     ];
     nixpkgsOverlaysModule = {
       nixpkgs = {

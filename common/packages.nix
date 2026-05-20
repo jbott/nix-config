@@ -8,6 +8,7 @@
 in {
   environment.systemPackages = with pkgs; [
     # keep-sorted start
+    agent-browser
     bitwarden-cli
     black
     btop
