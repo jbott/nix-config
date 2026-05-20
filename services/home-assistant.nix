@@ -1,8 +1,8 @@
 {pkgs, ...}: let
   imageName = "ghcr.io/home-assistant/home-assistant";
-  imageTag = "2025.3.3";
-  imageDigest = "sha256:f34de69aff7b21c7d7d474b86bef4dbce9613668b8d4a936e6c93b3844611505";
-  sha256 = "sha256-cHwl7KPTHq2M5P33LzWZjthr2OcvzhDgDoY3ib4GtXg=";
+  imageTag = "2026.5.3";
+  imageDigest = "sha256:ff875078181a0383bf3fca9f061be12d6180896dbd531de04e094e25505b0bb9";
+  sha256 = "sha256-BGiEDtZUEnq/W6rwI2lpwtEAEV2IdWM7yvsDYih3UOI=";
 
   image = "${imageName}:${imageTag}";
   imageFile = pkgs.dockerTools.pullImage {
