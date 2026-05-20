@@ -12,11 +12,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence.url = "github:nix-community/impermanence";
-    jj-starship = {
-      url = "github:dmmulroy/jj-starship";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
     nix-darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -38,7 +33,6 @@
     flake-utils,
     home-manager,
     impermanence,
-    jj-starship,
     nix-darwin,
     nix-rosetta-builder,
     nixpkgs,
@@ -50,13 +44,8 @@
 
     currentSystemNameModule = name: {_module.args.currentSystemName = name;};
 
-    jjStarshipOverlay = final: _prev: {
-      jj-starship = jj-starship.packages.${final.stdenv.hostPlatform.system}.jj-starship;
-    };
-
     overlays = [
       (import ./overlay)
-      jjStarshipOverlay
     ];
     nixpkgsOverlaysModule = {
       nixpkgs = {
