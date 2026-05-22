@@ -27,6 +27,23 @@ if ! @jj@ workspace root &>/dev/null; then
     exec @git@ "$@"
 fi
 
+# glab >= 1.87 caches the canonical remote under
+# remote.<name>.glab-resolved-{head,base}. If the read returns empty it
+# tries `git config --add` to populate the cache, which fails in a jj
+# workspace (no .git/config to write to). Inject the values via git's
+# env-config layer so real git's reads (--get-all, --get-regexp) return
+# them and glab skips the write entirely.
+injected_configs=(
+    "remote.origin.glab-resolved-head=head"
+    "remote.origin.glab-resolved-base=base"
+    "remote.origin.glab-resolved=head"
+)
+for i in "${!injected_configs[@]}"; do
+    export "GIT_CONFIG_KEY_$i=${injected_configs[i]%%=*}"
+    export "GIT_CONFIG_VALUE_$i=${injected_configs[i]#*=}"
+done
+export GIT_CONFIG_COUNT=${#injected_configs[@]}
+
 # Helper to run jj with a warning for user-facing commands
 jj_user() {
     echo "Warning: This is a jj workspace. Running: jj $*" >&2
@@ -239,16 +256,6 @@ case "$1" in
         # Handle git config operations selectively
         case "$1" in
             --get|--get-all)
-                # glab caches the resolved remote under
-                # `remote.<name>.glab-resolved`. In a real git checkout it
-                # writes the value on first use; in a jj workspace the
-                # write would fail, so glab keeps trying. Return the
-                # canonical value here so glab sees the cache as already
-                # populated and skips the write.
-                if [[ "$2" == remote.*.glab-resolved ]]; then
-                    echo "head"
-                    exit 0
-                fi
                 exec @git@ config "$@"
                 ;;
             --list|--get-regexp)
