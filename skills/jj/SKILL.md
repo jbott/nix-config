@@ -191,6 +191,30 @@ Always pass `--git` (jj's default diff format is harder to parse) and
 For diffs larger than ~5 files or ~200 lines, dispatch a haiku subagent to
 summarize rather than reading the whole diff yourself.
 
+## Comparing rewrites
+
+After amending, squashing, rebasing, or absorbing, you often want to verify
+"what did my change actually become?" — separate from any drift in its parent.
+
+```bash
+jj interdiff --from <old> --to <new> --git --no-pager                # patches of <old> vs <new>, normalized to same base
+jj interdiff --from john/foo@origin --to john/foo --git --no-pager   # what changed since last push
+jj evolog -p --git --no-pager -r <rev>                               # whole evolution of <rev>, every rewrite
+```
+
+`jj interdiff` rebases `--from` onto `--to`'s parents and diffs the result
+against `--to`. The output is "how the patches differ," not "how file contents
+differ." Use this when `<old>` and `<new>` have different parents — a plain
+`jj diff --from A --to B` would also include the parent drift, which interdiff
+strips out.
+
+`jj evolog -p` shows the full chain across every rewrite of a change, with the
+same parent normalization applied between each adjacent pair.
+
+Typical moment to reach for these: after `jj rom`, `jj squash`, `jj describe`,
+or `jj-hunk-tool absorb`, before `jj push` — verify the rewrite did what you
+intended. `<bookmark>@origin` is the canonical `--from` for "since last push".
+
 ## Describing and editing existing revisions
 
 ```bash
