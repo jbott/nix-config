@@ -10,8 +10,8 @@
       homeassistant = lib.mkForce true;
 
       serial = {
-        port = "/dev/serial/by-id/usb-dresden_elektronik_ingenieurtechnik_GmbH_ConBee_II_DE2250332-if00";
-        adapter = "deconz";
+        port = "/dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_30012bfc3f53ef11b8ba28e0174bec31-if00-port0";
+        adapter = "ember";
       };
     };
   };
