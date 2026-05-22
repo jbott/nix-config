@@ -10,6 +10,7 @@
       ".DS_Store"
       ".bash_profile"
       ".bashrc"
+      ".claude/scheduled_tasks.lock"
       ".claude/settings.local.json"
       ".gitconfig"
       ".gitmodules"
