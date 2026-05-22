@@ -10,6 +10,7 @@
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};
   m1ddc = self.callPackage ./pkgs/m1ddc {};
+  unifly = self.callPackage ./pkgs/unifly {};
   uhubctl = super.uhubctl.overrideAttrs (final: prev: {
     buildInputs =
       prev.buildInputs
