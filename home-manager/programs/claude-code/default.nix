@@ -55,6 +55,15 @@
     exit 1
   '';
 
+  # PostToolUse snapshot hook: `jj util snapshot` is the dedicated command for
+  # this (jj FAQ: "manually trigger a snapshot ... for scripting"). Captures
+  # Claude's edits as working-copy state — recoverable via `jj op log` /
+  # `jj op restore`. Silently no-ops outside jj repos (snapshot exits 1 with
+  # "no jj repo"; `|| true` swallows it).
+  jjSnapshotHook = pkgs.writeShellScript "claude-code-hook-jj-snapshot" ''
+    ${pkgs.jujutsu}/bin/jj util snapshot --quiet || true
+  '';
+
   worktreeRemoveHook = pkgs.writeShellScript "claude-code-hook-WorktreeRemove" ''
     set -euo pipefail
     input=$(cat)
@@ -93,6 +102,18 @@ in {
         command = "${statusLine}";
       };
       hooks = {
+        PostToolUse = [
+          {
+            matcher = "Edit|Write|MultiEdit|NotebookEdit|Bash";
+            hooks = [
+              {
+                type = "command";
+                command = "${jjSnapshotHook}";
+                timeout = 10;
+              }
+            ];
+          }
+        ];
         WorktreeCreate = [
           {
             hooks = [
