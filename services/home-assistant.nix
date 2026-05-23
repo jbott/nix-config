@@ -26,6 +26,8 @@ in {
   networking.firewall.allowedTCPPorts = [
     8123 # webui
     21064 # homekit bridge
+    21066
+    21067
   ];
 
   networking.firewall.allowedUDPPorts = [
