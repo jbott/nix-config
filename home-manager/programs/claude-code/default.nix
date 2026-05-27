@@ -51,6 +51,7 @@
     cat >&2 <<'EOF'
     jj invoked the description editor, but Claude cannot use interactive editors.
     Re-run the command with -m "<message>" (or --stdin for multi-line).
+    For `jj squash`, pass --use-destination-message (-u) to keep the existing message.
     EOF
     exit 1
   '';
