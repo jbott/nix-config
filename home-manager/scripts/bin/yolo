@@ -13,8 +13,11 @@ fi
 # repeat invocations resume the same claude session inside the same jj
 # workspace. `-w` / `--worktree` with no value (or `-w=`) synthesises a
 # name.
-gen_petname() {
-    petname -w 3 2>/dev/null || echo "wt-$(date +%Y%m%d-%H%M%S)"
+gen_codename() {
+    local mods nouns
+    mapfile -t mods < @modifiers@
+    mapfile -t nouns < @nouns@
+    printf '%s-%s\n' "${mods[RANDOM % ${#mods[@]}]}" "${nouns[RANDOM % ${#nouns[@]}]}"
 }
 
 mode=
@@ -37,7 +40,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         -w=*|--worktree=*)
             worktree_name=${1#*=}
-            [[ -z "$worktree_name" ]] && worktree_name=$(gen_petname)
+            [[ -z "$worktree_name" ]] && worktree_name=$(gen_codename)
             shift
             ;;
         -w|--worktree)
@@ -45,7 +48,7 @@ while [[ $# -gt 0 ]]; do
                 worktree_name=$2
                 shift 2
             else
-                worktree_name=$(gen_petname)
+                worktree_name=$(gen_codename)
                 shift
             fi
             ;;
@@ -61,14 +64,14 @@ if [[ -n "$worktree_name" ]]; then
     forwarded_args+=(-w "$worktree_name")
 fi
 
-# Label the session with a memorable petname so it shows up in the
+# Label the session with a memorable codename so it shows up in the
 # /resume picker — but only when the user didn't pass other args of
 # their own (a prompt, --resume, --continue, etc.), in which case
 # respect whatever they intended. For an existing worktree, resume the
 # session that the previous yolo run created.
 session_args=()
 if (( ! other_args_seen )); then
-    session_name=${worktree_name:-$(gen_petname)}
+    session_name=${worktree_name:-$(gen_codename)}
     if [[ -n "$worktree_name" && -n "${root:-}" \
           && -d "$root/.claude/worktrees/$worktree_name" ]]; then
         session_args=(--resume "$session_name")
