@@ -48,7 +48,6 @@ in {
     rclone
     ripgrep
     rust-analyzer
-    rust-petname
     rustfmt
     starship
     tmux
