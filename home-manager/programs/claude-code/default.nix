@@ -18,16 +18,31 @@
   '';
 
   # WorktreeCreate hook: claude pipes `{"name": "..."}` on stdin; we create
-  # a jj workspace at $CLAUDE_PROJECT_DIR/.claude/worktrees/<name> and print
-  # the absolute path on stdout for claude to cd into. If a workspace with
-  # that name already exists, reuse it so `yolo --worktree <name>` resumes.
-  # Source: https://github.com/kawaz/jj-worktree/issues/1
+  # a jj workspace at <parent-of-main-repo>/.worktrees/<main-repo>/<name> and
+  # print the absolute path on stdout for claude to cd into. Keeping worktrees
+  # beside the repo (not under .claude/) avoids nesting them inside the tracked
+  # tree; the <main-repo> segment namespaces them so sibling repos sharing the
+  # parent don't collide on a shared worktree name.
+  #
+  # We anchor to the MAIN workspace root, not $CLAUDE_PROJECT_DIR, because that
+  # may itself be a worktree (claude launched inside one) — using it directly
+  # would nest worktrees inside worktrees. jj's `$root/.jj/repo` is a directory
+  # in the main workspace but a file pointing at <main>/.jj/repo in secondary
+  # workspaces, so we follow it to recover the main root. If a workspace with
+  # the requested name already exists, reuse it so `yolo --worktree <name>`
+  # resumes. Source: https://github.com/kawaz/jj-worktree/issues/1
   worktreeCreateHook = pkgs.writeShellScript "claude-code-hook-WorktreeCreate" ''
     set -euo pipefail
     input=$(cat)
     name=$(${pkgs.jq}/bin/jq -r '.name' <<< "$input")
-    worktree_path="$CLAUDE_PROJECT_DIR/.claude/worktrees/$name"
-    jj="${pkgs.jujutsu}/bin/jj -R $CLAUDE_PROJECT_DIR"
+    ws_root=$(${pkgs.jujutsu}/bin/jj -R "$CLAUDE_PROJECT_DIR" workspace root)
+    if [ -f "$ws_root/.jj/repo" ]; then
+      repo_root=$(dirname "$(cd "$ws_root/.jj" && cd "$(dirname "$(cat repo)")" && pwd)")
+    else
+      repo_root="$ws_root"
+    fi
+    worktree_path="$(dirname "$repo_root")/.worktrees/$(basename "$repo_root")/$name"
+    jj="${pkgs.jujutsu}/bin/jj -R $repo_root"
     if $jj workspace list -T 'name ++ "\n"' | grep -Fxq "$name"; then
       if [ ! -d "$worktree_path" ]; then
         echo "Error: jj workspace '$name' is tracked but $worktree_path is missing." >&2
