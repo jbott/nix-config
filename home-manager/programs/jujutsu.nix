@@ -6,11 +6,13 @@
       echo "usage: $prog <workspace>..." >&2
       exit 2
     fi
-    jq=${pkgs.jq}/bin/jq
-    list_tpl='if(name != "default", "{\"name\":" ++ name.escape_json() ++ ",\"root\":" ++ root.escape_json() ++ "}\n", "")'
     for ws in "$@"; do
-      root=$(jj workspace list -T "$list_tpl" \
-        | $jq -r --arg n "$ws" 'select(.name == $n) | .root')
+      # Tab-separated name<TAB>root, one line per workspace. Tabs can't appear
+      # in either field, so a plain read parses it without jq/JSON escaping.
+      root=""
+      while IFS=$'\t' read -r name r; do
+        if [ "$name" = "$ws" ]; then root=$r; fi
+      done < <(jj workspace list -T 'name ++ "\t" ++ root ++ "\n"')
       if [ -z "$root" ]; then
         echo "$prog: no such workspace: $ws" >&2
         exit 1
