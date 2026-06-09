@@ -109,7 +109,7 @@ in {
     settings = {
       includeCoAuthoredBy = false;
       model = "opus[1m]";
-      autoCompactWindow = 400000;
+      autoCompactWindow = 500000;
       alwaysThinkingEnabled = true;
       skipDangerousModePermissionPrompt = true;
       spinnerTipsEnabled = false;
