@@ -21,6 +21,7 @@ in {
     docker-compose
     docker-credential-glab
     dotslash
+    fast-nix-gc
     fastmod
     fd
     fzf

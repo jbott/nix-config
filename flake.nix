@@ -6,6 +6,11 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    fast-nix-gc = {
+      url = "github:Mic92/fast-nix-gc";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -34,6 +39,7 @@
   outputs = {
     self,
     disko,
+    fast-nix-gc,
     flake-utils,
     home-manager,
     impermanence,
@@ -54,9 +60,20 @@
       claude-code = llm-agents.packages.${final.stdenv.hostPlatform.system}.claude-code;
     };
 
+    fastNixGcOverlay = final: _prev: {
+      # Two integration tests assume Linux filesystem semantics and fail on APFS
+      # (non-UTF8 store names rejected with EILSEQ; tmp FIFO handling differs), so
+      # skip the checkPhase on Darwin. Tests still run on our Linux hosts.
+      fast-nix-gc =
+        fast-nix-gc.packages.${final.stdenv.hostPlatform.system}.default.overrideAttrs (_: {
+          doCheck = !final.stdenv.hostPlatform.isDarwin;
+        });
+    };
+
     overlays = [
       (import ./overlay)
       llmAgentsOverlay
+      fastNixGcOverlay
     ];
     nixpkgsOverlaysModule = {
       nixpkgs = {
@@ -75,8 +92,8 @@
       checks = {
         formatting = treefmtEval.config.build.check self;
       };
-      packages = with pkgs; {
-        inherit claude-code claude-code-modes deploy-nixos finicky jj-hunk-tool jj-skill;
+      packages = {
+        inherit (pkgs) claude-code claude-code-modes deploy-nixos fast-nix-gc finicky jj-hunk-tool jj-skill;
       };
       devShells = {
         default = pkgs.mkShell {
