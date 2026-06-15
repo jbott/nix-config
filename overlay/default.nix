@@ -1,7 +1,6 @@
 (self: super: {
   blueutil = self.callPackage ./pkgs/blueutil {};
   claude-code-modes = self.callPackage ./pkgs/claude-code-modes {};
-  deconz-aarch64 = self.qt5.callPackage ./pkgs/deconz-aarch64 {};
   deploy-nixos = self.callPackage ./pkgs/deploy-nixos {};
   ed3d-plugins = self.callPackage ./pkgs/ed3d-plugins {};
   finicky = self.callPackage ./pkgs/finicky {};
