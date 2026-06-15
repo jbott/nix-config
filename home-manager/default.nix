@@ -35,14 +35,9 @@
       ]);
 
     home.packages = [
-      # yolo's word lists live in scripts/share/ but the script needs absolute
-      # store paths to read them at runtime, so substitute those in here. The
-      # raw scripts/bin/yolo is filtered out of the catchall buildEnv below to
-      # avoid a PATH collision.
-      (pkgs.writeScriptBin "yolo" (builtins.replaceStrings
-        ["@modifiers@" "@nouns@"]
-        ["${./scripts/share/yolo-modifiers.txt}" "${./scripts/share/yolo-nouns.txt}"]
-        (builtins.readFile ./scripts/bin/yolo)))
+      # yolo carries runtime data files, so it's packaged separately in the
+      # overlay (pkgs.yolo) rather than symlinked through the buildEnv below.
+      pkgs.yolo
       (pkgs.buildEnv {
         name = "home-manager-scripts";
         # Pull in all of the files under the scripts directory.
@@ -50,12 +45,7 @@
         # should be on PATH to be in the bin folder of a derivation (I think
         # those are the right words, but someone needs to make a nix
         # dictionary).
-        paths = [
-          (pkgs.lib.cleanSourceWith {
-            src = ./scripts;
-            filter = path: _: baseNameOf path != "yolo";
-          })
-        ];
+        paths = [./scripts];
       })
     ];
   };
