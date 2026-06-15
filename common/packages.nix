@@ -16,7 +16,6 @@ in {
     claude-code
     claude-code-modes
     difftastic
-    docker
     docker-buildx
     docker-compose
     docker-credential-glab
