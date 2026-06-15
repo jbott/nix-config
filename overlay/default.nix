@@ -1,5 +1,4 @@
 (self: super: {
-  blueutil = self.callPackage ./pkgs/blueutil {};
   claude-code-modes = self.callPackage ./pkgs/claude-code-modes {};
   deploy-nixos = self.callPackage ./pkgs/deploy-nixos {};
   ed3d-plugins = self.callPackage ./pkgs/ed3d-plugins {};
@@ -9,13 +8,4 @@
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};
   yolo = self.callPackage ./pkgs/yolo {};
-  uhubctl = super.uhubctl.overrideAttrs (final: prev: {
-    buildInputs =
-      prev.buildInputs
-      ++ (with self; [
-        git
-        pkg-config
-        which
-      ]);
-  });
 })
