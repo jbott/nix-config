@@ -35,6 +35,7 @@
       ]);
 
     home.packages = [
+      pkgs._1password-cli
       # yolo carries runtime data files, so it's packaged separately in the
       # overlay (pkgs.yolo) rather than symlinked through the buildEnv below.
       pkgs.yolo
