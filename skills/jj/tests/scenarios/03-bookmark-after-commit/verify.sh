@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091  # dynamic/generated source paths, not followable at lint time
 source "$(dirname "$0")/../../lib/common.sh"
-cd "$REPO_ROOT"
+cd "$REPO_ROOT" || exit 1
 
 # Find any john/ bookmark.
 name=$(jj bookmark list --no-pager -T 'name ++ "\n"' | grep '^john/' | head -n1)

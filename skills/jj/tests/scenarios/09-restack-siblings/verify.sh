@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091  # dynamic/generated source paths, not followable at lint time
 source "$(dirname "$0")/../../lib/common.sh"
-cd "$REPO_ROOT"
+cd "$REPO_ROOT" || exit 1
 
 # api-orders bookmark must have the new trunk tip as an ancestor.
 orders_change=$(jj log -r 'john/api-orders' --no-graph --no-pager -T 'change_id ++ "\n"' | head -n1)

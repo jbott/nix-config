@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091  # dynamic/generated source paths, not followable at lint time
 source "$(dirname "$0")/../../lib/common.sh"
 
 init_repo

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091  # dynamic/generated source paths, not followable at lint time
 source "$(dirname "$0")/../../lib/common.sh"
 
 init_repo
@@ -9,6 +10,7 @@ init_repo
 # working copy.
 cat > "$REPO_ROOT/.jj-editor-trap.sh" <<'TRAP'
 #!/usr/bin/env bash
+# shellcheck disable=SC1091  # dynamic/generated source paths, not followable at lint time
 cat >&2 <<'MSG'
 jj invoked the description editor, but Claude cannot use interactive editors.
 Re-run the command with -m "<message>".
