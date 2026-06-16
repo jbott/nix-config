@@ -383,6 +383,12 @@ case "$1" in
         esac
         ;;
 
+    --version|version)
+        # Read-only version query (cocoapods et al. parse `git --version`).
+        # No repo state involved, so pass straight through to real git.
+        exec @git@ "$@"
+        ;;
+
     diff)
         shift
         jj_user diff "$@"
