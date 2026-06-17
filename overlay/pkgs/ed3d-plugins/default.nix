@@ -5,8 +5,8 @@
   src = fetchFromGitHub {
     owner = "ed3dai";
     repo = "ed3d-plugins";
-    rev = "47257b5ead52972de667f8922f6cc4ec3af1d8cd";
-    hash = "sha256-IbbapwbuXyYJLf+rE3mFoMw+WRvc4dOhpYO2h1ioWME=";
+    rev = "998845ddf404fa0d184a9043576f9bce4395de80";
+    hash = "sha256-s6d5em01MUGrljDGMM+auR7P5IKicinqQl/jNolofJE=";
   };
   pluginNames = [
     "00-getting-started"
