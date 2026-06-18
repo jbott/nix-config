@@ -55,6 +55,14 @@ draft — copy the existing pattern. Match what the repo already does.
 - **Bookmarks ≠ branches.** Named pointers to commits. They do **not**
   auto-advance on `jj commit` (unlike git branches). They **do** follow
   rewrites. `jj tug` advances them manually.
+- **Workspaces are separate working copies sharing one repo.** Each has its own
+  `@`. In `jj log` a workspace's working copy renders as `<name>@` (trailing `@`,
+  nothing after) — e.g. `default@`, `monover@`, `fix-command-ack@`. This is
+  **not** a bookmark. A *bookmark* renders with no `@` (`john/foo`); a *remote*
+  bookmark renders as `name@remote` (`john/foo@origin`). So `foo@` = workspace,
+  `foo` = bookmark, `foo@origin` = remote bookmark. Don't treat a `<name>@` entry
+  as a branch you can `jj push` or `jj tug` — it's another checkout. List them
+  with `jj workspace list`; remove one with `jj wsrm <name>`.
 - **Conflicts are data.** A commit can contain conflicts and still be rebased,
   squashed, pushed. They must be resolved before code compiles, but jj never
   blocks on them.
@@ -97,7 +105,7 @@ Defined in `home-manager/programs/jujutsu.nix`. They encode the workflow.
 | `jj restack` | Rebase all of your mutable stacks onto `trunk()` (current + orphan stacks, but never stacks anchored by another active workspace) | After trunk moved, to bring every local stack current at once |
 | `jj dt` | `jj diff --git --from 'latest(heads(::@ & ::trunk()))' --to @` | Show the full diff of the current stack vs trunk |
 | `jj lt` | `jj log -r 'trunk()..@' --summary` | Quick stack overview with file-level changes |
-| `jj wsrm <ws>` | Forget a workspace and `rm -rf` its directory | Cleaning up a worktree |
+| `jj wsrm <ws>` | Forget a workspace and `rm -rf` its directory | Cleaning up a workspace |
 | `jj stack <rev>` | Insert `<rev>` as a new sibling parent of `closest_merge(@)` — i.e. attach a branch to the megamerge | Adding a single change as a new branch of the megamerge |
 | `jj stage` | Same as `jj stack closest_merge(@)+:: ~ empty()` — folds every non-empty commit above the megamerge into the merge as additional branches | One-shot consolidation of work done on top of a megamerge |
 
@@ -440,6 +448,10 @@ jj tug                                          # advance nearest bookmark (alia
 
 Names: `john/<2-4 word kebab description>`, e.g. `john/add-search-api`,
 `john/fix-login-redirect`. Auto-tracked on push.
+
+A `<name>@` in `jj log` (trailing `@`, e.g. `monover@`) is a **workspace**, not a
+bookmark — see the Mental model section. `jj bookmark list` shows the real
+bookmarks; `jj workspace list` shows workspaces.
 
 ## Conflicts
 
