@@ -63,6 +63,12 @@ draft — copy the existing pattern. Match what the repo already does.
   `foo` = bookmark, `foo@origin` = remote bookmark. Don't treat a `<name>@` entry
   as a branch you can `jj push` or `jj tug` — it's another checkout. List them
   with `jj workspace list`; remove one with `jj wsrm <name>`.
+  - **Every workspace's `@` is empty and mutable**, just like yours. So a revset
+    like `empty() & mutable()` matches *other* workspaces' working copies too —
+    `jj abandon` over it deletes another agent's/checkout's working copy out from
+    under it. Always exclude them: `working_copies()` is the revset for "every
+    workspace's `@`." Abandon only within your own stack — see the abandon-guard
+    pitfall below.
 - **Conflicts are data.** A commit can contain conflicts and still be rebased,
   squashed, pushed. They must be resolved before code compiles, but jj never
   blocks on them.
@@ -198,6 +204,41 @@ Always pass `--git` (jj's default diff format is harder to parse) and
 
 For diffs larger than ~5 files or ~200 lines, dispatch a haiku subagent to
 summarize rather than reading the whole diff yourself.
+
+### Reading `jj log` — what belongs to you vs another workspace
+
+Bare `jj log` uses John's alias revset, which is already scoped to `@`,
+**your** visible heads (`mine()`), tracked remote bookmarks, and `trunk()`. So
+the default view rarely shows foreign commits. But the moment you pass `-r`
+with a broad revset (`mutable()`, `empty()`, `all()`, `::@`), other workspaces'
+commits appear — and they look like leftover junk you might be tempted to
+abandon. They are not yours to touch. Annotated example:
+
+```
+@  vupuxmzt john@host 2026-06-25 … e67fc96b   ← YOUR working copy (the @ node)
+│  (empty) (no description set)
+○  znkkpsru john@host 2026-06-25 … john/fix-login a1b2c3d4   ← your commit; john/fix-login is a BOOKMARK
+│  services/auth: fix login redirect
+│ ○  ovkroqrz codebot@host 2026-06-25 … codebot@ 7b90ac42   ← ANOTHER workspace's @ (label codebot@). DO NOT abandon.
+├─╯  (empty) (no description set)
+◆  pozypntq john@host 2026-06-25 … main john/fix-login@origin 8c132424   ← immutable trunk; main / …@origin are bookmarks
+│  nix: flake update
+```
+
+Reading rules:
+
+- The `@` **node symbol** (leftmost) = *your* working copy. Exactly one per log.
+- A `<name>@` **ref label** (in the commit's ref list, e.g. `codebot@`) = *another
+  workspace's* working copy. The trailing-`@`-nothing-after is the tell. It is
+  another live checkout — never `jj abandon`, `jj push`, or `jj tug` it.
+- Don't confuse the **author email** `john@host` / `codebot@host` (always has a
+  host after the `@`) with a `<name>@` ref (nothing after the `@`).
+- `name` (no `@`) = local bookmark. `name@origin` = remote bookmark.
+- An empty `(no description set)` commit that is **another workspace's `@`** is
+  that workspace's clean state — abandoning it is the bug, not the cleanup.
+
+To see exactly which commits are foreign working copies:
+`jj log -r 'working_copies() ~ @' --no-pager`.
 
 ## Comparing rewrites
 
@@ -518,6 +559,8 @@ Or just redo the rewrite you intended.
 | `x..y` | y's ancestors minus x's |
 | `x & y`, `x \| y`, `~x`, `x ~ y` | intersect, union, complement, difference |
 | `mutable()`, `mine()`, `empty()`, `conflicts()` | predicates |
+| `working_copies()` | every workspace's `@` — exclude before bulk `abandon` |
+| `reachable(@, mutable())` | your current stack (commits reachable from `@` within mutable) |
 | `roots(s)`, `heads(s)`, `ancestors(s, n)` | functions |
 | `description("substring")` | match by description |
 
@@ -535,3 +578,18 @@ Full grammar: `jj help revsets`.
   jj refuses with an error. Use `mutable()` revset to find what's editable.
 - `jj squash` without args squashes `@` into `@-`. With `--from`/`--into` it
   moves changes between any two mutable revisions.
+- **Never bulk-abandon empty commits by a broad predicate.** `jj abandon
+  '(empty() & mutable()) ~ @'` looks like a tidy sweep but it deletes *other
+  workspaces'* working copies (each is empty + mutable) and unrelated empty
+  commits scattered through unpushed local history when `origin` is far behind.
+  Both are not yours. Empty commits are not garbage — a fresh `@` is *supposed*
+  to be empty (don't abandon it), and the next `jj rom` / `jj restack` skips
+  emptied commits in your own stack automatically. If you genuinely must drop
+  empties:
+  - Scope to your own stack, not all of `mutable()`:
+    `jj abandon -r 'reachable(@, mutable()) & empty() ~ working_copies()'`
+    (`trunk()..@ & empty()` works too for a linear stack).
+  - Always exclude `working_copies()`, never just `@` — `~ @` still catches
+    every *other* workspace's working copy.
+  - When in doubt, abandon specific change-ids you have inspected, one revset
+    at a time, rather than a category.
