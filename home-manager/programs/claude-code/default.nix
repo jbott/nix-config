@@ -113,6 +113,9 @@ in {
       alwaysThinkingEnabled = true;
       skipDangerousModePermissionPrompt = true;
       spinnerTipsEnabled = false;
+      # Keep `!` bash commands context-only (the pre-2.1.157 behavior) instead of
+      # having Claude auto-respond to their output.
+      respondToBashCommands = false;
       statusLine = {
         type = "command";
         command = "${statusLine}";
