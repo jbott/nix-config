@@ -11,7 +11,7 @@ git init --bare "$REMOTE_PATH" >/dev/null
 jj git remote add origin "$REMOTE_PATH" >/dev/null
 
 # Push the trunk seed so origin has the main branch.
-jj git push --bookmark main --allow-new >/dev/null 2>&1 || true
+jj git push --bookmark main >/dev/null 2>&1 || true
 
 # Add a stack of work and a john/ bookmark on the tip.
 mkdir -p services/notifier

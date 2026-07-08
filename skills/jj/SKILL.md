@@ -119,6 +119,37 @@ The repo auto-tracks `john/*` bookmarks on `origin` and `main|master|trunk` on
 both `origin` and `upstream`, so newly-pushed bookmarks become tracked
 automatically.
 
+### Publishing a bookmark (branch)
+
+```bash
+# Already-tracked bookmark (any john/*, or one you've pushed before):
+jj push                             # alias: pushes every bookmark ancestral to @
+
+# Brand-NEW bookmark, not yet on origin — create it on @- and push in one step:
+jj git push --named <name>=@-       # e.g. jj git push --named COM-924-foo=@-
+# equivalently, if the bookmark already exists locally, push it by name:
+jj git push --bookmark <name>       # explicit --bookmark creates it on the remote
+
+# Bookmark exists on origin but your local copy isn't tracking it:
+jj bookmark track <name>@origin && jj push
+```
+
+Why the extra step for a new bookmark: `auto-track-bookmarks` only auto-tracks
+`main`/`master`/`trunk` and `john/*`, and `git.push-new-bookmarks` is off. So for
+any other name (a `COM-924-…` ticket branch, say) the bare `jj push` alias
+**refuses to create it** and prints:
+
+```
+Warning: Refusing to create new remote bookmark <name>@origin
+Hint: Run `jj bookmark track <name> --remote=origin` and try again.
+Nothing changed.
+```
+
+That is the signal to push explicitly with `--named` / `--bookmark` (above) —
+**not** to add `--allow-new` (removed in this jj; it errors `unexpected argument
+'--allow-new'`) or `--force` (jj force-with-leases automatically; on rejection
+`jj git fetch` then re-push).
+
 The `closest_merge(to)` revset alias (`heads(::to & merges())`) returns the
 topmost merge commit ancestral to `to`. It backs `jj stack` / `jj stage` and is
 useful any time you need to refer to the current megamerge.
