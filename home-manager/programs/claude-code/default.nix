@@ -102,7 +102,6 @@ in {
 
     plugins = with pkgs.ed3d-plugins.plugins; [
       basic-agents
-      plan-and-execute
       research-agents
       extending-claude
     ];
