@@ -97,6 +97,7 @@ in {
 
     skills = {
       jj = "${pkgs.jj-skill}";
+      humanizer = "${pkgs.humanizer-skill}";
     };
 
     plugins = with pkgs.ed3d-plugins.plugins; [
