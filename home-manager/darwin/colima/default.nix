@@ -2,7 +2,7 @@
   yaml = pkgs.formats.yaml {};
   settings = {
     cpu = 8;
-    memory = 16;
+    memory = 8;
     kubernetes.enabled = true;
     docker.features.containerd-snapshotter = true;
     vmType = "vz";
