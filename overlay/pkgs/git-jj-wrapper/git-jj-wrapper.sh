@@ -15,6 +15,22 @@ if [[ "$1" == "clone" ]]; then
     exec @git@ "$@"
 fi
 
+# `git init` creates a fresh, independent repo (same rationale as clone) — e.g.
+# buck2's external-cell fetch does `git init` in a buck-out scratch dir, then
+# fetches into it. Once that dir has a real .git, the `rev-parse --git-dir`
+# check below already routes further commands to real git, so only `init`
+# needs to be allowed here.
+if [[ "$1" == "init" ]]; then
+    exec @git@ "$@"
+fi
+
+# `git -C <dir> ...` explicitly targets another directory's repo (buck2 and
+# other tools use this to manage their own scratch repos). Let real git handle
+# it against that dir rather than intercepting for the current jj workspace.
+if [[ "$1" == "-C" ]]; then
+    exec @git@ "$@"
+fi
+
 # Check if we're in a directory with a real .git directory
 # If so, use real git (this includes colocated jj+git repos)
 if @git@ rev-parse --git-dir &>/dev/null; then
