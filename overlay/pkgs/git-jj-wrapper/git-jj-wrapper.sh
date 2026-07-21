@@ -405,6 +405,12 @@ case "$1" in
         exec @git@ "$@"
         ;;
 
+    --help|-h|help)
+        # Read-only help output (usage text, man pages). No repo state
+        # involved, so pass straight through to real git.
+        exec @git@ "$@"
+        ;;
+
     diff)
         shift
         jj_user diff "$@"
