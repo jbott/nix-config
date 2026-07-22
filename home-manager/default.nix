@@ -17,6 +17,7 @@
       [
         ./programs/atuin.nix
         ./programs/claude-code
+        ./programs/codex.nix
         ./programs/dircolors.nix
         ./programs/direnv.nix
         ./programs/git.nix

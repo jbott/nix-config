@@ -55,6 +55,7 @@
     llmAgentsOverlay = final: _prev: {
       agent-browser = llm-agents.packages.${final.stdenv.hostPlatform.system}.agent-browser;
       claude-code = llm-agents.packages.${final.stdenv.hostPlatform.system}.claude-code;
+      codex = llm-agents.packages.${final.stdenv.hostPlatform.system}.codex;
     };
 
     fastNixGcOverlay = final: _prev: {
