@@ -100,11 +100,9 @@ in {
       humanizer = "${pkgs.humanizer-skill}";
     };
 
-    plugins = with pkgs.ed3d-plugins.plugins; [
-      basic-agents
-      research-agents
-      extending-claude
-    ];
+    plugins = {
+      inherit (pkgs.ed3d-plugins.plugins) basic-agents research-agents extending-claude;
+    };
 
     settings = {
       includeCoAuthoredBy = false;
