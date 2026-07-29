@@ -136,20 +136,119 @@ case "$1" in
 
     status)
         shift
-        if [ "$1" = "--porcelain" ]; then
-            # Machine-readable: no warning
-            # Return empty output if working copy is clean (to match git behavior)
-            if jj_silent status 2>&1 | grep -q "The working copy has no changes"; then
-                # Clean working copy
-                exit 0
-            else
-                # Has changes - output a simple format
-                # Just indicate there are changes
-                echo "M  (working copy has changes)"
-            fi
-        else
-            jj_user status "$@"
+        # Parse the flags that select git's machine-readable output. Callers
+        # parse this, so unrecognized flags error out rather than silently
+        # producing output that ignores them.
+        machine=0
+        show_branch=0
+        paths=()
+        while [ $# -gt 0 ]; do
+            case "$1" in
+                -s|--short|--porcelain|--porcelain=1|--porcelain=v1)
+                    machine=1
+                    ;;
+                -b|--branch)
+                    show_branch=1
+                    ;;
+                -sb|-bs)
+                    machine=1
+                    show_branch=1
+                    ;;
+                -u*|--untracked-files=*)
+                    # jj snapshots every non-ignored file into @, so there is no
+                    # tracked/untracked distinction to tune. Accept and ignore.
+                    ;;
+                --long)
+                    machine=0
+                    ;;
+                --)
+                    shift
+                    paths+=("$@")
+                    break
+                    ;;
+                -*)
+                    echo "git status $1: not supported in jj wrapper" >&2
+                    exit 1
+                    ;;
+                *)
+                    paths+=("$1")
+                    ;;
+            esac
+            shift
+        done
+
+        if [ "$machine" -eq 0 ]; then
+            jj_user status "${paths[@]}"
+            exit $?
         fi
+
+        # jj log filters commits by path, not the reported diff, so a pathspec
+        # would be silently dropped from the file list below.
+        if [ "${#paths[@]}" -gt 0 ]; then
+            echo "git status: pathspec filtering is not supported in jj wrapper" >&2
+            exit 1
+        fi
+
+        if [ "$show_branch" -eq 1 ]; then
+            # git prints "## <branch>...<upstream> [ahead N, behind M]".
+            # HEAD is @- (the working copy's parent), as elsewhere in this wrapper.
+            bookmarks=$(jj_silent log -r @- --no-graph -T 'bookmarks.map(|b| b.name()).join(" ")')
+            bm="${bookmarks%% *}"
+            if [ -z "$bm" ]; then
+                echo "## HEAD (no branch)"
+            else
+                # Upstream is a tracked remote bookmark of the same name that
+                # has actually been pushed (`present`); an unpushed bookmark has
+                # no remote ref to compare against, like a git branch with no
+                # upstream. The colocated "git" remote is jj-internal rather
+                # than a real remote, so skip it; prefer origin when several
+                # match.
+                upstream=""
+                for remote in $(jj_silent bookmark list -a \
+                    -T 'if(remote && tracked && present && remote != "git", name ++ "\t" ++ remote ++ "\n")' \
+                    | awk -F'\t' -v b="$bm" '$1 == b { print $2 }'); do
+                    if [ "$remote" = "origin" ]; then
+                        upstream="origin"
+                        break
+                    fi
+                    [ -z "$upstream" ] && upstream="$remote"
+                done
+
+                if [ -z "$upstream" ]; then
+                    echo "## $bm"
+                else
+                    ahead=$(jj_silent log -r "${bm}@${upstream}..@-" --no-graph -T '"x\n"' 2>/dev/null | wc -l | tr -d ' ')
+                    behind=$(jj_silent log -r "@-..${bm}@${upstream}" --no-graph -T '"x\n"' 2>/dev/null | wc -l | tr -d ' ')
+                    tracking=""
+                    if [ "$ahead" -gt 0 ] && [ "$behind" -gt 0 ]; then
+                        tracking=" [ahead $ahead, behind $behind]"
+                    elif [ "$ahead" -gt 0 ]; then
+                        tracking=" [ahead $ahead]"
+                    elif [ "$behind" -gt 0 ]; then
+                        tracking=" [behind $behind]"
+                    fi
+                    echo "## ${bm}...${upstream}/${bm}${tracking}"
+                fi
+            fi
+        fi
+
+        # Working-copy changes are the diff of @ against its parent, which is
+        # what `jj status` reports. jj auto-snapshots, so every change is
+        # already effectively staged: git's index column carries the status and
+        # the worktree column stays blank.
+        jj_silent log -r @ --no-graph \
+            -T 'diff.files().map(|f| f.status() ++ "\t" ++ f.source().path() ++ "\t" ++ f.target().path() ++ "\n").join("")' \
+            | while IFS=$'\t' read -r st src dst; do
+                case "$st" in
+                    "")       continue ;;
+                    added)    printf 'A  %s\n' "$dst" ;;
+                    modified) printf 'M  %s\n' "$dst" ;;
+                    removed)  printf 'D  %s\n' "$dst" ;;
+                    renamed)  printf 'R  %s -> %s\n' "$src" "$dst" ;;
+                    copied)   printf 'C  %s -> %s\n' "$src" "$dst" ;;
+                    *)        printf 'M  %s\n' "$dst" ;;
+                esac
+            done
         ;;
 
     log)
