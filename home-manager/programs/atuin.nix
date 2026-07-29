@@ -1,9 +1,11 @@
-{ config, lib, ... }:
-let
+{
+  config,
+  lib,
+  ...
+}: let
   # Matches the socket_path atuin writes into config.toml.
   atuinSocket = "${config.home.homeDirectory}/.local/share/atuin/daemon.sock";
-in
-{
+in {
   programs.atuin = {
     enable = true;
 

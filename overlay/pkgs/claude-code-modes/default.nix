@@ -44,18 +44,19 @@ stdenv.mkDerivation (finalAttrs: {
 
   # Disable claude-mode's self-update check: this is a Nix-managed binary,
   # and the network fetch at startup is pointless when the version is pinned.
-  postFixup = ''
-    wrapProgram $out/bin/claude-mode \
-      --set CLAUDE_MODE_NO_UPDATE_CHECK 1
-  ''
-  # bun's --compile produces a binary whose ad-hoc code signature is invalid
-  # the moment it's written (verified: `codesign -v` fails immediately after
-  # the bun build, before any Nix fixup). macOS SIGKILLs a binary with an
-  # invalid signature on launch (exit 137), which broke the version check.
-  # Re-sign ad-hoc to repair it. __noChroot makes the system codesign reachable.
-  + lib.optionalString stdenv.hostPlatform.isDarwin ''
-    /usr/bin/codesign --force --sign - "$out/bin/.claude-mode-wrapped"
-  '';
+  postFixup =
+    ''
+      wrapProgram $out/bin/claude-mode \
+        --set CLAUDE_MODE_NO_UPDATE_CHECK 1
+    ''
+    # bun's --compile produces a binary whose ad-hoc code signature is invalid
+    # the moment it's written (verified: `codesign -v` fails immediately after
+    # the bun build, before any Nix fixup). macOS SIGKILLs a binary with an
+    # invalid signature on launch (exit 137), which broke the version check.
+    # Re-sign ad-hoc to repair it. __noChroot makes the system codesign reachable.
+    + lib.optionalString stdenv.hostPlatform.isDarwin ''
+      /usr/bin/codesign --force --sign - "$out/bin/.claude-mode-wrapped"
+    '';
 
   # Bun on macOS links against /usr/lib/libicucore.A.dylib which needs ICU
   # data from /usr/share/icu/ at runtime; Nix's macOS sandbox blocks that
