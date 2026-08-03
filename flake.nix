@@ -30,6 +30,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zmk-nix = {
+      url = "github:lilyinstarlight/zmk-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -43,6 +47,7 @@
     nix-rosetta-builder,
     nixpkgs,
     treefmt-nix,
+    zmk-nix,
   } @ inputs: let
     inherit (nix-darwin.lib) darwinSystem;
     inherit (nixpkgs.lib) nixosSystem;
@@ -68,6 +73,8 @@
     overlays = [
       llmAgentsOverlay
       fastNixGcOverlay
+      # Provides buildKeyboard/buildZephyrPackage, used by toucan-firmware
+      zmk-nix.overlays.default
       (import ./overlay)
     ];
     nixpkgsOverlaysModule = {
@@ -148,7 +155,7 @@
     formatter = forAllSystems ({pkgs, ...}: (treefmtEval pkgs).config.build.wrapper);
 
     packages = forAllSystems ({pkgs, ...}: {
-      inherit (pkgs) claude-code claude-code-modes dd-cli deploy-nixos fast-nix-gc finicky glab-jj jj-hunk-tool jj-skill jjw jujutsu;
+      inherit (pkgs) claude-code claude-code-modes dd-cli deploy-nixos fast-nix-gc finicky glab-jj jj-hunk-tool jj-skill jjw jujutsu toucan-firmware;
     });
 
     devShells = forAllSystems ({

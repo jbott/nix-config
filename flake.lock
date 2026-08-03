@@ -301,7 +301,8 @@
         "nix-darwin": "nix-darwin_2",
         "nix-rosetta-builder": "nix-rosetta-builder",
         "nixpkgs": "nixpkgs_3",
-        "treefmt-nix": "treefmt-nix_2"
+        "treefmt-nix": "treefmt-nix_2",
+        "zmk-nix": "zmk-nix"
       }
     },
     "systems": {
@@ -357,6 +358,26 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "zmk-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785632481,
+        "narHash": "sha256-XcaLNmAAEIviaDzklk+NRPblmm52JynJEgNXGuzfLCY=",
+        "owner": "lilyinstarlight",
+        "repo": "zmk-nix",
+        "rev": "a7be86fa3118f7d2e868ed352add9b352db674dc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lilyinstarlight",
+        "repo": "zmk-nix",
         "type": "github"
       }
     }
