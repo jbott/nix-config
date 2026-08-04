@@ -62,7 +62,7 @@ draft — copy the existing pattern. Match what the repo already does.
   bookmark renders as `name@remote` (`john/foo@origin`). So `foo@` = workspace,
   `foo` = bookmark, `foo@origin` = remote bookmark. Don't treat a `<name>@` entry
   as a branch you can `jj push` or `jj tug` — it's another checkout. List them
-  with `jj workspace list`; remove one with `jj wsrm <name>`.
+  with `jj w ls`; remove one with `jj w rm <name>`.
   - **Every workspace's `@` is empty and mutable**, just like yours. So a revset
     like `empty() & mutable()` matches *other* workspaces' working copies too —
     `jj abandon` over it deletes another agent's/checkout's working copy out from
@@ -111,7 +111,9 @@ Defined in `home-manager/programs/jujutsu.nix`. They encode the workflow.
 | `jj restack` | Rebase all of your mutable stacks onto `trunk()` (current + orphan stacks, but never stacks anchored by another active workspace) | After trunk moved, to bring every local stack current at once |
 | `jj dt` | `jj diff --git --from 'latest(heads(::@ & ::trunk()))' --to @` | Show the full diff of the current stack vs trunk |
 | `jj lt` | `jj log -r 'trunk()..@' --summary` | Quick stack overview with file-level changes |
-| `jj wsrm <ws>` | Forget a workspace and `rm -rf` its directory | Cleaning up a workspace |
+| `jj w ls` | List workspaces as `<name><TAB><path>` | Seeing what workspaces exist and where |
+| `jj w new <name>` | Create (or reuse) the workspace for `<name>` at `<parent-of-repo>/.worktrees/<repo>/<name>`, print its path | Adding a workspace |
+| `jj w rm <ws>` | Forget a workspace and `rm -rf` its directory | Cleaning up a workspace |
 | `jj stack <rev>` | Insert `<rev>` as a new sibling parent of `closest_merge(@)` — i.e. attach a branch to the megamerge | Adding a single change as a new branch of the megamerge |
 | `jj stage` | Same as `jj stack closest_merge(@)+:: ~ empty()` — folds every non-empty commit above the megamerge into the merge as additional branches | One-shot consolidation of work done on top of a megamerge |
 
