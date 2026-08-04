@@ -32,6 +32,7 @@ in {
     htop
     jj-hunk-tool
     jjui
+    jjw
     jq
     jujutsu
     just

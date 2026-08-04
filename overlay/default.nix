@@ -8,6 +8,7 @@
   humanizer-skill = self.callPackage ./pkgs/humanizer-skill {};
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};
+  jjw = self.callPackage ./pkgs/jjw {};
   paseo = self.callPackage ./pkgs/paseo {};
   yolo = self.callPackage ./pkgs/yolo {};
 })

@@ -17,44 +17,15 @@
     fi
   '';
 
-  # WorktreeCreate hook: claude pipes `{"name": "..."}` on stdin; we create
-  # a jj workspace at <parent-of-main-repo>/.worktrees/<main-repo>/<name> and
-  # print the absolute path on stdout for claude to cd into. Keeping worktrees
-  # beside the repo (not under .claude/) avoids nesting them inside the tracked
-  # tree; the <main-repo> segment namespaces them so sibling repos sharing the
-  # parent don't collide on a shared worktree name.
-  #
-  # We anchor to the MAIN workspace root, not $CLAUDE_PROJECT_DIR, because that
-  # may itself be a worktree (claude launched inside one) — using it directly
-  # would nest worktrees inside worktrees. jj's `$root/.jj/repo` is a directory
-  # in the main workspace but a file pointing at <main>/.jj/repo in secondary
-  # workspaces, so we follow it to recover the main root. If a workspace with
-  # the requested name already exists, reuse it so `yolo --worktree <name>`
-  # resumes. Source: https://github.com/kawaz/jj-worktree/issues/1
+  # WorktreeCreate hook: claude pipes `{"name": "..."}` on stdin and expects the
+  # absolute worktree path on stdout to cd into. `jjw new` owns the path
+  # convention and the main-workspace anchoring (see overlay/pkgs/jjw), and is
+  # idempotent, so an existing workspace is reused and `yolo --worktree <name>`
+  # resumes.
   worktreeCreateHook = pkgs.writeShellScript "claude-code-hook-WorktreeCreate" ''
     set -euo pipefail
-    input=$(cat)
-    name=$(${pkgs.jq}/bin/jq -r '.name' <<< "$input")
-    ws_root=$(${pkgs.jujutsu}/bin/jj -R "$CLAUDE_PROJECT_DIR" workspace root)
-    if [ -f "$ws_root/.jj/repo" ]; then
-      repo_root=$(dirname "$(cd "$ws_root/.jj" && cd "$(dirname "$(cat repo)")" && pwd)")
-    else
-      repo_root="$ws_root"
-    fi
-    worktree_path="$(dirname "$repo_root")/.worktrees/$(basename "$repo_root")/$name"
-    jj="${pkgs.jujutsu}/bin/jj -R $repo_root"
-    if $jj workspace list -T 'name ++ "\n"' | grep -Fxq "$name"; then
-      if [ ! -d "$worktree_path" ]; then
-        echo "Error: jj workspace '$name' is tracked but $worktree_path is missing." >&2
-        echo "Run 'jj workspace forget $name' to drop the stale entry, then retry." >&2
-        exit 1
-      fi
-      echo "Reusing existing jj workspace '$name' at $worktree_path" >&2
-    else
-      mkdir -p "$(dirname "$worktree_path")"
-      $jj workspace add "$worktree_path" >&2
-    fi
-    echo "$worktree_path"
+    name=$(${pkgs.jq}/bin/jq -r '.name')
+    exec ${pkgs.jjw}/bin/jjw -R "$CLAUDE_PROJECT_DIR" new "$name"
   '';
 
   # Structural guard: jj reads JJ_EDITOR (cli/src/config.rs) and uses it as the
@@ -80,15 +51,12 @@
     ${pkgs.jujutsu}/bin/jj util snapshot --quiet || true
   '';
 
+  # `|| true` because this also fires for worktrees jj never tracked, and
+  # `jjw rm` exits non-zero on an unknown workspace.
   worktreeRemoveHook = pkgs.writeShellScript "claude-code-hook-WorktreeRemove" ''
     set -euo pipefail
-    input=$(cat)
-    worktree_path=$(${pkgs.jq}/bin/jq -r '.worktree_path' <<< "$input")
-    workspace_name=$(basename "$worktree_path")
-    if [ -d "$worktree_path" ]; then
-      ${pkgs.jujutsu}/bin/jj -R "$CLAUDE_PROJECT_DIR" workspace forget "$workspace_name" 2>/dev/null || true
-      rm -rf "$worktree_path"
-    fi
+    worktree_path=$(${pkgs.jq}/bin/jq -r '.worktree_path')
+    ${pkgs.jjw}/bin/jjw -R "$CLAUDE_PROJECT_DIR" rm "$(basename "$worktree_path")" || true
   '';
 in {
   programs.claude-code = {

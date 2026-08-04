@@ -28,20 +28,48 @@
     };
 
     initContent = ''
-      # Create a jj workspace with convention: ../w-<name>, bookmark john/<name>
+      # These wrap the `jjw` binary (overlay/pkgs/jjw, also `jj w`) to add the one
+      # thing a binary cannot do: cd the calling shell.
+
+      # A bare `jjw <name>` is shorthand for branching off main with a
+      # john/<name> bookmark; other arguments go straight to the binary.
       jjw() {
-        if [[ $# -lt 1 ]]; then
-          echo "Usage: jjw <branch-title>" >&2
-          return 1
+        case ''${1-} in
+          new)
+            local out
+            out=$(command jjw "$@") || return
+            cd "$out"
+            ;;
+          "" | -* | rm | ls | root)
+            command jjw "$@"
+            ;;
+          *)
+            local out
+            out=$(command jjw new -r main -b "john/$1" "$1") || return
+            cd "$out"
+            ;;
+        esac
+      }
+
+      # Shadows the `w` who-is-logged-in utility, which we never use.
+      w() {
+        if (($# == 0)); then
+          command jjw ls
+          return
         fi
-        local name="$1"
-        local root
-        root=$(jj workspace root 2>/dev/null) || { echo "Not in a jj repo" >&2; return 1; }
-        local ws_dir="$(dirname "$root")/w-$name"
-        jj workspace add "$ws_dir" && \
-        cd "$ws_dir" && \
-        jj new -r main && \
-        jj bookmark create "john/$name"
+        (($# == 1)) || {
+          echo "usage: w [<workspace>|^]" >&2
+          return 1
+        }
+        local dir
+        # `^` is the main workspace. It resolves without a recorded path, which
+        # repos initialized before jj 0.38 lack for their original workspace.
+        if [[ $1 == "^" ]]; then
+          dir=$(command jjw root) || return
+        else
+          dir=$(command jjw root "$1") || return
+        fi
+        cd "$dir"
       }
 
       # Disable 'r' for running the last command
