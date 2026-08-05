@@ -138,7 +138,12 @@
               '(-r --revision)'{-r,--revision}'[revision to branch from]:revision:_jjw_revisions' \
               '1:workspace:_jjw_workspaces'
             ;;
-          rm) _jjw_workspaces ;;
+          rm)
+            _arguments -S \
+              '--stale[forget every tracked workspace whose directory is gone]' \
+              '*:workspace:_jjw_workspaces'
+            ;;
+          ls) _arguments -S '--stale[list only workspaces whose directory is gone]' ;;
           root) (( CURRENT == 2 )) && _jjw_workspaces ;;
         esac
       }

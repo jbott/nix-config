@@ -30,11 +30,14 @@ commands:
         Create the workspace for <name> and print its path. Reuses an existing
         one, so it doubles as "resolve or create". Creates no bookmark: name a
         branch with 'jj bookmark create' once there is something to push.
-  rm <name>...
+  rm [--stale] <name>...
         Forget each workspace and delete its directory. Refuses the workspace
         you are standing in and the main workspace.
-  ls
-        List existing workspaces as <name><TAB><path>.
+        --stale forgets every tracked workspace whose directory is gone from
+        disk (and takes no names).
+  ls [--stale]
+        List existing workspaces as <name><TAB><path>. --stale lists only those
+        whose directory is gone from disk.
   root [<name>]
         Print the root of <name>, or of the main workspace if omitted.
 EOF
@@ -72,6 +75,21 @@ ws_path() {
 
 ws_exists() {
   jjq workspace list -T 'name ++ "\n"' | grep -Fxq "$1"
+}
+
+# Directory where workspace <name>'s files live: its jj-recorded path (jj
+# >=0.38), or the convention path we would have created it at (older repos
+# record no path).
+ws_dir() {
+  local root=$1 name=$2
+  jjq workspace root --name "$name" 2>/dev/null || ws_path "$root" "$name"
+}
+
+# A workspace is stale when it is tracked but its directory is gone from disk.
+# The main and current workspaces are never stale (their directories exist), so
+# this never flags a workspace that is unsafe to forget.
+ws_stale() {
+  [ ! -d "$(ws_dir "$1" "$2")" ]
 }
 
 cmd_new() {
@@ -113,14 +131,42 @@ cmd_new() {
 }
 
 cmd_rm() {
-  [ $# -gt 0 ] || die "rm: missing <workspace>..."
+  local stale_only=false name path
+  local names=()
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --stale)
+        stale_only=true
+        shift
+        ;;
+      -*) die "rm: unknown option: $1" ;;
+      *)
+        names+=("$1")
+        shift
+        ;;
+    esac
+  done
 
   local root current
   root=$(repo_root)
   current=$(jjq workspace root)
 
-  local name path
-  for name in "$@"; do
+  if $stale_only; then
+    [ ${#names[@]} -eq 0 ] || die "rm: --stale removes every stale workspace and takes no names"
+    local found=false
+    while IFS= read -r name; do
+      ws_stale "$root" "$name" || continue
+      jj -R "$root" workspace forget "$name"
+      note "forgot stale workspace '$name' (no directory on disk)"
+      found=true
+    done < <(jjq workspace list -T 'name ++ "\n"')
+    $found || note "no stale workspaces"
+    return 0
+  fi
+
+  [ ${#names[@]} -gt 0 ] || die "rm: missing <workspace>..."
+
+  for name in "${names[@]}"; do
     ws_exists "$name" || die "rm: no such workspace: $name"
 
     # The recorded path is authoritative, but it only exists for workspaces in
@@ -147,9 +193,22 @@ cmd_rm() {
 }
 
 cmd_ls() {
-  [ $# -eq 0 ] || die "ls: unexpected argument: $1"
-  local name path
+  local stale_only=false
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --stale)
+        stale_only=true
+        shift
+        ;;
+      -*) die "ls: unknown option: $1" ;;
+      *) die "ls: unexpected argument: $1" ;;
+    esac
+  done
+
+  local root name path
+  root=$(repo_root)
   while IFS= read -r name; do
+    ! $stale_only || ws_stale "$root" "$name" || continue
     # A "-" means jj has no recorded path for the workspace (see cmd_rm).
     path=$(jjq workspace root --name "$name" 2>/dev/null) || path=-
     printf '%s\t%s\n' "$name" "$path"
