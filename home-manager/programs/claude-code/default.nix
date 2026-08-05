@@ -63,10 +63,7 @@ in {
     enable = true;
     package = pkgs.claude-code;
 
-    skills = {
-      jj = "${pkgs.jj-skill}";
-      humanizer = "${pkgs.humanizer-skill}";
-    };
+    skills = import ../../agent-skills.nix {inherit pkgs;};
 
     plugins = {
       inherit (pkgs.ed3d-plugins.plugins) basic-agents research-agents extending-claude;
