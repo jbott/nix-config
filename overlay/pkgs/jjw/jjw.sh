@@ -26,9 +26,10 @@ usage() {
 usage: $prog [-R <repo>] <command> [args]
 
 commands:
-  new [-r <revset>] [-b <bookmark>] <name>
+  new|add [-r <revset>] <name>
         Create the workspace for <name> and print its path. Reuses an existing
-        one, so it doubles as "resolve or create".
+        one, so it doubles as "resolve or create". Creates no bookmark: name a
+        branch with 'jj bookmark create' once there is something to push.
   rm <name>...
         Forget each workspace and delete its directory. Refuses the workspace
         you are standing in and the main workspace.
@@ -74,17 +75,12 @@ ws_exists() {
 }
 
 cmd_new() {
-  local revset="" bookmark="" name=""
+  local revset="" name=""
   while [ $# -gt 0 ]; do
     case $1 in
       -r | --revision)
         [ $# -ge 2 ] || die "new: missing argument to $1"
         revset=$2
-        shift 2
-        ;;
-      -b | --bookmark)
-        [ $# -ge 2 ] || die "new: missing argument to $1"
-        bookmark=$2
         shift 2
         ;;
       -*) die "new: unknown option: $1" ;;
@@ -113,7 +109,6 @@ cmd_new() {
   [ -z "$revset" ] || add+=(--revision "$revset")
   mkdir -p "$(dirname "$path")"
   jj -R "$root" "${add[@]}" "$path" >&2
-  [ -z "$bookmark" ] || jj -R "$path" bookmark create "$bookmark" >&2
   printf '%s\n' "$path"
 }
 
@@ -196,7 +191,8 @@ cmd=$1
 shift
 
 case $cmd in
-  new) cmd_new "$@" ;;
+  # `add` spells the same thing as `jj workspace add` and `git worktree add`.
+  new | add) cmd_new "$@" ;;
   rm) cmd_rm "$@" ;;
   ls) cmd_ls "$@" ;;
   root) cmd_root "$@" ;;

@@ -31,11 +31,12 @@
       # These wrap the `jjw` binary (overlay/pkgs/jjw, also `jj w`) to add the one
       # thing a binary cannot do: cd the calling shell.
 
-      # A bare `jjw <name>` is shorthand for branching off main with a
-      # john/<name> bookmark; other arguments go straight to the binary.
+      # A bare `jjw <name>` is shorthand for branching off main; other arguments
+      # go straight to the binary. No bookmark is created — make one with
+      # `jj bookmark create john/<name>` when there is something worth pushing.
       jjw() {
         case ''${1-} in
-          new)
+          new | add)
             local out
             out=$(command jjw "$@") || return
             cd "$out"
@@ -44,8 +45,14 @@
             command jjw "$@"
             ;;
           *)
+            # The shorthand takes exactly one name. Without this it would treat
+            # `jjw add foo` as "create a workspace called add" and drop `foo`.
+            (($# == 1)) || {
+              echo "jjw: unknown command: $1 (a bare name takes no further arguments)" >&2
+              return 2
+            }
             local out
-            out=$(command jjw new -r main -b "john/$1" "$1") || return
+            out=$(command jjw new -r main "$1") || return
             cd "$out"
             ;;
         esac
@@ -126,10 +133,9 @@
         shift words
         (( CURRENT-- ))
         case $cmd in
-          new)
+          new | add)
             _arguments -S \
               '(-r --revision)'{-r,--revision}'[revision to branch from]:revision:_jjw_revisions' \
-              '(-b --bookmark)'{-b,--bookmark}'[bookmark to create]:bookmark: ' \
               '1:workspace:_jjw_workspaces'
             ;;
           rm) _jjw_workspaces ;;
