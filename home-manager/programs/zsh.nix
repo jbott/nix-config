@@ -72,6 +72,100 @@
         cd "$dir"
       }
 
+      # Existing workspaces, described by their path. `jjw ls` prints
+      # <name><TAB><path>, with "-" where jj has no recorded path (repos
+      # initialized before jj 0.38).
+      _jjw_workspaces() {
+        local -a names
+        # Not `path`: that name is tied to $PATH in zsh, and assigning it here
+        # would clobber the shell's command lookup.
+        local name dir
+        while IFS=$'\t' read -r name dir; do
+          if [[ $dir == - ]]; then
+            names+=("$name")
+          else
+            names+=("$name:$dir")
+          fi
+        done < <(command jjw ls 2>/dev/null)
+        _describe -t workspaces workspace names
+      }
+
+      # Bookmarks are the revisions worth branching a new workspace from.
+      _jjw_revisions() {
+        local -a revs
+        revs=(''${(fu)"$(command jj --ignore-working-copy bookmark list -T 'name ++ "\n"' 2>/dev/null)"})
+        _describe -t revisions revision revs
+      }
+
+      _jjw() {
+        # Step over the global -R/--repository, completing its directory.
+        while (( CURRENT > 3 )) && [[ $words[2] == (-R|--repository) ]]; do
+          shift 2 words
+          (( CURRENT -= 2 ))
+        done
+        if [[ $words[CURRENT-1] == (-R|--repository) ]]; then
+          _files -/
+          return
+        fi
+
+        if (( CURRENT == 2 )); then
+          local -a subcmds=(
+            'new:create or reuse a workspace and cd to it'
+            'rm:forget a workspace and delete its directory'
+            'ls:list workspaces'
+            'root:print a workspace root'
+          )
+          _describe -t commands command subcmds
+          # A bare name is shorthand for `new`, which also reuses an existing
+          # workspace, so those are worth offering here too.
+          _jjw_workspaces
+          return
+        fi
+
+        local cmd=$words[2]
+        shift words
+        (( CURRENT-- ))
+        case $cmd in
+          new)
+            _arguments -S \
+              '(-r --revision)'{-r,--revision}'[revision to branch from]:revision:_jjw_revisions' \
+              '(-b --bookmark)'{-b,--bookmark}'[bookmark to create]:bookmark: ' \
+              '1:workspace:_jjw_workspaces'
+            ;;
+          rm) _jjw_workspaces ;;
+          root) (( CURRENT == 2 )) && _jjw_workspaces ;;
+        esac
+      }
+
+      _w() {
+        (( CURRENT == 2 )) || return
+        local -a main=('^:main workspace')
+        _describe -t workspaces workspace main
+        _jjw_workspaces
+      }
+
+      compdef _jjw jjw
+      compdef _w w
+
+      # `jj w` is a `util exec` alias, so jj's own completer sees only `util
+      # exec` and offers file paths for it. Running jj's shipped _jj defines its
+      # clap completer and binds `jj` to it; we then take the binding back for a
+      # wrapper that handles the alias and delegates everything else. If jj ever
+      # renames that completer, leave jj's own binding alone rather than break
+      # `jj` completion wholesale.
+      if autoload -Uz _jj && _jj >/dev/null 2>&1 && (( $+functions[_clap_dynamic_completer_jj] )); then
+        _jj_w_aware() {
+          if (( CURRENT > 2 )) && [[ $words[2] == w ]]; then
+            shift words
+            (( CURRENT-- ))
+            _jjw
+            return
+          fi
+          _clap_dynamic_completer_jj "$@"
+        }
+        compdef _jj_w_aware jj
+      fi
+
       # Disable 'r' for running the last command
       disable r
 
