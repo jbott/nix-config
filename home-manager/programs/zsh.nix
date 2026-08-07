@@ -1,4 +1,8 @@
 {currentSystemName, ...}: {
+  # Prepended to PATH via hm-session-vars.sh, which the zsh module sources.
+  # For things installed outside nix (uv tools, pipx, one-off scripts).
+  home.sessionPath = ["$HOME/.local/bin"];
+
   programs.zsh = {
     enable = true;
     syntaxHighlighting = {
