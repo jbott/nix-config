@@ -1,5 +1,6 @@
 {
   imports = [
+    ./claude-code.nix
     ./defaults-finder.nix
     ./defaults-screencapture.nix
     ./defaults-spotlight.nix

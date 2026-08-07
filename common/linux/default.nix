@@ -1,5 +1,6 @@
 {
   imports = [
+    ./claude-code.nix
     ./hardware.nix
     ./nscd-fix.nix
     ./openssh.nix
