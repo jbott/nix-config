@@ -40,6 +40,8 @@ commands:
         whose directory is gone from disk.
   root [<name>]
         Print the root of <name>, or of the main workspace if omitted.
+
+Any <name> may carry the trailing "@" jj prints it with; it is dropped.
 EOF
 }
 
@@ -77,6 +79,13 @@ ws_exists() {
   jjq workspace list -T 'name ++ "\n"' | grep -Fxq "$1"
 }
 
+# Workspace names are spelled "<name>@" in revsets, so that is how they appear
+# in jj's own output and how they get copied onto our command line. Accept the
+# suffix and drop it. jj does permit "@" inside a name, but it then quotes the
+# name in template output, which ws_exists never matches — such a workspace is
+# already beyond this tool's reach, so nothing is lost by stripping blind.
+ws_name() { printf '%s\n' "${1%@}"; }
+
 # Directory where workspace <name>'s files live: its jj-recorded path (jj
 # >=0.38), or the convention path we would have created it at (older repos
 # record no path).
@@ -110,6 +119,7 @@ cmd_new() {
     esac
   done
   [ -n "$name" ] || die "new: missing <name>"
+  name=$(ws_name "$name")
 
   local root path
   root=$(repo_root)
@@ -141,7 +151,7 @@ cmd_rm() {
         ;;
       -*) die "rm: unknown option: $1" ;;
       *)
-        names+=("$1")
+        names+=("$(ws_name "$1")")
         shift
         ;;
     esac
@@ -221,9 +231,11 @@ cmd_root() {
     repo_root
     return 0
   }
-  ws_exists "$1" || die "root: no such workspace: $1"
-  jjq workspace root --name "$1" 2>/dev/null ||
-    die "root: workspace '$1' has no recorded path (repo predates jj 0.38)"
+  local name
+  name=$(ws_name "$1")
+  ws_exists "$name" || die "root: no such workspace: $name"
+  jjq workspace root --name "$name" 2>/dev/null ||
+    die "root: workspace '$name' has no recorded path (repo predates jj 0.38)"
 }
 
 while [ $# -gt 0 ]; do
