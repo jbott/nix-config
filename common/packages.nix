@@ -3,7 +3,7 @@
   lib,
   ...
 }: let
-  docker-compose = pkgs.writeShellScriptBin "docker-compose" "exec ${pkgs.docker}/bin/docker compose \"\$@\"";
+  docker-compose = pkgs.writeShellScriptBin "docker-compose" "exec ${pkgs.docker-client}/bin/docker compose \"\$@\"";
   docker-credential-glab = pkgs.writeShellScriptBin "docker-credential-glab" "exec ${pkgs.glab}/bin/glab auth docker-helper \"\$@\"";
 in {
   environment.systemPackages = with pkgs; [
