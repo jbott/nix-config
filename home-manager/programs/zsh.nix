@@ -91,6 +91,13 @@
         # Not `path`: that name is tied to $PATH in zsh, and assigning it here
         # would clobber the shell's command lookup.
         local name dir
+
+        # Names copied out of jj's output carry the trailing "@" they are
+        # spelled with in revsets, and "alpha@" matches no candidate. Drop it
+        # from the prefix we match against; because it is not moved into
+        # IPREFIX, completing also erases it from the line, which is what jjw
+        # would have done with it anyway.
+        PREFIX=''${PREFIX%@}
         while IFS=$'\t' read -r name dir; do
           if [[ $dir == - ]]; then
             names+=("$name")
