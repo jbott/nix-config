@@ -71,6 +71,17 @@ jj_silent() {
     @jj@ "$@"
 }
 
+# Fail the way real git does in a directory with no .git. A pure jj workspace
+# is exactly that from git's point of view, so this is the honest answer to a
+# query we cannot translate — and it is the answer callers are built to read.
+# Both the wording and the 128 matter: tools sniff the message to tell "no repo
+# here" apart from "repo, but broken". Claude Code's isolation-worktree check
+# is one of them; see the rev-parse dispatch below.
+not_a_git_repo() {
+    echo "fatal: not a git repository (or any of the parent directories): .git" >&2
+    exit 128
+}
+
 # Strip leading `-c key=value` config-override flags before the subcommand.
 # Tools like glab pass these to set transport/credential options that don't
 # apply to jj — drop them so we dispatch on the real subcommand.
@@ -83,8 +94,44 @@ done
 case "$1" in
     rev-parse)
         shift
+        # Two kinds of caller ask rev-parse about the repo itself, and they
+        # want opposite answers here.
+        #
+        # Repo *detection* — `rev-parse --git-dir >/dev/null`, and friends —
+        # is how most tools decide whether there is version control at all.
+        # Answer those the way a git checkout would, so the caller goes on to
+        # issue commands this wrapper can translate instead of falling back to
+        # its no-VCS path.
+        #
+        # Repo *identity* — --absolute-git-dir, --git-common-dir — is asked by
+        # callers that will then read or compare the git directory on disk. A
+        # pure jj workspace has none, so claiming one strands them: Claude Code
+        # probes a candidate isolation worktree with
+        #   git rev-parse --absolute-git-dir --show-toplevel --git-common-dir
+        # and then stats the ref store and back-pointer under whatever path it
+        # is handed. Report no repository and it takes its supported
+        # "not a git worktree" path instead. (Its other probes pass -C, which
+        # goes to real git above and says the same thing — so this keeps the
+        # two consistent.) Note it leads with --absolute-git-dir, which is why
+        # the fatal has to win for a probe that also asks --show-toplevel.
+        #
+        # Hence: answer only the options below, and only one at a time — a
+        # multi-option probe wants one output line per option, and this
+        # dispatch reads $1 alone. Everything else is no repository, rather
+        # than the option echoed back with a zero exit (that fallback is meant
+        # for unresolvable revisions, which git really does echo) — a caller
+        # reads that as a repository answering nonsense.
         case "$1" in
+            --git-dir)
+                [ $# -eq 1 ] || not_a_git_repo
+                echo ".git"
+                ;;
+            --is-inside-work-tree)
+                [ $# -eq 1 ] || not_a_git_repo
+                echo "true"
+                ;;
             --show-toplevel)
+                [ $# -eq 1 ] || not_a_git_repo
                 jj_silent workspace root
                 ;;
             --abbrev-ref)
@@ -122,6 +169,9 @@ case "$1" in
                 ;;
             HEAD)
                 jj_silent log -r @- --no-graph -T 'commit_id'
+                ;;
+            -*)
+                not_a_git_repo
                 ;;
             *)
                 # Try to parse as a revision
