@@ -7,5 +7,6 @@
   git-jj-wrapper = self.callPackage ./pkgs/git-jj-wrapper {};
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};
+  paseo = self.callPackage ./pkgs/paseo {};
   yolo = self.callPackage ./pkgs/yolo {};
 })

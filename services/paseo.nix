@@ -1,51 +1,76 @@
-{pkgs, ...}: let
-  imageName = "ghcr.io/getpaseo/paseo";
-  imageTag = "latest";
-  imageDigest = "sha256:593cb65b1eabee061af8f240fcb4031818e9c330fe66b584c345e3b296531b95";
-  sha256 = "sha256-lEBsIYVOqX4SZ42kcJhIqrkmMBwQas6sMwgJQ+3FE3A=";
+{
+  pkgs,
+  lib,
+  ...
+}: {
+  # Paseo self-hosted coding-agent daemon, run natively as jbo (un-containerized)
+  # so agents execute in the real host environment: jbo's files, tools, configs
+  # and credentials. The daemon is packaged from @getpaseo/cli in the overlay.
 
-  image = "${imageName}:${imageTag}";
-  imageFile = pkgs.dockerTools.pullImage {
-    inherit imageName imageDigest sha256;
-    finalImageTag = imageTag;
-  };
-in {
-  # podman won't create bind-mount sources; the container runs as uid/gid 1000,
-  # so pre-create these dirs with that ownership.
+  # Expose the CLI on the host too (`paseo ls`, `paseo status`, ...).
+  environment.systemPackages = [pkgs.paseo];
+
+  # PASEO_PASSWORD stays out of the nix store. Create on the host:
+  #   /persist/var/lib/paseo/paseo.env  ->  PASEO_PASSWORD=<secret>
   systemd.tmpfiles.rules = [
     "d /persist/var/lib/paseo 0755 root root -"
-    "d /persist/var/lib/paseo/home 0700 1000 1000 -"
-    "d /persist/var/lib/paseo/workspace 0755 1000 1000 -"
   ];
 
-  virtualisation.oci-containers = {
-    containers.paseo = {
-      inherit image imageFile;
-      environment = {
-        TZ = "America/Los_Angeles";
-        # Daemon rejects requests whose Host header isn't whitelisted (403).
-        # Allow this host's tailscale MagicDNS names.
-        PASEO_HOSTNAMES = "ha.tailc10a4.ts.net,ha";
-        # Put the nix-built claude-code CLI (available via the /nix/store mount)
-        # on PATH so the daemon can spawn `claude`; base image PATH kept after it.
-        PATH = "${pkgs.claude-code}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
-        # Make ~ resolve to jbo's real home so agent-relative paths like ~/src
-        # match the host layout. Daemon state stays under /home/paseo via the
-        # image's explicit PASEO_HOME / XDG_* env, which we leave untouched.
-        HOME = "/home/jbo";
-        CLAUDE_CONFIG_DIR = "/home/jbo/.claude";
-      };
-      # PASEO_PASSWORD lives outside the nix store. Create this file on the host:
-      #   /persist/var/lib/paseo/paseo.env  ->  PASEO_PASSWORD=<secret>
-      environmentFiles = ["/persist/var/lib/paseo/paseo.env"];
-      volumes = [
-        "/persist/var/lib/paseo/home:/home/paseo" # daemon state + agent credentials
-        "/persist/var/lib/paseo/workspace:/workspace" # code the agents operate on
-        "/nix/store:/nix/store:ro" # closure backing the mounted claude-code CLI
-        "/home/jbo/.claude:/home/jbo/.claude" # real host OAuth login + claude settings (CLAUDE_CONFIG_DIR), at its host path
-        "/home/jbo/src:/home/jbo/src" # repos, mounted at their host path so absolute paths match
+  systemd.services.paseo = {
+    description = "Paseo self-hosted coding-agent daemon";
+    wantedBy = ["multi-user.target"];
+    after = ["network-online.target" "tailscaled.service"];
+    wants = ["network-online.target"];
+
+    # Toolchain the daemon hands to the agents it spawns. Running on the host as
+    # jbo, we reuse the host packages directly (same store paths as jbo's
+    # profile) — claude-code, jj, git, nix, node, plus a normal shell userland.
+    path = [
+      pkgs.paseo
+      pkgs.claude-code
+      pkgs.jujutsu
+      pkgs.git
+      pkgs.nix
+      pkgs.nodejs_22
+      pkgs.bashInteractive
+      pkgs.coreutils
+      pkgs.gnugrep
+      pkgs.gnused
+      pkgs.gawk
+      pkgs.findutils
+      pkgs.gnutar
+      pkgs.gzip
+      pkgs.which
+      pkgs.openssh
+    ];
+
+    environment = {
+      HOME = "/home/jbo";
+      # Daemon state in jbo's (persisted) home; ~/.claude oauth is used as-is.
+      PASEO_HOME = "/home/jbo/.paseo";
+      TZ = "America/Los_Angeles";
+      # Voice needs sherpa-onnx (pruned from the package); disable it. The daemon
+      # loads it lazily, so this just avoids the model download / load attempt.
+      PASEO_VOICE_MODE_ENABLED = "false";
+      # CA bundle so claude / git-over-https reach their endpoints under systemd.
+      SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
+    };
+
+    serviceConfig = {
+      User = "jbo";
+      WorkingDirectory = "/home/jbo";
+      # PASEO_PASSWORD (read by root before dropping to User=, so 0600 is fine).
+      EnvironmentFile = "/persist/var/lib/paseo/paseo.env";
+      ExecStart = lib.concatStringsSep " " [
+        "${pkgs.paseo}/bin/paseo daemon start"
+        "--foreground"
+        "--listen 0.0.0.0:6767"
+        "--no-relay" # tailscale-only; no end-to-end relay
+        "--web-ui"
+        "--hostnames ha.tailc10a4.ts.net,ha"
       ];
-      extraOptions = ["--network=host"]; # binds 0.0.0.0:6767; reachable via tailscale only (firewall below)
+      Restart = "on-failure";
+      RestartSec = 5;
     };
   };
 
