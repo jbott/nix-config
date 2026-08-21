@@ -29,6 +29,11 @@ in {
         # Put the nix-built claude-code CLI (available via the /nix/store mount)
         # on PATH so the daemon can spawn `claude`; base image PATH kept after it.
         PATH = "${pkgs.claude-code}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+        # Make ~ resolve to jbo's real home so agent-relative paths like ~/src
+        # match the host layout. Daemon state stays under /home/paseo via the
+        # image's explicit PASEO_HOME / XDG_* env, which we leave untouched.
+        HOME = "/home/jbo";
+        CLAUDE_CONFIG_DIR = "/home/jbo/.claude";
       };
       # PASEO_PASSWORD lives outside the nix store. Create this file on the host:
       #   /persist/var/lib/paseo/paseo.env  ->  PASEO_PASSWORD=<secret>
@@ -37,7 +42,7 @@ in {
         "/persist/var/lib/paseo/home:/home/paseo" # daemon state + agent credentials
         "/persist/var/lib/paseo/workspace:/workspace" # code the agents operate on
         "/nix/store:/nix/store:ro" # closure backing the mounted claude-code CLI
-        "/home/jbo/.claude:/home/paseo/.claude" # real host OAuth login + claude settings (CLAUDE_CONFIG_DIR)
+        "/home/jbo/.claude:/home/jbo/.claude" # real host OAuth login + claude settings (CLAUDE_CONFIG_DIR), at its host path
         "/home/jbo/src:/home/jbo/src" # repos, mounted at their host path so absolute paths match
       ];
       extraOptions = ["--network=host"]; # binds 0.0.0.0:6767; reachable via tailscale only (firewall below)
