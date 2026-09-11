@@ -148,7 +148,7 @@
     formatter = forAllSystems ({pkgs, ...}: (treefmtEval pkgs).config.build.wrapper);
 
     packages = forAllSystems ({pkgs, ...}: {
-      inherit (pkgs) claude-code claude-code-modes dd-cli deploy-nixos fast-nix-gc finicky glab-jj jj-hunk-tool jj-skill jjw jujutsu;
+      inherit (pkgs) claude-code claude-code-modes dd-cli deploy-nixos fast-nix-gc finicky glab-jj jabracli jj-hunk-tool jj-skill jjw jujutsu;
     });
 
     devShells = forAllSystems ({

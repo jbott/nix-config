@@ -8,6 +8,7 @@
   gen-firefox-profile-launchers = self.callPackage ./pkgs/gen-firefox-profile-launchers {};
   glab-jj = self.callPackage ./pkgs/glab-jj {};
   humanizer-skill = self.callPackage ./pkgs/humanizer-skill {};
+  jabracli = self.callPackage ./pkgs/jabracli {};
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};
   jjw = self.callPackage ./pkgs/jjw {};

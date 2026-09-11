@@ -7,6 +7,7 @@
     finicky
     gen-firefox-profile-launchers
     iproute2mac
+    jabracli
     m1ddc
     utm
     # keep-sorted end
