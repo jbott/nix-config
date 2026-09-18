@@ -35,9 +35,10 @@
       # These wrap the `jjw` binary (overlay/pkgs/jjw, also `jj w`) to add the one
       # thing a binary cannot do: cd the calling shell.
 
-      # A bare `jjw <name>` is shorthand for branching off main; other arguments
-      # go straight to the binary. No bookmark is created — make one with
-      # `jj bookmark create john/<name>` when there is something worth pushing.
+      # A bare `jjw <name>` is shorthand for branching off main; no arguments
+      # opens a picker. Other arguments go straight to the binary. No bookmark
+      # is created — make one with `jj bookmark create john/<name>` when there
+      # is something worth pushing.
       jjw() {
         case ''${1-} in
           new | add)
@@ -45,7 +46,10 @@
             out=$(command jjw "$@") || return
             cd "$out"
             ;;
-          "" | -* | rm | ls | root)
+          "")
+            _jjw_pick_workspace
+            ;;
+          -* | rm | ls | root)
             command jjw "$@"
             ;;
           *)
@@ -65,7 +69,7 @@
       # Shadows the `w` who-is-logged-in utility, which we never use.
       w() {
         if (($# == 0)); then
-          command jjw ls
+          _jjw_pick_workspace
           return
         fi
         (($# == 1)) || {
@@ -81,6 +85,16 @@
           dir=$(command jjw root "$1") || return
         fi
         cd "$dir"
+      }
+
+      _jjw_pick_workspace() {
+        local choice name
+        choice=$(command jjw ls | fzf --height 50% --reverse --no-multi) || return
+        [[ -n $choice ]] || return
+        name=''${choice%%$'\t'*}
+        # Resolve through `w` so a workspace named after a jjw command, such as
+        # `ls`, is handled as a workspace name after it is selected.
+        w "$name"
       }
 
       # Existing workspaces, described by their path. `jjw ls` prints

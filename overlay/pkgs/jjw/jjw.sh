@@ -123,9 +123,9 @@ cmd_new() {
 
   local root path
   root=$(repo_root)
-  path=$(ws_path "$root" "$name")
 
   if ws_exists "$name"; then
+    path=$(ws_dir "$root" "$name")
     [ -d "$path" ] ||
       die "workspace '$name' is tracked but $path is missing; run '$prog rm $name' to drop the stale entry, then retry"
     note "reusing workspace '$name' at $path"
@@ -133,6 +133,7 @@ cmd_new() {
     return 0
   fi
 
+  path=$(ws_path "$root" "$name")
   local add=(workspace add --name "$name")
   [ -z "$revset" ] || add+=(--revision "$revset")
   mkdir -p "$(dirname "$path")"
