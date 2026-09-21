@@ -35,6 +35,9 @@ commands:
         you are standing in and the main workspace.
         --stale forgets every tracked workspace whose directory is gone from
         disk (and takes no names).
+  rm --self
+        Forget and delete the current workspace (or the -R target). Refuses
+        the main workspace. Your shell must cd out of the deleted directory.
   ls [--stale]
         List existing workspaces as <name><TAB><path>. --stale lists only those
         whose directory is gone from disk.
@@ -142,12 +145,16 @@ cmd_new() {
 }
 
 cmd_rm() {
-  local stale_only=false name path
+  local stale_only=false self=false name path
   local names=()
   while [ $# -gt 0 ]; do
     case $1 in
       --stale)
         stale_only=true
+        shift
+        ;;
+      --self)
+        self=true
         shift
         ;;
       -*) die "rm: unknown option: $1" ;;
@@ -161,6 +168,18 @@ cmd_rm() {
   local root current
   root=$(repo_root)
   current=$(jjq workspace root)
+
+  if $self; then
+    ! $stale_only || die "rm: --self cannot be combined with --stale"
+    [ ${#names[@]} -eq 0 ] || die "rm: --self takes no names"
+    [ "$current" != "$root" ] || die "rm: refusing to remove the main workspace"
+
+    jj -R "$current" workspace forget
+    cd "$root"
+    rm -rf "$current"
+    note "removed current workspace ($current); main workspace is $root"
+    return 0
+  fi
 
   if $stale_only; then
     [ ${#names[@]} -eq 0 ] || die "rm: --stale removes every stale workspace and takes no names"
