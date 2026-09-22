@@ -28,7 +28,8 @@ usage: $prog [-R <repo>] <command> [args]
 commands:
   new|add [-r <revset>] <name>
         Create the workspace for <name> and print its path. Reuses an existing
-        one, so it doubles as "resolve or create". Creates no bookmark: name a
+        one, so it doubles as "resolve or create". Defaults to the local bookmark
+        matching <name>, if it exists; -r overrides this. Creates no bookmark: name a
         branch with 'jj bookmark create' once there is something to push.
   rm [--stale] <name>...
         Forget each workspace and delete its directory. Refuses the workspace
@@ -134,6 +135,15 @@ cmd_new() {
     note "reusing workspace '$name' at $path"
     printf '%s\n' "$path"
     return 0
+  fi
+
+  if [ -z "$revset" ]; then
+    local bookmark_name bookmark_revset matches
+    bookmark_name=${name//\\/\\\\}
+    bookmark_name=${bookmark_name//\"/\\\"}
+    bookmark_revset="bookmarks(exact:\"$bookmark_name\")"
+    matches=$(jjq log --no-graph -r "$bookmark_revset" -T 'commit_id ++ "\n"')
+    [ -z "$matches" ] || revset=$bookmark_revset
   fi
 
   path=$(ws_path "$root" "$name")
