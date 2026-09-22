@@ -90,7 +90,7 @@
         formatting = treefmtEval.config.build.check self;
       };
       packages = {
-        inherit (pkgs) claude-code claude-code-modes dd-cli deploy-nixos fast-nix-gc finicky jj-hunk-tool jj-skill jjw jujutsu;
+        inherit (pkgs) claude-code claude-code-modes dd-cli deploy-nixos fast-nix-gc finicky glab-jj jj-hunk-tool jj-skill jjw jujutsu;
       };
       devShells = {
         default = pkgs.mkShell {

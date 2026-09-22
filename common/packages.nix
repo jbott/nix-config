@@ -28,7 +28,7 @@ in {
     gh
     git
     git-absorb
-    glab
+    glab-jj
     gmailctl
     htop
     jj-hunk-tool
