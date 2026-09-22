@@ -49,7 +49,17 @@
           "")
             _jjw_pick_workspace
             ;;
-          -* | rm | ls | root)
+          rm)
+            if (( ''${argv[(Ie)--self]} )); then
+              local root
+              root=$(command jjw root) || return
+              command jjw "$@" || return
+              cd "$root"
+            else
+              command jjw "$@"
+            fi
+            ;;
+          -* | ls | root)
             command jjw "$@"
             ;;
           *)
