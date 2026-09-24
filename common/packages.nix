@@ -12,6 +12,7 @@ in {
     bitwarden-cli
     black
     btop
+    ccusage
     cdrtools
     claude-code
     claude-code-modes
