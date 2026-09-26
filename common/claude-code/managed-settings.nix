@@ -79,7 +79,6 @@ in
     "$schema" = "https://json.schemastore.org/claude-code-settings.json";
 
     includeCoAuthoredBy = false;
-    autoCompactWindow = 500000;
     skipDangerousModePermissionPrompt = true;
     spinnerTipsEnabled = false;
     # Keep `!` bash commands context-only (the pre-2.1.157 behavior) instead of
