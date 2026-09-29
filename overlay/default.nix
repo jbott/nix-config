@@ -11,6 +11,5 @@
   jj-skill = self.callPackage ../skills/jj {};
   jjw = self.callPackage ./pkgs/jjw {};
   jujutsu = self.callPackage ./pkgs/jujutsu {jujutsu = super.jujutsu;};
-  paseo = self.callPackage ./pkgs/paseo {};
   yolo = self.callPackage ./pkgs/yolo {};
 })
