@@ -47,4 +47,24 @@
 
   # Enable linger so systemd user units start at boot
   users.users.jbo.linger = true;
+
+  # A backstop for all user work, including interactive tmux scopes that are
+  # outside swarm.service. Swarm has its own smaller limit below.
+  systemd.slices.user.sliceConfig = {
+    CPUQuota = "250%";
+    MemoryHigh = "8G";
+    MemoryMax = "10G";
+  };
+
+  # swarm's unit lives in jbo's home directory. Add limits as a drop-in so
+  # they apply without replacing its unit or release override.
+  systemd.user.units."swarm.service" = {
+    overrideStrategy = "asDropin";
+    text = ''
+      [Service]
+      CPUQuota=150%
+      MemoryHigh=4G
+      MemoryMax=6G
+    '';
+  };
 }

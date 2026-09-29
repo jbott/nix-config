@@ -19,7 +19,11 @@ in {
       volumes = [
         "/persist/var/lib/home-assistant:/config"
       ];
-      extraOptions = ["--network=host"];
+      extraOptions = [
+        "--network=host"
+        "--memory=2g"
+        "--cpus=1"
+      ];
     };
   };
 

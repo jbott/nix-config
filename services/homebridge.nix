@@ -19,7 +19,11 @@ in {
       volumes = [
         "/persist/var/lib/homebridge:/homebridge"
       ];
-      extraOptions = ["--network=host"];
+      extraOptions = [
+        "--network=host"
+        "--memory=1g"
+        "--cpus=0.5"
+      ];
     };
   };
 
