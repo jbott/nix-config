@@ -69,9 +69,9 @@
     };
 
     overlays = [
-      (import ./overlay)
       llmAgentsOverlay
       fastNixGcOverlay
+      (import ./overlay)
     ];
     nixpkgsOverlaysModule = {
       nixpkgs = {
