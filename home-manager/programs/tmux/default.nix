@@ -1,20 +1,24 @@
-{pkgs, ...}: let
-  tmux-jj-title = pkgs.writeShellScript "tmux-jj-title" ''
-    dir="$1"
-    if root=$(cd "$dir" && ${pkgs.jujutsu}/bin/jj workspace root --ignore-working-copy 2>/dev/null); then
-      root=$(realpath "$root")
-      base=$(basename "$dir")
-      repo=$(basename "$root")
-      if [ "$dir" = "$root" ]; then
-        printf '[%s]' "$repo"
-      else
-        printf '[%s] %s' "$repo" "$base"
-      fi
-    else
-      printf '%s' "$(basename "$dir")"
-    fi
-  '';
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  tmux-jj-title = pkgs.writeShellScript "tmux-jj-title" (builtins.readFile ./jj-title.sh);
 in {
+  xdg.configFile."tmux/jj-title".source = tmux-jj-title;
+
+  programs.zsh.initContent = lib.mkAfter ''
+    _tmux_jj_title() {
+      [[ -n ''${TMUX-} ]] || return 0
+      "${config.home.profileDirectory}/bin/tmux" set-option -p -t "$TMUX_PANE" @jj-title \
+        "$("${config.xdg.configHome}/tmux/jj-title" "$PWD")"
+    }
+    autoload -Uz add-zsh-hook
+    add-zsh-hook chpwd _tmux_jj_title
+    _tmux_jj_title
+  '';
+
   programs.tmux = {
     enable = true;
     extraConfig =
@@ -40,10 +44,10 @@ in {
         bind -n C-Pageup previous-window
         bind -n C-Pagedown next-window
 
-        # Auto-rename panes
+        # Auto-rename windows
         set-option -g status-interval 2
         set-option -g automatic-rename on
-        set-option -g automatic-rename-format '#(${tmux-jj-title} #{pane_current_path})'
+        set-option -g automatic-rename-format '#{?@jj-title,#{@jj-title},#{b:pane_current_path}}'
 
         # long scrollback
         set-option -g history-limit 50000
