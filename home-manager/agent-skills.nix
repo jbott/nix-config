@@ -8,4 +8,5 @@
 {pkgs}: {
   jj = "${pkgs.jj-skill}";
   humanizer = "${pkgs.humanizer-skill}";
+  swiftui-pro = "${pkgs.swiftui-pro-skill}";
 }
