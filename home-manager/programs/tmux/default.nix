@@ -10,7 +10,8 @@ in {
 
   programs.zsh.initContent = lib.mkAfter ''
     _tmux_jj_title() {
-      [[ -n ''${TMUX-} ]] || return 0
+      [[ -n ''${TMUX-} && -t 0 && $ZSH_SUBSHELL == 0 ]] || return 0
+      [[ $TTY == "$("${config.home.profileDirectory}/bin/tmux" display-message -p -t "$TMUX_PANE" '#{pane_tty}')" ]] || return 0
       "${config.home.profileDirectory}/bin/tmux" set-option -p -t "$TMUX_PANE" @jj-title \
         "$("${config.xdg.configHome}/tmux/jj-title" "$PWD")"
     }
