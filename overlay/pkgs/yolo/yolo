@@ -7,12 +7,6 @@ if [[ -n "${root:-}" ]]; then
     cd "$root"
 fi
 
-# Scan args for `-m`/`--mode <preset>` and `-w`/`--worktree [name]`. The
-# mode is consumed (dispatches to claude-code-modes) while the worktree
-# flag is forwarded to claude and paired with a named session below so
-# repeat invocations resume the same claude session inside the same jj
-# workspace. `-w` / `--worktree` with no value (or `-w=`) synthesises a
-# name.
 gen_codename() {
     local mods nouns
     mapfile -t mods < @modifiers@
@@ -22,7 +16,6 @@ gen_codename() {
 
 mode=
 worktree_name=
-other_args_seen=0
 forwarded_args=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -53,7 +46,6 @@ while [[ $# -gt 0 ]]; do
             fi
             ;;
         *)
-            other_args_seen=1
             forwarded_args+=("$1")
             shift
             ;;
@@ -64,31 +56,13 @@ if [[ -n "$worktree_name" ]]; then
     forwarded_args+=(-w "$worktree_name")
 fi
 
-# Label the session with a memorable codename so it shows up in the
-# /resume picker — but only when the user didn't pass other args of
-# their own (a prompt, --resume, --continue, etc.), in which case
-# respect whatever they intended. For an existing worktree, resume the
-# session that the previous yolo run created.
-session_args=()
-if (( ! other_args_seen )); then
-    session_name=${worktree_name:-$(gen_codename)}
-    if [[ -n "$worktree_name" && -n "${root:-}" \
-          && -d "$root/.claude/worktrees/$worktree_name" ]]; then
-        session_args=(--resume "$session_name")
-    else
-        session_args=(--name "$session_name")
-    fi
-fi
-
 if [[ -n "$mode" ]]; then
     # claude-mode parses its own flags; anything for claude must come after `--`.
     exec claude-mode "$mode" -- \
         --dangerously-skip-permissions \
-        ${session_args[@]+"${session_args[@]}"} \
         ${forwarded_args[@]+"${forwarded_args[@]}"}
 fi
 
 exec claude \
     --dangerously-skip-permissions \
-    ${session_args[@]+"${session_args[@]}"} \
     ${forwarded_args[@]+"${forwarded_args[@]}"}

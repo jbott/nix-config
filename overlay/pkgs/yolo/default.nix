@@ -30,7 +30,7 @@ stdenvNoCC.mkDerivation {
   '';
 
   meta = {
-    description = "Launch Claude Code with --dangerously-skip-permissions, named sessions, and jj worktrees";
+    description = "Launch Claude Code with --dangerously-skip-permissions and jj worktrees";
     mainProgram = "yolo";
     platforms = lib.platforms.unix;
   };
