@@ -5,23 +5,23 @@
   unzip,
   versionCheckHook,
 }: let
-  version = "0.8.17";
+  version = "0.8.19";
   targets = {
     "aarch64-darwin" = {
       platform = "macos-arm64";
-      hash = "sha256-8y0rc8rVXsEYkr8sZkQ2fi0adoIkv1+3xqLJKDlmbEI=";
+      hash = "sha256-iieGhdzx6oTP0MGORw4IKq7yQ5XRzDnewGO85gZeptc=";
     };
     "aarch64-linux" = {
       platform = "linux-arm64";
-      hash = "sha256-Jq3pW33W5wPK0NcxT1jHzYoI9kht31z6xMg8vDLqj9A=";
+      hash = "sha256-+uzrEBEp/FGwFjuZ1vRqcgguFI3l+Gf149NXz5zZoL0=";
     };
     "x86_64-darwin" = {
       platform = "macos-amd64";
-      hash = "sha256-l2Xw7J5YyGpCcPYzpUat+jBQAZzS1s3iKXFOxOyNPP0=";
+      hash = "sha256-WZhGf/EhX19F5ZEH1XZzDIJXSeNDyu6pm/C3PMJeoQ4=";
     };
     "x86_64-linux" = {
       platform = "linux-amd64";
-      hash = "sha256-vfFBVxCnGlcuvt8HUQhFfJ80xtVB/bnh2sRrJr8GYUQ=";
+      hash = "sha256-Zaa9zCn//YEOae8K4i73pPDFoplrXJkOzWnBZ7zPZpU=";
     };
   };
   target = targets.${stdenvNoCC.hostPlatform.system};
