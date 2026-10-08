@@ -15,6 +15,45 @@
       echo "$updated" > "$settings_file"
     '';
   };
+
+  # Items shown in the TUI footer. Run `/statusline` inside codex to preview
+  # the full list of identifiers.
+  statusLine = [
+    "model-with-reasoning"
+    "context-remaining"
+    "used-tokens"
+    "context-window-size"
+    "git-branch"
+    "current-dir"
+  ];
+
+  # config.toml stays mutable because codex writes trust levels and other
+  # settings into it, so only this key is patched in place. tomlkit keeps the
+  # rest of the file's formatting intact.
+  setCodexStatusLine =
+    pkgs.writers.writePython3Bin "set-codex-status-line" {
+      libraries = [pkgs.python3Packages.tomlkit];
+    } ''
+      import json
+      import os
+      import sys
+      import tomlkit
+
+      path = os.path.expanduser("~/.codex/config.toml")
+      os.makedirs(os.path.dirname(path), exist_ok=True)
+      try:
+          with open(path) as f:
+              doc = tomlkit.parse(f.read())
+      except FileNotFoundError:
+          doc = tomlkit.document()
+
+      doc.setdefault("tui", tomlkit.table())["status_line"] = json.loads(
+          sys.argv[1]
+      )
+
+      with open(path, "w") as f:
+          f.write(tomlkit.dumps(doc))
+    '';
 in {
   programs.codex = {
     enable = true;
@@ -29,5 +68,9 @@ in {
 
   home.activation.codexDaemonUpdater = lib.hm.dag.entryAfter ["writeBoundary"] ''
     run ${lib.getExe disableDaemonUpdater}
+  '';
+
+  home.activation.codexStatusLine = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    run ${lib.getExe setCodexStatusLine} ${lib.escapeShellArg (builtins.toJSON statusLine)}
   '';
 }
