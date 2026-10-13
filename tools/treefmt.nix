@@ -5,11 +5,13 @@ in {
   projectRootFile = "flake.nix";
 
   programs = {
+    actionlint.enable = true;
     alejandra.enable = true;
     just.enable = true;
     keep-sorted.enable = true;
     shellcheck.enable = true;
     typos.enable = true;
+    zizmor.enable = true;
   };
 
   settings = {
