@@ -1,0 +1,83 @@
+name: nix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  linux:
+    name: build (${{ matrix.system }})
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: x86_64-linux
+            runner: ubuntu-24.04
+          # Also builds the rosetta builder image the darwin job pulls from cache.
+          - system: aarch64-linux
+            runner: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Nix
+        # actionlint does not support the $/ self-repository syntax yet.
+        uses: ./.github/actions/setup-nix # zizmor: ignore[self-repository]
+        with:
+          cache-bucket: ${{ vars.S3_BUCKET_NAME }}
+          cache-endpoint: ${{ vars.S3_ENDPOINT }}
+          cache-public-key: ${{ vars.NIX_CACHE_PUBLIC_KEY }}
+          cache-private-key: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Build checks
+        env:
+          SYSTEM: ${{ matrix.system }}
+        run: |
+          nix run --inputs-from . nixpkgs#nix-fast-build -- \
+            --no-nom --skip-cached --flake .#checks --systems "$SYSTEM"
+
+  darwin:
+    name: build (aarch64-darwin)
+    # Wait for the aarch64-linux job to cache the rosetta builder image, but
+    # still build darwin if an unrelated linux check failed.
+    needs: linux
+    if: ${{ !cancelled() }}
+    runs-on: macos-26
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Nix
+        # actionlint does not support the $/ self-repository syntax yet.
+        uses: ./.github/actions/setup-nix # zizmor: ignore[self-repository]
+        with:
+          cache-bucket: ${{ vars.S3_BUCKET_NAME }}
+          cache-endpoint: ${{ vars.S3_ENDPOINT }}
+          cache-public-key: ${{ vars.NIX_CACHE_PUBLIC_KEY }}
+          cache-private-key: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Build checks
+        run: |
+          nix run --inputs-from . nixpkgs#nix-fast-build -- \
+            --no-nom --skip-cached --flake .#checks --systems aarch64-darwin

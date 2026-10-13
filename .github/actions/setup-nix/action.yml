@@ -1,0 +1,126 @@
+name: Setup Nix
+description: >-
+  Install Nix and, when cache credentials are available, wire the nix-daemon up
+  to read from and upload locally built paths to the R2 binary cache.
+
+inputs:
+  cache-bucket:
+    description: R2 bucket name. Leave empty to build without the binary cache.
+    default: ""
+  cache-endpoint:
+    description: R2 S3 API endpoint host.
+    default: ""
+  cache-public-key:
+    description: Public key paths in the cache are signed with.
+    default: ""
+  cache-private-key:
+    description: Secret key used to sign locally built paths.
+    default: ""
+  aws-access-key-id:
+    description: R2 access key id.
+    default: ""
+  aws-secret-access-key:
+    description: R2 secret access key.
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # Ubuntu runners ship with ~20GB free, not enough for NixOS closures.
+    - name: Free disk space
+      if: runner.os == 'Linux'
+      uses: wimpysworld/nothing-but-nix@687c797a730352432950c707ab493fcc951818d7 # v10
+
+    - name: Install Nix
+      uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+      with:
+        github_access_token: ${{ github.token }}
+        extra_nix_config: |
+          accept-flake-config = false
+          max-jobs = auto
+
+    # The nixos-disk-image for the rosetta builder requires the kvm feature.
+    # Hosted arm runners don't expose /dev/kvm, so advertise it anyway and let
+    # QEMU fall back to TCG emulation.
+    - name: Advertise kvm feature
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        if [[ ! -e /dev/kvm ]]; then
+          echo "::notice::/dev/kvm unavailable, VM builds will use TCG emulation"
+        fi
+        echo "extra-system-features = kvm" | sudo tee -a /etc/nix/nix.conf
+
+    # Substitution and post-build uploads happen in the root nix-daemon, so the
+    # credentials have to live in its environment, not just the job's.
+    - name: Configure binary cache
+      if: inputs.cache-bucket != '' && inputs.aws-access-key-id != ''
+      shell: bash
+      env:
+        CACHE_BUCKET: ${{ inputs.cache-bucket }}
+        CACHE_ENDPOINT: ${{ inputs.cache-endpoint }}
+        CACHE_PUBLIC_KEY: ${{ inputs.cache-public-key }}
+        CACHE_PRIVATE_KEY: ${{ inputs.cache-private-key }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+      run: |
+        set -euo pipefail
+
+        creds=/etc/nix/aws-credentials
+        key=/etc/nix/cache-priv-key.pem
+        hook=/etc/nix/upload-to-cache.sh
+        cache_url="s3://${CACHE_BUCKET}?endpoint=${CACHE_ENDPOINT}&region=auto"
+        upload_url="${cache_url}&compression=zstd&parallel-compression=true"
+
+        sudo sh -c "umask 077 && cat > $creds" <<EOF
+        [default]
+        aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+        aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+        EOF
+        printf '%s\n' "$CACHE_PRIVATE_KEY" | sudo sh -c "umask 077 && cat > $key"
+        # The client also queries the cache (e.g. nix-fast-build --skip-cached).
+        mkdir -p ~/.aws
+        (umask 077 && sudo cat "$creds" > ~/.aws/credentials)
+
+        # S3 binary caches require every reference to be present, so upload
+        # the whole closure; paths already in the bucket are skipped.
+        sudo tee "$hook" >/dev/null <<EOF
+        #!/bin/sh
+        set -eu
+        # shellcheck disable=SC2086
+        exec /nix/var/nix/profiles/default/bin/nix copy --to '${upload_url}' \$OUT_PATHS
+        EOF
+        sudo chmod 755 "$hook"
+
+        sudo tee -a /etc/nix/nix.conf >/dev/null <<EOF
+        extra-substituters = ${cache_url}
+        extra-trusted-public-keys = ${CACHE_PUBLIC_KEY}
+        secret-key-files = ${key}
+        post-build-hook = ${hook}
+        EOF
+
+        case "$RUNNER_OS" in
+          Linux)
+            sudo mkdir -p /etc/systemd/system/nix-daemon.service.d
+            printf '[Service]\nEnvironment=AWS_SHARED_CREDENTIALS_FILE=%s\n' "$creds" |
+              sudo tee /etc/systemd/system/nix-daemon.service.d/aws.conf >/dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl restart nix-daemon
+            ;;
+          macOS)
+            plist=/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+            # The installer's plist may not have an EnvironmentVariables dict yet.
+            sudo /usr/libexec/PlistBuddy -c "Add :EnvironmentVariables dict" "$plist" 2>/dev/null || true
+            sudo /usr/libexec/PlistBuddy -c "Add :EnvironmentVariables:AWS_SHARED_CREDENTIALS_FILE string $creds" "$plist"
+            sudo launchctl bootout system/org.nixos.nix-daemon || true
+            sudo launchctl bootstrap system "$plist"
+            ;;
+        esac
+
+        for _ in $(seq 30); do
+          nix store info >/dev/null 2>&1 && break
+          sleep 1
+        done
+
+        # Fail fast on bad credentials or endpoint.
+        nix store info --store "$cache_url"
