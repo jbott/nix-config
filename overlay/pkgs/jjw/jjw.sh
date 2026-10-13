@@ -80,7 +80,7 @@ ws_path() {
 }
 
 ws_exists() {
-  jjq workspace list -T 'name ++ "\n"' | grep -Fxq "$1"
+  jjq workspace list -T 'name ++ "\n"' | grep -Fx -- "$1" >/dev/null
 }
 
 # Workspace names are spelled "<name>@" in revsets, so that is how they appear
@@ -90,16 +90,34 @@ ws_exists() {
 # already beyond this tool's reach, so nothing is lost by stripping blind.
 ws_name() { printf '%s\n' "${1%@}"; }
 
+# Name of the workspace rooted at <dir>.
+ws_name_at() {
+  jj -R "$1" --ignore-working-copy workspace list \
+    -T 'if(target.current_working_copy(), name ++ "\n")'
+}
+
 # Directory where workspace <name>'s files live: its jj-recorded path (jj
-# >=0.38), or the convention path we would have created it at (older repos
-# record no path).
+# >=0.38), or, in older repos that record no path, the main or current
+# workspace root if it is one of those, else the convention path we would have
+# created it at. Without the main/current check, the main workspace of an old
+# repo would resolve to a nonexistent convention path and look stale.
 ws_dir() {
-  local root=$1 name=$2
-  jjq workspace root --name "$name" 2>/dev/null || ws_path "$root" "$name"
+  local root=$1 name=$2 current
+  jjq workspace root --name "$name" 2>/dev/null && return 0
+  if [ "$name" = "$(ws_name_at "$root")" ]; then
+    printf '%s\n' "$root"
+    return 0
+  fi
+  current=$(jjq workspace root)
+  if [ "$name" = "$(ws_name_at "$current")" ]; then
+    printf '%s\n' "$current"
+    return 0
+  fi
+  ws_path "$root" "$name"
 }
 
 # A workspace is stale when it is tracked but its directory is gone from disk.
-# The main and current workspaces are never stale (their directories exist), so
+# ws_dir resolves the main and current workspaces to their (existing) roots, so
 # this never flags a workspace that is unsafe to forget.
 ws_stale() {
   [ ! -d "$(ws_dir "$1" "$2")" ]
@@ -206,29 +224,40 @@ cmd_rm() {
 
   [ ${#names[@]} -gt 0 ] || die "rm: missing <workspace>..."
 
+  # Validate every name before touching any, so a bad name late in the list
+  # does not leave the earlier ones half-done.
+  local paths=() recorded=()
   for name in "${names[@]}"; do
     ws_exists "$name" || die "rm: no such workspace: $name"
+    path=$(ws_dir "$root" "$name")
+    [ "$path" != "$current" ] || die "rm: refusing to remove the workspace you are in: $name"
+    [ "$path" != "$root" ] || die "rm: refusing to remove the main workspace: $name"
 
     # The recorded path is authoritative, but it only exists for workspaces in
     # repos initialized with jj >=0.38. Older ones report "no recorded path",
     # and we will not `rm -rf` a directory we cannot confirm jj owns.
-    if ! path=$(jjq workspace root --name "$name" 2>/dev/null); then
-      path=$(ws_path "$root" "$name")
-      if [ -e "$path" ]; then
+    if jjq workspace root --name "$name" >/dev/null 2>&1; then
+      recorded+=(true)
+    else
+      [ ! -e "$path" ] ||
         die "rm: workspace '$name' has no recorded path (repo predates jj 0.38); delete its directory by hand, then run 'jj workspace forget $name'"
-      fi
-      # Nothing on disk to protect: this is a stale entry, so just forget it.
-      jj -R "$root" workspace forget "$name"
-      note "forgot stale workspace '$name' (no directory on disk)"
-      continue
+      recorded+=(false)
     fi
+    paths+=("$path")
+  done
 
-    [ "$path" != "$current" ] || die "rm: refusing to remove the workspace you are in: $name"
-    [ "$path" != "$root" ] || die "rm: refusing to remove the main workspace: $name"
-
+  local i
+  for i in "${!names[@]}"; do
+    name=${names[$i]}
+    path=${paths[$i]}
     jj -R "$root" workspace forget "$name"
-    rm -rf "$path"
-    note "removed workspace '$name' ($path)"
+    if ${recorded[$i]}; then
+      rm -rf "$path"
+      note "removed workspace '$name' ($path)"
+    else
+      # Nothing on disk to protect: this is a stale entry, so just forget it.
+      note "forgot stale workspace '$name' (no directory on disk)"
+    fi
   done
 }
 
