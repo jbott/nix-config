@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 if ! dir=$(cd -- "$1" 2>/dev/null && pwd -P); then
   printf '%s' "$1"
   exit 0
