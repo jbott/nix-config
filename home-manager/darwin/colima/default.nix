@@ -10,6 +10,11 @@
     mountType = "virtiofs";
   };
 in {
+  # Lima state (VM disks included) lives on a dedicated APFS volume, created
+  # by nix-darwin activation (common/darwin/lima.nix). Colima and limactl
+  # both honour LIMA_HOME.
+  home.sessionVariables.LIMA_HOME = "/Volumes/Lima";
+
   home.file.".colima/_templates/default.yaml".source =
     pkgs.runCommand "colima-template" {
       nativeBuildInputs = [pkgs.yq-go];
