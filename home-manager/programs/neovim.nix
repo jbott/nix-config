@@ -84,7 +84,6 @@ in {
       -- Setup Plugins
       vim.lsp.config['biome'] = {}
       require('nvim-lastplace').setup{}
-      require('typescript-tools').setup {}
 
       -- Global mappings.
       -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -157,7 +156,6 @@ in {
       plenary-nvim
       rustaceanvim
       telescope-nvim
-      typescript-tools-nvim
       vim-astro
       vim-challenger-deep-theme
       vim-elixir
