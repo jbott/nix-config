@@ -34,11 +34,6 @@ in {
   systemd.user.sockets.atuin-daemon.Socket.ListenStream =
     lib.mkIf pkgs.stdenv.hostPlatform.isLinux (lib.mkForce atuinSocket);
 
-  # Home-manager pins the atuin daemon to the "user" launchd domain
-  # (Background session), which doesn't reliably auto-load on GUI login
-  # after a reboot. Force it back to the gui/Aqua domain. See hm#9568.
-  launchd.agents.atuin-daemon.domain = "gui";
-
   # atuin's daemon does not unlink a stale socket before binding, so an
   # unclean shutdown (reboot) leaves daemon.sock behind and every start
   # fails with "Address already in use" (EADDRINUSE), crash-looping under
