@@ -57,12 +57,7 @@
     };
 
     fastNixGcOverlay = final: _prev: {
-      # Two integration tests assume Linux filesystem semantics and fail on APFS
-      # (non-UTF8 store names rejected with EILSEQ; tmp FIFO handling differs), so
-      # skip the checkPhase on Darwin. Tests still run on our Linux hosts.
-      fast-nix-gc = fast-nix-gc.packages.${final.stdenv.hostPlatform.system}.default.overrideAttrs (_: {
-        doCheck = !final.stdenv.hostPlatform.isDarwin;
-      });
+      fast-nix-gc = fast-nix-gc.packages.${final.stdenv.hostPlatform.system}.default;
     };
 
     overlays = [
