@@ -1,5 +1,4 @@
 {
-  cfg,
   currentSystemName,
   pkgs,
   ...
