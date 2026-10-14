@@ -50,12 +50,7 @@
     };
   };
 
-  # Use bind mounts to map Samba state onto /persist
-  fileSystems."/var/lib/samba" = {
-    device = "/persist/var/lib/samba";
-    fsType = "none";
-    options = ["bind"];
-  };
+  environment.persistence."/persist".directories = ["/var/lib/samba"];
 
   # Open firewall for Samba on Tailscale interface only
   networking.firewall.interfaces.tailscale0.allowedTCPPorts = [445];
