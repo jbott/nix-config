@@ -10,7 +10,6 @@
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};
   jjw = self.callPackage ./pkgs/jjw {};
-  jujutsu = self.callPackage ./pkgs/jujutsu {jujutsu = super.jujutsu;};
   swiftui-pro-skill = self.callPackage ./pkgs/swiftui-pro-skill {};
   yolo = self.callPackage ./pkgs/yolo {};
 })
