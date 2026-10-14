@@ -6,7 +6,7 @@
   nix = {
     package = pkgs.nix;
     settings = {
-      experimental-features = ["nix-command flakes"];
+      experimental-features = ["nix-command" "flakes"];
       trusted-users = ["jbo"];
       substituters = [
         "https://cache.nixos.org/"
@@ -24,11 +24,9 @@
       http-connections = 128;
       max-substitution-jobs = 128;
       warn-dirty = false;
+      builders-use-substitutes = true;
     };
     distributedBuilds = true;
-    extraOptions = ''
-      builders-use-substitutes = true
-    '';
 
     registry.nixpkgs.flake = inputs.nixpkgs;
     registry.nix-config = {
