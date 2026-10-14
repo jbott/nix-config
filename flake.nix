@@ -143,9 +143,12 @@
 
     formatter = forAllSystems ({pkgs, ...}: (treefmtEval pkgs).config.build.wrapper);
 
-    packages = forAllSystems ({pkgs, ...}: {
-      inherit (pkgs) claude-code dd-cli deploy-nixos fast-nix-gc finicky glab-jj jj-hunk-tool jj-skill jjw;
-    });
+    # Only the packages each system can build, so finicky (darwin-only) and
+    # dd-cli (no aarch64-linux binary) don't break evaluation elsewhere.
+    packages = forAllSystems ({pkgs, ...}:
+      nixpkgs.lib.filterAttrs (_: nixpkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform) {
+        inherit (pkgs) claude-code dd-cli deploy-nixos fast-nix-gc finicky glab-jj jj-hunk-tool jj-skill jjw;
+      });
 
     devShells = forAllSystems ({
       system,
@@ -190,8 +193,7 @@
         formatting = (treefmtEval pkgs).config.build.check self;
         devshell = self.devShells.${system}.default;
       }
-      // lib.mapAttrs' (name: lib.nameValuePair "package-${name}")
-      (lib.filterAttrs (_: lib.meta.availableOn pkgs.stdenv.hostPlatform) self.packages.${system})
+      // lib.mapAttrs' (name: lib.nameValuePair "package-${name}") self.packages.${system}
       // hostToplevels "nixos" self.nixosConfigurations
       // hostToplevels "darwin" self.darwinConfigurations
       // rosettaBuilderImages);
