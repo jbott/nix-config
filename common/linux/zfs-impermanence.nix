@@ -7,6 +7,9 @@
 }: {
   boot.zfs.forceImportRoot = false;
 
+  # Impermanence bind-mounts from here during stage 1.
+  fileSystems."/persist".neededForBoot = true;
+
   boot.initrd.systemd.services.rollback-root = {
     description = "Rollback ZFS root filesystem to blank snapshot";
     wantedBy = ["initrd.target"];

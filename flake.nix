@@ -115,6 +115,7 @@
           ./common
           ./common/linux
           ./home-manager
+          impermanence.nixosModules.impermanence
           ./machines/Only-Slightly-Bent
         ];
         specialArgs = {inherit inputs;};
