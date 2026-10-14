@@ -223,7 +223,9 @@
       zle -N zle-line-init
 
       # Bind keyboard control characters to useful functions
-      # TODO: Understand why using zsh from nix breaks home / end / del
+      # zsh's emacs keymap leaves Home/End/Del unbound. macOS's stock
+      # /etc/zshrc binds them from terminfo, but nix-darwin replaces that file
+      # (and NixOS never had it), so bind them here.
       bindkey '^[[1~' beginning-of-line               # Home / Fn Left-Arrow
       bindkey '^[[5~' beginning-of-buffer-or-history  # Page-up / Fn Up-Arrow
       bindkey '^[[4~' end-of-line                     # End / Fn Right-Arrow
