@@ -225,10 +225,16 @@
       # Bind keyboard control characters to useful functions
       # zsh's emacs keymap leaves Home/End/Del unbound. macOS's stock
       # /etc/zshrc binds them from terminfo, but nix-darwin replaces that file
-      # (and NixOS never had it), so bind them here.
-      bindkey '^[[1~' beginning-of-line               # Home / Fn Left-Arrow
+      # (and NixOS never had it), so bind them here. tmux always sends the
+      # ^[[1~ / ^[[4~ forms; Ghostty sends ^[[H / ^[[F, or ^[OH / ^[OF when a
+      # program has left the keypad in application mode.
+      bindkey '^[[1~' beginning-of-line               # Home / Fn Left-Arrow (tmux)
+      bindkey '^[[H'  beginning-of-line               # Home (Ghostty)
+      bindkey '^[OH'  beginning-of-line               # Home (application mode)
       bindkey '^[[5~' beginning-of-buffer-or-history  # Page-up / Fn Up-Arrow
-      bindkey '^[[4~' end-of-line                     # End / Fn Right-Arrow
+      bindkey '^[[4~' end-of-line                     # End / Fn Right-Arrow (tmux)
+      bindkey '^[[F'  end-of-line                     # End (Ghostty)
+      bindkey '^[OF'  end-of-line                     # End (application mode)
       bindkey '^[[6~' end-of-buffer-or-history        # Page-down / Fn Down-Arrow
       bindkey '^[[3~' delete-char                     # Del / Fn delete
       # Make word navigation stop at all boundaries (bash-style)
