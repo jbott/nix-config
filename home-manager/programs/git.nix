@@ -3,24 +3,14 @@
     enable = true;
     lfs.enable = true;
 
-    # Global ignores for Claude Code sandbox phantom files
-    # See: https://github.com/anthropics/claude-code/issues/17087
     ignores = [
       ".DS_Store"
-      ".bash_profile"
-      ".bashrc"
       ".claude/scheduled_tasks.lock"
       ".claude/settings.local.json"
-      ".gitconfig"
-      ".gitmodules"
       ".idea"
       ".mcp.json"
-      ".profile"
-      ".ripgreprc"
       ".venv"
       ".vscode"
-      ".zprofile"
-      ".zshrc"
     ];
 
     settings = {
