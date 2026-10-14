@@ -16,12 +16,7 @@
     };
   };
 
-  # Use a bind mount to map data onto /persist
-  fileSystems."/var/lib/zigbee2mqtt" = {
-    device = "/persist/var/lib/zigbee2mqtt";
-    fsType = "none";
-    options = ["bind"];
-  };
+  environment.persistence."/persist".directories = ["/var/lib/zigbee2mqtt"];
 
   # Open the firewall for the web ui
   networking.firewall.allowedTCPPorts = [8080];
