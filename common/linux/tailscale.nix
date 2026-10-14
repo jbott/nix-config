@@ -1,11 +1,7 @@
 {...}: {
-  services.tailscale = {
-    enable = true;
-    extraDaemonFlags = [
-      "--state=/persist/var/lib/tailscale/tailscaled.state"
-      "--statedir=/persist/var/lib/tailscale"
-    ];
-  };
+  services.tailscale.enable = true;
+
+  environment.persistence."/persist".directories = ["/var/lib/tailscale"];
 
   # Strict reverse path filtering breaks exit node, disable it here
   networking.firewall.checkReversePath = "loose";
