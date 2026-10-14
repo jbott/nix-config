@@ -15,7 +15,6 @@ in {
     ccusage
     cdrtools
     claude-code
-    claude-code-modes
     dd-cli
     difftastic
     docker-buildx

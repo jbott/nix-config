@@ -1,5 +1,4 @@
 (self: super: {
-  claude-code-modes = self.callPackage ./pkgs/claude-code-modes {};
   dd-cli = self.callPackage ./pkgs/dd-cli {};
   deploy-nixos = self.callPackage ./pkgs/deploy-nixos {};
   ed3d-plugins = self.callPackage ./pkgs/ed3d-plugins {};
