@@ -26,40 +26,18 @@
     "git-branch"
     "current-dir"
   ];
-
-  # config.toml stays mutable because codex writes trust levels and other
-  # settings into it, so only this key is patched in place. tomlkit keeps the
-  # rest of the file's formatting intact.
-  setCodexStatusLine =
-    pkgs.writers.writePython3Bin "set-codex-status-line" {
-      libraries = [pkgs.python3Packages.tomlkit];
-    } ''
-      import json
-      import os
-      import sys
-      import tomlkit
-
-      path = os.path.expanduser("~/.codex/config.toml")
-      os.makedirs(os.path.dirname(path), exist_ok=True)
-      try:
-          with open(path) as f:
-              doc = tomlkit.parse(f.read())
-      except FileNotFoundError:
-          doc = tomlkit.document()
-
-      doc.setdefault("tui", tomlkit.table())["status_line"] = json.loads(
-          sys.argv[1]
-      )
-
-      with open(path, "w") as f:
-          f.write(tomlkit.dumps(doc))
-    '';
 in {
   programs.codex = {
     enable = true;
     # Sourced from the llm-agents overlay (see flake.nix) to track upstream
     # releases alongside claude-code, rather than nixpkgs' snapshot.
     package = pkgs.codex;
+
+    # Codex writes trust levels and other preferences back into config.toml,
+    # so declared settings are merged into the writable file at activation
+    # rather than linked from the store.
+    mutableSettings = true;
+    settings.tui.status_line = statusLine;
 
     # Same set claude-code gets; home-manager symlinks each entry individually
     # into ~/.codex/skills, so codex's bundled .system skills stay put.
@@ -68,9 +46,5 @@ in {
 
   home.activation.codexDaemonUpdater = lib.hm.dag.entryAfter ["writeBoundary"] ''
     run ${lib.getExe disableDaemonUpdater}
-  '';
-
-  home.activation.codexStatusLine = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    run ${lib.getExe setCodexStatusLine} ${lib.escapeShellArg (builtins.toJSON statusLine)}
   '';
 }
