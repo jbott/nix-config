@@ -7,10 +7,12 @@
 # `darwin-rebuild switch` aborts with "would be clobbered".
 #
 # Managed settings sit in the one scope Claude Code never writes to, so nix and
-# Claude Code stop fighting over a single file. The trade is precedence:
-# managed outranks project `.claude/settings.json`, so nothing here can be
-# overridden per-repo. Keep this to machine policy — hooks, env, the status
-# line — and leave genuine preferences to the user scope.
+# Claude Code stop fighting over a single file. Home Manager's
+# `programs.claude-code.mutableSettings` now solves the clobbering too, but
+# managed is kept for its precedence: it outranks project
+# `.claude/settings.json`, so nothing here can be overridden per-repo. Keep
+# this to machine policy — hooks, env, the status line — and leave genuine
+# preferences to the user scope.
 #
 # Consumed by common/darwin/claude-code.nix and common/linux/claude-code.nix,
 # which differ only in where the file has to land.
