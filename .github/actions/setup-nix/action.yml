@@ -1,11 +1,17 @@
 name: Setup Nix
 description: >-
-  Install Nix and, when cache credentials are available, wire the nix-daemon up
-  to read from and upload locally built paths to the R2 binary cache.
+  Install Nix reading from the binary cache's public URL and, when cache
+  credentials are available, wire the nix-daemon up to upload locally built
+  paths to the R2 bucket behind it.
 
 inputs:
+  cache-url:
+    description: >-
+      Public HTTPS URL of the binary cache. Reading it needs no credentials, so
+      runs without secrets (e.g. Dependabot's) still substitute from it.
+    default: ""
   cache-bucket:
-    description: R2 bucket name. Leave empty to build without the binary cache.
+    description: R2 bucket name. Leave empty to build without uploading.
     default: ""
   cache-endpoint:
     description: R2 S3 API endpoint host.
@@ -42,6 +48,8 @@ runs:
           max-jobs = auto
           extra-substituters = https://cache.numtide.com
           extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
+          extra-substituters = ${{ inputs.cache-url }}
+          extra-trusted-public-keys = ${{ inputs.cache-public-key }}
 
     # The nixos-disk-image for the rosetta builder requires the kvm feature.
     # Hosted arm runners don't expose /dev/kvm, so advertise it anyway and let
