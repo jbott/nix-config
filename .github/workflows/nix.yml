@@ -37,6 +37,7 @@ jobs:
         # actionlint does not support the $/ self-repository syntax yet.
         uses: ./.github/actions/setup-nix # zizmor: ignore[self-repository]
         with:
+          cache-url: https://nix-cache.jbott.io
           cache-bucket: ${{ vars.S3_BUCKET_NAME }}
           cache-endpoint: ${{ vars.S3_ENDPOINT }}
           cache-public-key: ${{ vars.NIX_CACHE_PUBLIC_KEY }}
@@ -70,6 +71,7 @@ jobs:
         # actionlint does not support the $/ self-repository syntax yet.
         uses: ./.github/actions/setup-nix # zizmor: ignore[self-repository]
         with:
+          cache-url: https://nix-cache.jbott.io
           cache-bucket: ${{ vars.S3_BUCKET_NAME }}
           cache-endpoint: ${{ vars.S3_ENDPOINT }}
           cache-public-key: ${{ vars.NIX_CACHE_PUBLIC_KEY }}
