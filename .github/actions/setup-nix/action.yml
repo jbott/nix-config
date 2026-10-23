@@ -41,8 +41,16 @@ runs:
       uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
       with:
         github_access_token: ${{ github.token }}
+        # The installer writes this before it first starts the nix-daemon, so
+        # daemon-side settings like system-features take effect without a
+        # restart.
+        #
         # numtide's cache serves the llm-agents packages (codex, claude-code);
         # without it CI compiles codex from source on every llm-agents bump.
+        #
+        # The nixos-disk-image for the rosetta builder requires the kvm feature.
+        # Hosted arm runners don't expose /dev/kvm, so advertise it anyway and
+        # let QEMU fall back to TCG emulation.
         extra_nix_config: |
           accept-flake-config = false
           max-jobs = auto
@@ -50,18 +58,7 @@ runs:
           extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
           extra-substituters = ${{ inputs.cache-url }}
           extra-trusted-public-keys = ${{ inputs.cache-public-key }}
-
-    # The nixos-disk-image for the rosetta builder requires the kvm feature.
-    # Hosted arm runners don't expose /dev/kvm, so advertise it anyway and let
-    # QEMU fall back to TCG emulation.
-    - name: Advertise kvm feature
-      if: runner.os == 'Linux'
-      shell: bash
-      run: |
-        if [[ ! -e /dev/kvm ]]; then
-          echo "::notice::/dev/kvm unavailable, VM builds will use TCG emulation"
-        fi
-        echo "extra-system-features = kvm" | sudo tee -a /etc/nix/nix.conf
+          ${{ runner.os == 'Linux' && 'extra-system-features = kvm' || '' }}
 
     # Substitution and post-build uploads happen in the root nix-daemon, so the
     # credentials have to live in its environment, not just the job's.
