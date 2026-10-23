@@ -1,0 +1,59 @@
+name: flake-update
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  update:
+    name: update flake.lock
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # push the update branch
+      pull-requests: write # open or edit its PR
+      actions: write # dispatch nix.yml on it
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Nix
+        # actionlint does not support the $/ self-repository syntax yet.
+        uses: ./.github/actions/setup-nix # zizmor: ignore[self-repository]
+
+      - name: Update flake.lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          nix flake update --commit-lock-file --commit-lockfile-summary "nix: flake update"
+
+      - name: Open or refresh the PR
+        env:
+          BRANCH: flake-update
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "$(git rev-parse HEAD)" == "$GITHUB_SHA" ]]; then
+            echo "flake.lock is already up to date"
+            exit 0
+          fi
+
+          gh auth setup-git
+          git push --force origin "HEAD:refs/heads/$BRANCH"
+
+          body=$(git log -1 --format=%b)
+          if [[ "$(gh pr view "$BRANCH" --json state --jq .state 2>/dev/null)" == OPEN ]]; then
+            gh pr edit "$BRANCH" --body "$body"
+          else
+            gh pr create --head "$BRANCH" --title "nix: flake update" --body "$body"
+          fi
+
+          # Pushes and PRs made with GITHUB_TOKEN don't trigger other workflows,
+          # except workflow_dispatch, so CI has to be started explicitly.
+          gh workflow run nix.yml --ref "$BRANCH"
