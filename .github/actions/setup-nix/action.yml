@@ -8,7 +8,7 @@ inputs:
   cache-url:
     description: >-
       Public HTTPS URL of the binary cache. Reading it needs no credentials, so
-      runs without secrets (e.g. Dependabot's) still substitute from it.
+      runs without secrets (e.g. PRs from forks) still substitute from it.
     default: ""
   cache-bucket:
     description: R2 bucket name. Leave empty to build without uploading.
