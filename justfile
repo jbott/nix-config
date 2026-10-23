@@ -1,6 +1,10 @@
 fmt:
     treefmt
 
+# Bump pinned GitHub Actions to their newest release at least 7 days old
+actions-update:
+    GITHUB_TOKEN="$(gh auth token)" pinact run --update --min-age 7
+
 nix-flake-update:
     @git diff-index --quiet --cached HEAD || (echo "Repo has files staged! Aborting..." && exit 1)
     nix flake update --commit-lock-file --commit-lockfile-summary "nix: flake update"
