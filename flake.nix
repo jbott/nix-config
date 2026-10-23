@@ -158,6 +158,7 @@
         buildInputs = with pkgs; [
           deploy-nixos
           nvd
+          pinact
           self.formatter.${system}
         ];
       };
