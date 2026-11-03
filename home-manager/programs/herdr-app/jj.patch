@@ -1,0 +1,254 @@
+--- a/jj-menu/main.js
++++ b/jj-menu/main.js
+@@ -105,7 +105,7 @@
+     const it = items(props(), this.git)[i];
+     if (!it) return;
+     closeOverlay(props()?.overlay);
+-    if (it[1] === "worktree") openOverlay({ mod: "worktree", kind: "dialog", ...(it[2].action === "open" ? { width: 560, height: 480 } : { width: 440, height: 260 }), props: it[2] });
++    if (it[1] === "worktree") openOverlay({ mod: "jj-worktree", kind: "dialog", ...(it[2].action === "open" ? { width: 560, height: 480 } : { width: 440, height: 260 }), props: it[2] });
+     else run(it[1], it[2]);
+   }
+ 
+--- a/jj-new-menu/main.js
++++ b/jj-new-menu/main.js
+@@ -67,7 +67,7 @@
+         .when(this.agents.length === 0, el => el.child(div().px(9).py(6).text_color(t.dim).child(this.failed ? "Could not load agents" : "Checking installed agents…"))))
+       .child(div().h(1).mx(4).my(5).bg(t.border))
+       .child(this.row("space", div().w(14).child("+"), "New space", () => run("space.new"), shortcut("space.new")))
+-      .child(this.row("worktree", svg("mods/workspace-chrome/branch.svg").size(14), "New worktree…", () => openOverlay({ mod: "worktree", kind: "dialog", width: 460, height: 280, props: { space: space?.id, folder: panes().find(p => p.focused)?.cwd, action: "new" } }), "", Boolean(space)))
+-      .child(this.row("worktree-open", svg("mods/workspace-chrome/branch.svg").size(14), "Open worktree\u2026", () => openOverlay({ mod: "worktree", kind: "dialog", width: 560, height: 480, props: { space: space?.id, folder: panes().find(p => p.focused)?.cwd, action: "open" } }), "", Boolean(space)));
++      .child(this.row("worktree", svg("mods/workspace-chrome/branch.svg").size(14), "New worktree…", () => openOverlay({ mod: "jj-worktree", kind: "dialog", width: 460, height: 280, props: { space: space?.id, folder: panes().find(p => p.focused)?.cwd, action: "new" } }), "", Boolean(space)))
++      .child(this.row("worktree-open", svg("mods/workspace-chrome/branch.svg").size(14), "Open worktree\u2026", () => openOverlay({ mod: "jj-worktree", kind: "dialog", width: 560, height: 480, props: { space: space?.id, folder: panes().find(p => p.focused)?.cwd, action: "open" } }), "", Boolean(space)));
+   }
+ }
+--- a/jj-spaces/main.js
++++ b/jj-spaces/main.js
+@@ -6,6 +6,7 @@
+ import { View, div, svg } from "gpui-kit";
+ import { v_flex, h_flex } from "gpui-base";
+ import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
++import { status as jjStatus } from "./jj.js";
+ 
+ function find(node, id) {
+   if (node?.id === id) return node;
+@@ -222,6 +223,7 @@
+           info.behind = Math.abs(parseInt(b, 10)) || 0;
+         }
+       }
++      if (info.branch === "(detached)") Object.assign(info, (await jjStatus(cwd, on).catch(() => null)) ?? {});
+       this.git[key] = info;
+       if (!on) this.watch(repo, cx);
+     } catch {
+@@ -247,7 +249,7 @@
+ 
+   menu(w) {
+     // A popup is as tall as its items; height is only the most.
+-    openOverlay({ mod: "menu", kind: "popup", width: 200, height: 260, props: { tab: "space", target: { id: w.id } } });
++    openOverlay({ mod: "jj-menu", kind: "popup", width: 200, height: 260, props: { tab: "space", target: { id: w.id } } });
+   }
+ 
+   // Spaces in order, each worktree space moved under its main checkout's.
+--- a/jj-tabs/main.js
++++ b/jj-tabs/main.js
+@@ -93,7 +93,7 @@
+       .on_mouse_up("left", () => { this.pressed = null; })
+       .on_scroll_wheel(e => { if (Math.abs(e.delta.y) >= 1) run(e.delta.y > 0 ? "tab.prev" : "tab.next"); })
+       .child(h_flex().id("tab-scroll").flex_1().min_w(0).h_full().items_center().gap(3).overflow_x_scrollbar().children(shown.map(item)))
+-      .child(button("tab-new", "+", () => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })))
++      .child(button("tab-new", "+", () => openOverlay({ mod: "jj-new-menu", kind: "popup", width: 250, height: 512 })))
+       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
+       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
+       .when(w?.buttons, el => el.child(button("minimize", w.platform === "windows" ? svg("mods/jj-tabs/win-min.svg").size(16) : "−", () => run("window.minimize")))
+--- a/jj-worktree/main.js
++++ b/jj-worktree/main.js
+@@ -1,9 +1,11 @@
+ // Worktree dialog: { space, action: "new" | "open" | "remove" } or
+ // { folder, machine } for a repo without a space; optional { branch, tab, argv }.
++// In a checkout jj tracks, it works on jj workspaces (via jjw) instead.
+ 
+ import { View, div } from "gpui-kit";
+ import { v_flex, h_flex, InputState, Input, Scrollbar } from "gpui-base";
+ import { run, props, closeOverlay, theme, spaces, panes, exec, home } from "herdr";
++import { jj, jjw, workspace } from "./jj.js";
+ 
+ // Where a space is now: its first terminal's live folder, else where it was made.
+ function place(s) {
+@@ -43,6 +45,25 @@
+   return out.sort((a, b) => b.main - a.main || b.at - a.at);
+ }
+ 
++// checkouts() for jj: workspaces whose folder exists, named in `branch`.
++async function workspaces(repo, on) {
++  const [list, stale, times] = await Promise.all([
++    jjw(repo.main, ["-R", repo.main, "ls"], on),
++    jjw(repo.main, ["-R", repo.main, "ls", "--stale"], on),
++    jj(repo.main, ["--ignore-working-copy", "log", "--no-graph", "-r", "working_copies()", "-T", 'working_copies ++ "\\t" ++ committer.timestamp().format("%s") ++ "\\n"'], on),
++  ]);
++  if (!list.ok) return [];
++  const gone = new Set(stale.ok ? stale.out.split("\n").map((l) => l.split("\t")[0]) : []);
++  const when = new Map();
++  for (const [names, at] of times.out.split("\n").map((l) => l.split("\t"))) {
++    for (const n of (names ?? "").split(" ").filter(Boolean)) when.set(n.replace(/@$/, ""), Number(at) || 0);
++  }
++  const out = list.out.split("\n").filter(Boolean).map((l) => l.split("\t"))
++    .filter(([name, path]) => path && !gone.has(name))
++    .map(([name, path]) => ({ path, branch: name, main: path === repo.main, at: when.get(name) ?? 0 }));
++  return out.sort((a, b) => b.main - a.main || b.at - a.at);
++}
++
+ // The space showing a checkout: its first terminal is in it (the deepest checkout wins).
+ function spaceOf(path, all, on) {
+   const inside = (p, dir) => p === dir || p.startsWith(dir + "/");
+@@ -95,15 +116,19 @@
+ }
+ 
+ // The repo a folder belongs to: its main checkout and name, and whether
+-// the folder is itself a linked worktree. null outside git.
++// the folder is itself a linked worktree. null outside git. `jj`: its jj workspace, if any.
+ async function repoOf(folder, on) {
+   const top = await git(folder, ["rev-parse", "--show-toplevel"], on);
+   const common = await git(folder, ["rev-parse", "--path-format=absolute", "--git-common-dir"], on);
+   if (!top.ok || !common.ok) return null;
+   const main = common.out.endsWith("/.git") ? common.out.slice(0, -5) : common.out;
+-  return { top: top.out, main, name: main.split("/").pop(), linked: main !== top.out };
++  const ws = await workspace(top.out, on).catch(() => null);
++  return { top: top.out, main, name: main.split("/").pop(), linked: main !== top.out, jj: ws ? { name: ws } : null };
+ }
+ 
++// Where jjw puts workspaces.
++const jjRoot = (repo) => `${repo.main.replace(/\/[^/]+$/, "")}/.worktrees/${repo.name}`;
++
+ export default class Worktree extends View {
+   init(_props, cx) {
+     this.on = this.space()?.machine;
+@@ -112,7 +137,7 @@
+     this.text = props()?.branch ?? "";
+     this.list = undefined; // open: the checkouts, once read
+     this.at = 0;
+-    this.input = InputState.new({ value: this.text, placeholder: this.opening ? "filter worktrees" : "branch name" });
++    this.input = InputState.new({ value: this.text, placeholder: this.opening ? "filter" : "name" });
+     this.input.on("change", (_e, cx) => { this.text = this.input.value(); this.error = ""; this.at = 0; cx.notify(); });
+     this.input.on("submit", (_e, cx) => this.go(cx));
+     this.inputFocused = true;
+@@ -143,9 +168,9 @@
+         const repo = await repoOf(this.folder, this.on);
+         if (repo && props().action === "remove") {
+           this.dirty = (await git(repo.top, ["--no-optional-locks", "-c", "core.fsmonitor=false", "status", "--porcelain"], this.on)).out !== "";
+-          this.unpushed = (await submodules(repo.top, this.on)).unpushed;
++          if (!repo.jj) this.unpushed = (await submodules(repo.top, this.on)).unpushed;
+         }
+-        if (repo && this.opening) this.list = await checkouts(repo, this.on);
++        if (repo && this.opening) this.list = repo.jj ? await workspaces(repo, this.on) : await checkouts(repo, this.on);
+         this.repo = repo;
+         cx.notify();
+         if (props().branch) await this.work(cx);
+@@ -181,7 +206,8 @@
+ 
+   async create() {
+     const branch = this.text.trim();
+-    if (!branch) return "Type a branch name.";
++    if (!branch) return this.repo.jj ? "Type a workspace name." : "Type a branch name.";
++    if (this.repo.jj) return this.createWorkspace(branch);
+     const path = `${ROOT(this.userHome)}/${this.repo.name}/${slug(branch)}`;
+     const exists = (await git(this.repo.main, ["show-ref", "--verify", "--quiet", `refs/heads/${branch}`], this.on)).ok;
+     const add = exists ? ["worktree", "add", path, branch] : ["worktree", "add", "-b", branch, path, "HEAD"];
+@@ -193,6 +219,18 @@
+     return "";
+   }
+ 
++  // jjw checks out a bookmark of that name; otherwise start from this checkout's @-.
++  async createWorkspace(name) {
++    const { main, jj: ws } = this.repo;
++    const mark = await jj(main, ["--ignore-working-copy", "log", "--no-graph", "-r", `bookmarks(exact:${JSON.stringify(name)})`, "-T", '"x"'], this.on);
++    const from = mark.ok && mark.out ? [] : ["-r", `${JSON.stringify(ws.name)}@-`];
++    const r = await jjw(main, ["-R", main, "new", ...from, name], this.on);
++    if (!r.ok) return r.err || "jjw new failed.";
++    const p = props();
++    run("space.new", { folder: r.out.split("\n").pop(), machine: this.on, tab: p.tab, argv: p.argv });
++    return "";
++  }
++
+   shown() {
+     const f = this.text.trim().toLowerCase();
+     return (this.list ?? []).filter((c) => !f || `${c.branch ?? ""} ${c.path}`.toLowerCase().includes(f));
+@@ -208,6 +246,7 @@
+ 
+   async remove() {
+     const s = this.space();
++    if (this.repo.jj) return this.removeWorkspace(s);
+     const status = await git(this.repo.top, ["--no-optional-locks", "-c", "core.fsmonitor=false", "status", "--porcelain"], this.on);
+     if (!status.ok) return status.err || "git status failed.";
+     // git refuses a worktree with submodules unless forced, because their
+@@ -225,6 +264,15 @@
+     return r.ok ? "" : r.err || "git worktree remove failed.";
+   }
+ 
++  // Snapshot first: forgetting a workspace doesn't, and jjw rm deletes the folder.
++  async removeWorkspace(s) {
++    const snap = await jj(this.repo.top, ["util", "snapshot"], this.on);
++    if (!snap.ok) return snap.err || "jj util snapshot failed.";
++    run("space.close", { id: s.id, confirmed: true });
++    const r = await jjw(this.repo.main, ["-R", this.repo.main, "rm", this.repo.jj.name], this.on);
++    return r.ok ? "" : r.err || "jjw rm failed.";
++  }
++
+   key(e, cx) {
+     if (e.key === "escape") return this.close();
+     if (this.opening) {
+@@ -267,6 +315,7 @@
+         )
+         .child(div().truncate().text_size(11.5).text_color(t.dim).child(tilde(c.path, this.userHome ?? "")));
+     };
++    const noun = r?.jj ? "workspace" : "worktree";
+     const count = rows.length === all.length ? `${all.length} checkouts` : `${rows.length}/${all.length} checkouts`;
+     return v_flex()
+       .id("worktree")
+@@ -277,7 +326,7 @@
+       .gap(10)
+       .bg(t.popover)
+       .text_size(13)
+-      .child(h_flex().child(div().flex_1().font_semibold().text_color(t.foreground).child(`Open worktree${r ? ` of ${r.name}` : ""}`)).child(div().text_size(11).text_color(t.dim).child(r ? count : "")))
++      .child(h_flex().child(div().flex_1().font_semibold().text_color(t.foreground).child(`Open ${noun}${r ? ` of ${r.name}` : ""}`)).child(div().text_size(11).text_color(t.dim).child(r ? count : "")))
+       .when(r === undefined || (r && this.list === undefined), (el) => el.child(div().text_color(t.muted).child("\u2026")))
+       .when(r === null, (el) => el.child(div().text_color(t.muted).child(`${this.folder ? tilde(this.folder, this.userHome ?? "") : "This folder"} is not in a git repository.`)))
+       .when(Boolean(r && this.list), (el) =>
+@@ -294,7 +343,7 @@
+                   .size_full()
+                   .overflow_y_scroll()
+                   .children(rows.map(row))
+-                  .when(rows.length === 0, (el) => el.child(div().p(10).text_color(t.dim).child("No matching worktrees."))),
++                  .when(rows.length === 0, (el) => el.child(div().p(10).text_color(t.dim).child(`No matching ${noun}s.`))),
+               )
+               .child(Scrollbar.vertical("wt-list").absolute().inset_0()),
+           ),
+@@ -308,12 +357,19 @@
+     const remove = props()?.action === "remove";
+     const s = this.space();
+     const r = this.repo;
+-    const title = remove ? `Remove worktree ${s?.name ?? ""}?` : `New worktree${r ? ` of ${r.name}` : ""}`;
++    const noun = r?.jj ? "workspace" : "worktree";
++    const title = remove ? `Remove ${noun} ${s?.name ?? ""}?` : `New ${noun}${r ? ` of ${r.name}` : ""}`;
+     const detail =
+       r === undefined
+         ? "…"
+         : r === null
+           ? `${this.folder ? tilde(this.folder, this.userHome) : "This folder"} is not in a git repository.`
++          : r.jj
++            ? remove
++              ? !r.linked
++                ? "This is the repository's main workspace."
++                : `Closes the space, forgets jj workspace ${r.jj.name} and deletes ${tilde(r.top, this.userHome)}. Its commits stay in the repo.`
++              : `A new space on a jj workspace in ${tilde(jjRoot(r), this.userHome)}/. A bookmark with that name is checked out; otherwise it starts from here.`
+           : remove
+             ? !r.linked
+               ? "This is the repository's main checkout, not a worktree."
+@@ -331,7 +387,8 @@
+       .text_size(13)
+       .child(div().font_semibold().text_color(t.foreground).child(title))
+       .child(div().text_color(t.muted).child(detail))
+-      .when(remove && this.dirty, (el) => el.child(div().text_color(t.blocked).child("It has uncommitted changes: they will be lost.")))
++      .when(remove && this.dirty && !r?.jj, (el) => el.child(div().text_color(t.blocked).child("It has uncommitted changes: they will be lost.")))
++      .when(remove && this.dirty && Boolean(r?.jj), (el) => el.child(div().text_color(t.muted).child("Its uncommitted changes stay in its working-copy commit.")))
+       .when(remove && this.unpushed.length > 0, (el) => el.child(div().text_color(t.blocked).child(`Submodule ${this.unpushed.join(", ")} has commits that aren't pushed anywhere: they will be lost.`)))
+       .when(!remove && !blocked, (el) =>
+         el.child(
