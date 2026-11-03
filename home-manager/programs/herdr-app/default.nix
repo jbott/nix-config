@@ -1,12 +1,39 @@
-# jj support for the Herdr app: patched copies of its shipped mods, built from
-# the installed version's defaults so a Herdr update re-applies jj.patch (and
-# fails the build if upstream changed those lines). Shipped mods can't be
-# edited in place: Herdr restores them on every start.
+# The Herdr app, set up like tmux was. jj support: patched copies of its
+# shipped mods, built from the installed version's defaults so a Herdr update
+# re-applies jj.patch (and fails the build if upstream changed those lines).
+# Shipped mods can't be edited in place: Herdr restores them on every start.
 {
+  config,
   lib,
   pkgs,
   ...
 }: let
+  # tmux's keys for getting around (../tmux): windows are Herdr's tabs, and
+  # ctrl-b ctrl-k/j go up and down the spaces sidebar. A ctrl-b not followed
+  # by one of these reaches the program after a second.
+  tmuxKeys = {
+    "ctrl-b h" = "pane.go:left";
+    "ctrl-b j" = "pane.go:down";
+    "ctrl-b k" = "pane.go:up";
+    "ctrl-b l" = "pane.go:right";
+    "ctrl-b z" = "pane.zoom";
+    "ctrl-b ctrl-h" = "tab.prev";
+    "ctrl-b ctrl-l" = "tab.next";
+    "ctrl-b ctrl-k" = "space.prev";
+    "ctrl-b ctrl-j" = "space.next";
+    "ctrl-pageup" = "tab.prev";
+    "ctrl-pagedown" = "tab.next";
+  };
+
+  # Herdr's own macOS keys plus tmux's, so a Herdr update's new defaults come too.
+  keys =
+    pkgs.runCommandLocal "herdr-app-keys-${pkgs.herdr-app.version}" {
+      nativeBuildInputs = [pkgs.jq];
+      tmuxKeys = builtins.toJSON tmuxKeys;
+    } ''
+      jq --argjson tmux "$tmuxKeys" '.global += $tmux' ${pkgs.herdr-app.src}/defaults/keys.macos.json > $out
+    '';
+
   cloned = ["agents" "menu" "new-menu" "spaces" "tabs" "worktree"];
 
   # jj-agents names each agent the way tmux named windows.
@@ -34,6 +61,18 @@
       [ "$(jq '[.. | objects | select(.mod == "jj-agents" or .mod == "jj-spaces" or .mod == "jj-tabs")] | length' $out/layouts/jj.json)" = 3 ]
     '';
 in {
+  # A copy, not a link: Herdr reloads keys.json when its mtime changes, and
+  # every store path has the same one. Renamed into place so Herdr never sees
+  # it missing (it would write its defaults).
+  home.activation.herdrAppKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    dest="${config.xdg.configHome}/herdr-app/keys.json"
+    if ! ${pkgs.diffutils}/bin/cmp -s ${keys} "$dest"; then
+      run mkdir -p "$(dirname "$dest")"
+      run install -m 644 ${keys} "$dest.nix-new"
+      run mv -f "$dest.nix-new" "$dest"
+    fi
+  '';
+
   # recursive: Herdr writes jsconfig.json and gpui-kit.d.ts into mod folders.
   # force: replaces the files `mod.clone` made before these were managed here.
   xdg.configFile =
