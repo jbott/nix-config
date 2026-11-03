@@ -7,7 +7,10 @@
   pkgs,
   ...
 }: let
-  cloned = ["menu" "new-menu" "spaces" "tabs" "worktree"];
+  cloned = ["agents" "menu" "new-menu" "spaces" "tabs" "worktree"];
+
+  # jj-agents names each agent the way tmux named windows.
+  jjTitle = pkgs.writeShellScript "jj-title" (builtins.readFile ../tmux/jj-title.sh);
 
   jjMods =
     pkgs.runCommandLocal "herdr-app-jj-mods-${pkgs.herdr-app.version}" {
@@ -24,10 +27,11 @@
       patch -p1 --fuzz=0 --no-backup-if-mismatch -d $out/mods < ${./jj.patch}
       cp ${./jj.js} $out/mods/jj-spaces/jj.js
       cp ${./jj.js} $out/mods/jj-worktree/jj.js
+      substituteInPlace $out/mods/jj-agents/main.js --replace-fail @jjTitle@ ${jjTitle}
 
-      jq 'walk(if type == "object" and (.mod == "spaces" or .mod == "tabs") then .mod = "jj-" + .mod else . end)' \
+      jq 'walk(if type == "object" and (.mod == "agents" or .mod == "spaces" or .mod == "tabs") then .mod = "jj-" + .mod else . end)' \
         "$shipped/layouts/main.json" > $out/layouts/jj.json
-      [ "$(jq '[.. | objects | select(.mod == "jj-spaces" or .mod == "jj-tabs")] | length' $out/layouts/jj.json)" = 2 ]
+      [ "$(jq '[.. | objects | select(.mod == "jj-agents" or .mod == "jj-spaces" or .mod == "jj-tabs")] | length' $out/layouts/jj.json)" = 3 ]
     '';
 in {
   # recursive: Herdr writes jsconfig.json and gpui-kit.d.ts into mod folders.
