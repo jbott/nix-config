@@ -105,6 +105,28 @@
          .when(Boolean(machine), el => el.child(div().text_size(10).text_color(t.dim).child(machine)))
          .when(subs.length > 0, el => el.child(fold(a, subs)))
          .when(this.hovered === a.address, el => el.child(pin))
+@@ -362,7 +405,7 @@
+       else groups.push({ id, label: byPriority ? SECTION[r] : a.space_name || "", status: byPriority ? SECTION_STATUS[r] : null, members: [a] });
+     }
+ 
+-    // A group's header; it folds the group. Folded, it says how many and the most urgent state.
++    // A group's header. It doesn't fold its group: clicking a space's name by mistake hid its agents.
+     const header = (g) => {
+       const open = !this.folded.has(g.id);
+       const top = g.members.reduce((m, a) => ((RANK[a.status] ?? 0) > (RANK[m] ?? 0) ? a.status : m), null);
+@@ -376,12 +419,6 @@
+         .items_center()
+         .text_size(11)
+         .font_medium()
+-        .cursor_pointer()
+-        .hover((s) => s.text_color(t.foreground))
+-        .on_click((_e, cx) => {
+-          open ? this.folded.add(g.id) : this.folded.delete(g.id);
+-          cx.notify();
+-        })
+         .child(div().truncate().text_color(t[g.status] ?? t.dim).child(g.label))
+         .when(byPriority || !open, (el) => el.child(div().text_color(t.dim).child(String(g.members.length))))
+         .child(div().flex_1())
 --- a/jj-menu/main.js
 +++ b/jj-menu/main.js
 @@ -105,7 +105,7 @@
