@@ -56,7 +56,8 @@
       cp ${./jj.js} $out/mods/jj-worktree/jj.js
       substituteInPlace $out/mods/jj-agents/main.js --replace-fail @jjTitle@ ${jjTitle}
 
-      jq 'walk(if type == "object" and (.mod == "agents" or .mod == "spaces" or .mod == "tabs") then .mod = "jj-" + .mod else . end)' \
+      jq 'walk(if type == "object" and (.mod == "agents" or .mod == "spaces" or .mod == "tabs") then .mod = "jj-" + .mod else . end)
+        | .theme = {light: "paper", dark: "challenger-deep"}' \
         "$shipped/layouts/main.json" > $out/layouts/jj.json
       [ "$(jq '[.. | objects | select(.mod == "jj-agents" or .mod == "jj-spaces" or .mod == "jj-tabs")] | length' $out/layouts/jj.json)" = 3 ]
     '';
@@ -86,6 +87,12 @@ in {
     // {
       "herdr-app/layouts/jj.json" = {
         source = "${jjMods}/layouts/jj.json";
+        force = true;
+      };
+      # Challenger Deep, as in neovim and tmux: Ghostty's bundled palette, with
+      # the vim theme's Visual color for selection (Ghostty's is the foreground).
+      "herdr-app/themes/challenger-deep.json" = {
+        source = ./challenger-deep.json;
         force = true;
       };
     };
