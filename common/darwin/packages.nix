@@ -5,6 +5,7 @@
     colima
     docker-client
     finicky
+    herdr-app
     iproute2mac
     m1ddc
     utm

@@ -12,6 +12,7 @@
   ed3d-plugins = self.callPackage ./pkgs/ed3d-plugins {};
   finicky = self.callPackage ./pkgs/finicky {};
   glab-jj = self.callPackage ./pkgs/glab-jj {};
+  herdr-app = self.callPackage ./pkgs/herdr-app {inherit (super) herdr-app;};
   humanizer-skill = self.callPackage ./pkgs/humanizer-skill {};
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};
