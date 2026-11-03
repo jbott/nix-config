@@ -179,7 +179,70 @@
    // Spaces in order, each worktree space moved under its main checkout's.
 --- a/jj-tabs/main.js
 +++ b/jj-tabs/main.js
-@@ -93,7 +93,7 @@
+@@ -1,6 +1,9 @@
+ import { View, div, svg, image } from "gpui-kit";
+ import { h_flex } from "gpui-base";
+-import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings } from "herdr";
++import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings, exec } from "herdr";
++
++// Prints "[repo] workspace/subfolder" for a folder in a jj workspace or git worktree.
++const JJ_TITLE = "@jjTitle@";
+ 
+ function find(node, id) {
+   if (node?.id === id) return node;
+@@ -15,6 +18,26 @@
+   init() {
+     this.pressed = null;
+     this.panels = JSON.parse(localStorage.getItem("panels") ?? "{}");
++    // Each folder's checkout, { repo, rest }, or null outside one or until read.
++    this.places = new Map();
++  }
++
++  // As jj-agents' place(): read once per folder, not asked again when it fails.
++  place(cwd, on, cx) {
++    if (!cwd) return null;
++    const key = `${on ?? ""}\u0000${cwd}`;
++    if (!this.places.has(key)) {
++      this.places.set(key, null);
++      cx.spawn(async (cx) => {
++        try {
++          const r = await exec(JJ_TITLE, [cwd], { on });
++          const m = r.code === 0 && /^\[(.+?)\](?: (.+))?$/.exec(r.stdout.trim());
++          if (m) this.places.set(key, { repo: m[1], rest: m[2] ?? null });
++        } catch {}
++        cx.notify();
++      });
++    }
++    return this.places.get(key);
+   }
+ 
+   // The side panel is remembered per space: switching shows that space's choice
+@@ -45,7 +68,7 @@
+     localStorage.setItem("panels", JSON.stringify(this.panels));
+   }
+ 
+-  render() {
++  render(cx) {
+     const t = theme();
+     const space = spaces().find(p => p.active);
+     const shown = space?.tabs ?? [];
+@@ -54,7 +77,14 @@
+       .on_mouse_down("left", stop).on_click(action).child(label);
+     const item = (c, i) => {
+       const program = panes().find(p => p.tab === c.id && p.program?.agent)?.program ?? panes().find(p => p.tab === c.id)?.program;
+-      const name = /^tb\d+$/.test(c.name) ? program?.name ?? "Terminal" : c.name;
++      // A tab nobody named says its checkout, as tmux named windows: its focused
++      // pane's, else its agent's, else its first's ("complement \u00b7 aptean").
++      // In a space named for the repo, the repo goes without saying ("aptean").
++      const mine = panes().filter(p => p.tab === c.id && p.cwd);
++      const here = (mine.find(p => p.focused) ?? mine.find(p => p.program?.agent) ?? mine[0])?.cwd;
++      const at = c.named ? null : this.place(here, space.machine, cx);
++      const checkout = at && (!at.rest ? at.repo : space.name === at.repo ? at.rest : `${at.repo} \u00b7 ${at.rest}`);
++      const name = checkout || (/^tb\d+$/.test(c.name) ? program?.name ?? "Terminal" : c.name);
+       return h_flex().id(`tab-${c.id}`).h(29).px(10).gap(7).rounded(7).items_center().flex_none().text_size(12.8)
+         .border(1).border_color(c.active ? t.border : t.chrome).bg(c.active ? t.raised : t.chrome).text_color(c.active ? t.foreground : t.muted)
+         .hover(s => s.bg(t.hover))
+@@ -93,7 +123,7 @@
        .on_mouse_up("left", () => { this.pressed = null; })
        .on_scroll_wheel(e => { if (Math.abs(e.delta.y) >= 1) run(e.delta.y > 0 ? "tab.prev" : "tab.next"); })
        .child(h_flex().id("tab-scroll").flex_1().min_w(0).h_full().items_center().gap(3).overflow_x_scrollbar().children(shown.map(item)))

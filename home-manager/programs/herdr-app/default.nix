@@ -36,7 +36,7 @@
 
   cloned = ["agents" "menu" "new-menu" "spaces" "tabs" "worktree"];
 
-  # jj-agents names each agent the way tmux named windows.
+  # jj-agents and jj-tabs name agents and tabs the way tmux named windows.
   jjTitle = pkgs.writeShellScript "jj-title" (builtins.readFile ../tmux/jj-title.sh);
 
   jjMods =
@@ -54,7 +54,7 @@
       patch -p1 --fuzz=0 --no-backup-if-mismatch -d $out/mods < ${./jj.patch}
       cp ${./jj.js} $out/mods/jj-spaces/jj.js
       cp ${./jj.js} $out/mods/jj-worktree/jj.js
-      substituteInPlace $out/mods/jj-agents/main.js --replace-fail @jjTitle@ ${jjTitle}
+      substituteInPlace $out/mods/jj-agents/main.js $out/mods/jj-tabs/main.js --replace-fail @jjTitle@ ${jjTitle}
 
       jq 'walk(if type == "object" and (.mod == "agents" or .mod == "spaces" or .mod == "tabs") then .mod = "jj-" + .mod else . end)
         | .theme = {light: "paper", dark: "challenger-deep"}' \
