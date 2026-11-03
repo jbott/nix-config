@@ -74,6 +74,26 @@ in {
     fi
   '';
 
+  # Option types its character (Option-dash is an en dash), as Ghostty's left
+  # Option does. Herdr's default, auto, makes Option Alt on US layouts, and it
+  # has no left/right split like Ghostty's macos-option-as-alt = "right".
+  # Merged in, not linked: Herdr writes this file itself (the zoom keys).
+  home.activation.herdrAppSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    dest="${config.xdg.configHome}/herdr-app/settings.json"
+    if [ "$(${pkgs.jq}/bin/jq -r '.option_as_alt // ""' "$dest" 2>/dev/null)" != off ]; then
+      new=$(mktemp)
+      if [ -e "$dest" ]; then
+        ${pkgs.jq}/bin/jq '.option_as_alt = "off"' "$dest" > "$new"
+      else
+        ${pkgs.jq}/bin/jq -n '{option_as_alt: "off"}' > "$new"
+      fi
+      run mkdir -p "$(dirname "$dest")"
+      run install -m 644 "$new" "$dest.nix-new"
+      run mv -f "$dest.nix-new" "$dest"
+      rm -f "$new"
+    fi
+  '';
+
   # recursive: Herdr writes jsconfig.json and gpui-kit.d.ts into mod folders.
   # force: replaces the files `mod.clone` made before these were managed here.
   xdg.configFile =
