@@ -87,6 +87,12 @@ in
     # having Claude auto-respond to their output.
     respondToBashCommands = false;
 
+    # Pin the 1-hour prompt cache instead of the automatic choice, which drops
+    # to 5 minutes on API-key/Bedrock/Vertex auth and always for subagents.
+    # 1h writes bill higher but survive longer breaks between turns.
+    promptCacheTtl = "1h";
+    subagentPromptCacheTtl = "1h";
+
     statusLine = {
       type = "command";
       command = "${statusLine}";
