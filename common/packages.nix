@@ -30,6 +30,7 @@ in {
     git-absorb
     glab-jj
     gmailctl
+    herdr-core
     htop
     jj-hunk-tool
     jjui

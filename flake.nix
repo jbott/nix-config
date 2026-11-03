@@ -54,6 +54,7 @@
       ccusage = llm-agents.packages.${final.stdenv.hostPlatform.system}.ccusage;
       claude-code = llm-agents.packages.${final.stdenv.hostPlatform.system}.claude-code;
       codex = llm-agents.packages.${final.stdenv.hostPlatform.system}.codex;
+      herdr-core = llm-agents.packages.${final.stdenv.hostPlatform.system}.herdr-core;
     };
 
     fastNixGcOverlay = final: _prev: {
