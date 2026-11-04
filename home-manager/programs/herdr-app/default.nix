@@ -10,8 +10,8 @@
   ...
 }: let
   # tmux's keys (../tmux): windows are Herdr's tabs, and ctrl-b ctrl-k/j go up
-  # and down the spaces sidebar. A ctrl-b not followed by one of these reaches
-  # the program after a second.
+  # and down the spaces (in the jj layout, its tabs: jjLayoutKeys). A ctrl-b not
+  # followed by one of these reaches the program after a second.
   tmuxKeys = {
     "ctrl-b c" = "tab.new";
     "ctrl-b %" = "pane.split:right";
@@ -29,13 +29,27 @@
     "ctrl-pagedown" = "tab.next";
   };
 
+  # In the jj layout the sidebar lists every tab, so ctrl-b ctrl-j/k go down and
+  # up it a tab at a time, across spaces (other layouts keep space.next/prev),
+  # and tmux's other next and previous window keys do the same.
+  jjLayoutKeys = {
+    "ctrl-b ctrl-j" = "jj-sidebar.next";
+    "ctrl-b ctrl-k" = "jj-sidebar.prev";
+    "ctrl-b ctrl-l" = "jj-sidebar.next";
+    "ctrl-b ctrl-h" = "jj-sidebar.prev";
+    "ctrl-pagedown" = "jj-sidebar.next";
+    "ctrl-pageup" = "jj-sidebar.prev";
+  };
+
   # Herdr's own macOS keys plus tmux's, so a Herdr update's new defaults come too.
   keys =
     pkgs.runCommandLocal "herdr-app-keys-${pkgs.herdr-app.version}" {
       nativeBuildInputs = [pkgs.jq];
       tmuxKeys = builtins.toJSON tmuxKeys;
+      jjLayoutKeys = builtins.toJSON jjLayoutKeys;
     } ''
-      jq --argjson tmux "$tmuxKeys" '.global += $tmux' ${pkgs.herdr-app.src}/defaults/keys.macos.json > $out
+      jq --argjson tmux "$tmuxKeys" --argjson jj "$jjLayoutKeys" \
+        '.global += $tmux | ."layout:jj" += $jj' ${pkgs.herdr-app.src}/defaults/keys.macos.json > $out
     '';
 
   cloned = ["menu" "new-menu" "worktree"];
