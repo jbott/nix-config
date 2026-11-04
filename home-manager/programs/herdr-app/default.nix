@@ -97,26 +97,38 @@ in {
     fi
   '';
 
-  # recursive: Herdr writes jsconfig.json and gpui-kit.d.ts into mod folders.
-  # force: replaces the files `mod.clone` made before these were managed here.
-  xdg.configFile =
-    lib.listToAttrs (map (m:
-      lib.nameValuePair "herdr-app/mods/jj-${m}" {
-        source = "${jjMods}/mods/jj-${m}";
-        recursive = true;
-        force = true;
-      })
-    cloned)
-    // {
-      "herdr-app/layouts/jj.json" = {
-        source = "${jjMods}/layouts/jj.json";
-        force = true;
-      };
-      # Challenger Deep, as in neovim and tmux: Ghostty's bundled palette, with
-      # the vim theme's Visual color for selection (Ghostty's is the foreground).
-      "herdr-app/themes/challenger-deep.json" = {
-        source = ./challenger-deep.json;
-        force = true;
-      };
+  # The layout and the mods' files are copies, not links, each renamed into
+  # place only when it differs. The mods: Herdr won't import a module (jj.js)
+  # that resolves outside its mod's folder, and a link into the store does;
+  # file by file, as Herdr writes jsconfig.json and gpui-kit.d.ts in there too.
+  # The layout: home-manager swaps a link by removing it first, and a shown
+  # layout that disappears makes Herdr switch to another one. Before
+  # linkGeneration, so the links older generations made here are already
+  # files when it cleans up (it leaves those alone).
+  home.activation.herdrAppFiles = lib.hm.dag.entryBetween ["linkGeneration"] ["writeBoundary"] ''
+    herdrPut() {
+      if [ -L "$2" ] || ! ${pkgs.diffutils}/bin/cmp -s "$1" "$2"; then
+        run install -m 644 "$1" "$2.nix-new"
+        run mv -f "$2.nix-new" "$2"
+      fi
+    }
+    herdr="${config.xdg.configHome}/herdr-app"
+    run mkdir -p "$herdr/layouts"
+    herdrPut ${jjMods}/layouts/jj.json "$herdr/layouts/jj.json"
+    for m in ${lib.concatMapStringsSep " " (m: "jj-${m}") cloned}; do
+      run mkdir -p "$herdr/mods/$m"
+      for f in ${jjMods}/mods/$m/*; do
+        herdrPut "$f" "$herdr/mods/$m/''${f##*/}"
+      done
+    done
+  '';
+
+  xdg.configFile = {
+    # Challenger Deep, as in neovim and tmux: Ghostty's bundled palette, with
+    # the vim theme's Visual color for selection (Ghostty's is the foreground).
+    "herdr-app/themes/challenger-deep.json" = {
+      source = ./challenger-deep.json;
+      force = true;
     };
+  };
 }
