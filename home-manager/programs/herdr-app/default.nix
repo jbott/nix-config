@@ -31,7 +31,9 @@
 
   # In the jj layout the sidebar lists every tab, so ctrl-b ctrl-j/k go down and
   # up it a tab at a time, across spaces (other layouts keep space.next/prev),
-  # and tmux's other next and previous window keys do the same.
+  # and tmux's other next and previous window keys do the same. Herdr's cmd-]
+  # and cmd-[ go through every agent; with shift (Herdr's next and previous
+  # tab, which those keys do here), only the ones blocked or done.
   jjLayoutKeys = {
     "ctrl-b ctrl-j" = "jj-sidebar.next";
     "ctrl-b ctrl-k" = "jj-sidebar.prev";
@@ -39,6 +41,8 @@
     "ctrl-b ctrl-h" = "jj-sidebar.prev";
     "ctrl-pagedown" = "jj-sidebar.next";
     "ctrl-pageup" = "jj-sidebar.prev";
+    "cmd-shift-]" = "jj-sidebar.waiting-next";
+    "cmd-shift-[" = "jj-sidebar.waiting-prev";
   };
 
   # Herdr's own macOS keys plus tmux's, so a Herdr update's new defaults come too.

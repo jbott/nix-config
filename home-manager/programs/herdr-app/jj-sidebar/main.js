@@ -8,13 +8,14 @@
 // it. Right-click for a space's or tab's menu, double-click a tab to rename it,
 // drag spaces or tabs to reorder them. A space's chevron folds it; its + opens
 // the new tab menu there. Commands: jj-sidebar.next / .prev step down or up the
-// list a tab at a time.
+// list a tab at a time; .waiting-next / .waiting-prev go to the next or previous
+// agent that needs you (blocked or done).
 // props { footer: true }: the sidebar's footer instead (Settings, the Files and
 // Changes panels the tab bar had, Add machine).
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { spaces, machines, panes, agents, terminals, focused, run, openOverlay, exec, hc, home, theme, shared, setShared, setAgentOrder, watchFolder, nextCommand, window, layout, props, updates } from "herdr";
+import { spaces, machines, panes, agents, terminals, focused, run, openOverlay, notify, exec, hc, home, theme, shared, setShared, setAgentOrder, watchFolder, nextCommand, window, layout, props, updates } from "herdr";
 import { status as jjStatus } from "./jj.js";
 
 // Prints "[repo] workspace/subfolder" for a folder in a jj workspace or git worktree.
@@ -151,14 +152,30 @@ export default class Sidebar extends View {
     cx.timer.every(250, (cx) => this.checkNew(cx));
     // The agents' "3m".
     cx.timer.every(30000, (cx) => cx.notify());
-    // Keys bound to jj-sidebar.next / jj-sidebar.prev.
+    // Keys bound to jj-sidebar.<command>.
     cx.spawn(async (cx) => {
       for (;;) {
         const c = await nextCommand();
         if (c === "next" || c === "prev") this.step(c === "next" ? 1 : -1);
+        else if (c === "waiting-next" || c === "waiting-prev") this.waiting(c === "waiting-next" ? 1 : -1);
         cx.notify();
       }
     });
+  }
+
+  // To the next (or previous) agent that needs you, blocked or done, in the
+  // list's order and round at the ends, as agent.next goes through them all.
+  waiting(dir) {
+    const live = new Map(agents().map((a) => [a.address, a]));
+    const list = (this.agentOrder ?? []).map((addr) => live.get(addr)).filter(Boolean);
+    const len = list.length;
+    const at = list.findIndex((a) => a.focused);
+    const start = at < 0 ? (dir > 0 ? -1 : len) : at;
+    for (let n = 1; n <= len; n++) {
+      const a = list[(((start + dir * n) % len) + len) % len];
+      if (!a.focused && (a.status === "blocked" || a.status === "done")) return run("pane.focus", { pane: a.pane });
+    }
+    notify({ title: "No agent is waiting", level: "info", timeout: 2000 });
   }
 
   // Down or up the list a tab at a time, on into the next space and round at the
@@ -902,8 +919,9 @@ export default class Sidebar extends View {
     const byTab = new Map();
     for (const a of list) byTab.set(a.tab, [...(byTab.get(a.tab) ?? []), a]);
     const rows = this.ordered(sp, ps);
-    // agent.next / agent.prev go down the tree, through folded spaces too.
-    setAgentOrder(rows.flatMap((r) => r.w.tabs.flatMap((c) => (byTab.get(c.id) ?? []).map((a) => a.address))));
+    // agent.next / agent.prev (and waiting()) go down the tree, through folded spaces too.
+    this.agentOrder = rows.flatMap((r) => r.w.tabs.flatMap((c) => (byTab.get(c.id) ?? []).map((a) => a.address)));
+    setAgentOrder(this.agentOrder);
     const all = terminals();
     // Each terminal's 7501 report: `report`, or `status` where that's still the record.
     const reports = new Map(all.map((k) => [k.address, k.report ?? (typeof k.status === "object" ? k.status : null)]));
