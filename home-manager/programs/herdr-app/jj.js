@@ -1,6 +1,6 @@
-// Shared by jj-worktree and jj-spaces (mods can't import each other).
+// Shared by jj-worktree and jj-sidebar (mods can't import each other).
 // Reads pass --ignore-working-copy: a snapshot writes under .git, which would
-// wake the spaces sidebar's watch again.
+// wake the sidebar's watch again.
 
 import { exec } from "herdr";
 

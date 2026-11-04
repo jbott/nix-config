@@ -1,7 +1,8 @@
 # The Herdr app, set up like tmux was. jj support: patched copies of its
 # shipped mods, built from the installed version's defaults so a Herdr update
-# re-applies jj.patch (and fails the build if upstream changed those lines).
-# Shipped mods can't be edited in place: Herdr restores them on every start.
+# re-applies jj.patch (and fails the build if upstream changed those lines),
+# plus a sidebar of our own (jj-sidebar). Shipped mods can't be edited in
+# place: Herdr restores them on every start.
 {
   config,
   lib,
@@ -37,9 +38,13 @@
       jq --argjson tmux "$tmuxKeys" '.global += $tmux' ${pkgs.herdr-app.src}/defaults/keys.macos.json > $out
     '';
 
-  cloned = ["agents" "menu" "new-menu" "spaces" "tabs" "worktree"];
+  cloned = ["menu" "new-menu" "worktree"];
+  # Ours, not clones: jj-sidebar is the sidebar as a vertical tab list (spaces,
+  # their tabs, the tabs' agents), in place of the spaces and agents panels
+  # and the tab bar.
+  own = ["sidebar"];
 
-  # jj-agents and jj-tabs name agents and tabs the way tmux named windows.
+  # jj-sidebar names tabs the way tmux named windows.
   jjTitle = pkgs.writeShellScript "jj-title" (builtins.readFile ../tmux/jj-title.sh);
 
   jjMods =
@@ -55,14 +60,24 @@
         sed -i "s#mods/$m/#mods/jj-$m/#g" "$out/mods/jj-$m/main.js"
       done
       patch -p1 --fuzz=0 --no-backup-if-mismatch -d $out/mods < ${./jj.patch}
-      cp ${./jj.js} $out/mods/jj-spaces/jj.js
+      cp -r ${./jj-sidebar} $out/mods/jj-sidebar
+      chmod -R u+w $out/mods/jj-sidebar
+      cp ${./jj.js} $out/mods/jj-sidebar/jj.js
       cp ${./jj.js} $out/mods/jj-worktree/jj.js
-      substituteInPlace $out/mods/jj-agents/main.js $out/mods/jj-tabs/main.js --replace-fail @jjTitle@ ${jjTitle}
+      substituteInPlace $out/mods/jj-sidebar/main.js --replace-fail @jjTitle@ ${jjTitle}
 
-      jq 'walk(if type == "object" and (.mod == "agents" or .mod == "spaces" or .mod == "tabs") then .mod = "jj-" + .mod else . end)
+      # main, with jj-sidebar in place of the spaces and agents lists (and in
+      # the footer, which gains the tab bar's Files and Changes buttons), and
+      # no tab bar.
+      jq 'walk(
+            if type == "object" and .id == "sidebar-lists" then {id: "tree", type: "block", content: {mod: "jj-sidebar"}}
+            elif type == "object" and .id == "sidebar-footer" then .content = {mod: "jj-sidebar", props: {footer: true}}
+            elif type == "object" and .id == "work" then .children |= map(select(.id != "tabs"))
+            else . end)
         | .theme = {light: "paper", dark: "challenger-deep"}' \
         "$shipped/layouts/main.json" > $out/layouts/jj.json
-      [ "$(jq '[.. | objects | select(.mod == "jj-agents" or .mod == "jj-spaces" or .mod == "jj-tabs")] | length' $out/layouts/jj.json)" = 3 ]
+      jq -e '[.. | objects | select(.mod == "jj-sidebar")] | length == 2' $out/layouts/jj.json
+      jq -e '[.. | objects | select(.id == "tabs" or .mod == "spaces" or .mod == "agents" or .mod == "tabs")] | length == 0' $out/layouts/jj.json
     '';
 in {
   # A copy, not a link: Herdr reloads keys.json when its mtime changes, and
@@ -115,7 +130,7 @@ in {
     herdr="${config.xdg.configHome}/herdr-app"
     run mkdir -p "$herdr/layouts"
     herdrPut ${jjMods}/layouts/jj.json "$herdr/layouts/jj.json"
-    for m in ${lib.concatMapStringsSep " " (m: "jj-${m}") cloned}; do
+    for m in ${lib.concatMapStringsSep " " (m: "jj-${m}") (cloned ++ own)}; do
       run mkdir -p "$herdr/mods/$m"
       for f in ${jjMods}/mods/$m/*; do
         herdrPut "$f" "$herdr/mods/$m/''${f##*/}"
