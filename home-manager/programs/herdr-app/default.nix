@@ -8,10 +8,13 @@
   pkgs,
   ...
 }: let
-  # tmux's keys for getting around (../tmux): windows are Herdr's tabs, and
-  # ctrl-b ctrl-k/j go up and down the spaces sidebar. A ctrl-b not followed
-  # by one of these reaches the program after a second.
+  # tmux's keys (../tmux): windows are Herdr's tabs, and ctrl-b ctrl-k/j go up
+  # and down the spaces sidebar. A ctrl-b not followed by one of these reaches
+  # the program after a second.
   tmuxKeys = {
+    "ctrl-b c" = "tab.new";
+    "ctrl-b %" = "pane.split:right";
+    "ctrl-b \"" = "pane.split:down";
     "ctrl-b h" = "pane.go:left";
     "ctrl-b j" = "pane.go:down";
     "ctrl-b k" = "pane.go:up";
