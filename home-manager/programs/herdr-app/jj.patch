@@ -1,6 +1,6 @@
 --- a/jj-menu/main.js
 +++ b/jj-menu/main.js
-@@ -105,7 +105,7 @@
+@@ -112,7 +112,7 @@
      const it = items(props(), this.git)[i];
      if (!it) return;
      closeOverlay(props()?.overlay);
@@ -34,7 +34,7 @@
 +import { jj, jjw, workspace } from "./jj.js";
  
  // Where a space is now: its first terminal's live folder, else where it was made.
- function place(s) {
+ function place(s, all = panes()) {
 @@ -43,6 +45,25 @@
    return out.sort((a, b) => b.main - a.main || b.at - a.at);
  }
@@ -59,7 +59,7 @@
 +}
 +
  // The space showing a checkout: its first terminal is in it (the deepest checkout wins).
- function spaceOf(path, all, on) {
+ function spaceOf(path, all, on, spaceList, paneList) {
    const inside = (p, dir) => p === dir || p.startsWith(dir + "/");
 @@ -95,15 +116,19 @@
  }
@@ -157,7 +157,7 @@
    key(e, cx) {
      if (e.key === "escape") return this.close();
      if (this.opening) {
-@@ -267,6 +315,7 @@
+@@ -269,6 +317,7 @@
          )
          .child(div().truncate().text_size(11.5).text_color(t.dim).child(tilde(c.path, this.userHome ?? "")));
      };
@@ -165,7 +165,7 @@
      const count = rows.length === all.length ? `${all.length} checkouts` : `${rows.length}/${all.length} checkouts`;
      return v_flex()
        .id("worktree")
-@@ -277,7 +326,7 @@
+@@ -279,7 +328,7 @@
        .gap(10)
        .bg(t.popover)
        .text_size(13)
@@ -174,7 +174,7 @@
        .when(r === undefined || (r && this.list === undefined), (el) => el.child(div().text_color(t.muted).child("\u2026")))
        .when(r === null, (el) => el.child(div().text_color(t.muted).child(`${this.folder ? tilde(this.folder, this.userHome ?? "") : "This folder"} is not in a git repository.`)))
        .when(Boolean(r && this.list), (el) =>
-@@ -294,7 +343,7 @@
+@@ -296,7 +345,7 @@
                    .size_full()
                    .overflow_y_scroll()
                    .children(rows.map(row))
@@ -183,7 +183,7 @@
                )
                .child(Scrollbar.vertical("wt-list").absolute().inset_0()),
            ),
-@@ -308,12 +357,19 @@
+@@ -310,12 +359,19 @@
      const remove = props()?.action === "remove";
      const s = this.space();
      const r = this.repo;
@@ -204,7 +204,7 @@
            : remove
              ? !r.linked
                ? "This is the repository's main checkout, not a worktree."
-@@ -331,7 +387,8 @@
+@@ -333,7 +389,8 @@
        .text_size(13)
        .child(div().font_semibold().text_color(t.foreground).child(title))
        .child(div().text_color(t.muted).child(detail))
