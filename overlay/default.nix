@@ -17,4 +17,10 @@
   jjw = self.callPackage ./pkgs/jjw {};
   swiftui-pro-skill = self.callPackage ./pkgs/swiftui-pro-skill {};
   yolo = self.callPackage ./pkgs/yolo {};
+  # Same cause as dotslash: aws-lc-sys now wants a system aws-lc. Drop once
+  # https://github.com/NixOS/nixpkgs/pull/584921 reaches nixos-unstable.
+  zizmor = super.zizmor.overrideAttrs (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or []) ++ [self.pkg-config];
+    buildInputs = (old.buildInputs or []) ++ [self.aws-lc];
+  });
 })
