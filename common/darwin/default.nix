@@ -1,5 +1,6 @@
 {
   imports = [
+    ./aerospace.nix
     ./claude-code.nix
     ./defaults-finder.nix
     ./defaults-screencapture.nix
