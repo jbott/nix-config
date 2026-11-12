@@ -10,7 +10,18 @@ in {
     enable = true;
     settings = {
       config-version = 2;
-      persistent-workspaces = workspaces;
+
+      # A newly connected monitor gets an off-screen workspace already assigned
+      # to it; failing that, the lowest-numbered empty workspace that is neither
+      # persistent nor pinned. The default config makes every bound workspace
+      # persistent, so external displays came up as 10, 11 (unbound).
+      #
+      # So pin 1 to the first external and leave 2-9 non-persistent, so other
+      # displays get the lowest free one. 1 must be persistent for the pin to
+      # find it; with no external connected the pin is ignored.
+      persistent-workspaces = ["1"];
+      # A name pattern resolves to the leftmost matching monitor.
+      workspace-to-monitor-force-assignment."1" = "^(?!built-in)";
 
       mode.main.binding =
         {
