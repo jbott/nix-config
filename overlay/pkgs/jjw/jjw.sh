@@ -31,11 +31,14 @@ commands:
         one, so it doubles as "resolve or create". Defaults to the local bookmark
         matching <name>, if it exists; -r overrides this. Creates no bookmark: name a
         branch with 'jj bookmark create' once there is something to push.
-  rm [--stale] <name>...
+  rm [--stale|--empty] <name>...
         Forget each workspace and delete its directory. Refuses the workspace
         you are standing in and the main workspace.
         --stale forgets every tracked workspace whose directory is gone from
         disk (and takes no names).
+        --empty removes every other workspace whose working-copy commit has no
+        changes, no description and no bookmark, and has no commits between it
+        and trunk() (and takes no names).
   rm --self
         Forget and delete the current workspace (or the -R target). Refuses
         the main workspace. Your shell must cd out of the deleted directory.
@@ -123,6 +126,19 @@ ws_stale() {
   [ ! -d "$(ws_dir "$1" "$2")" ]
 }
 
+# Prints "empty" when the workspace at <dir> holds no work: its working-copy
+# commit has no changes, no description and no bookmark (the commit `jj
+# workspace forget` abandons), and sits directly on trunk, with no commits of
+# its own between the two. Anything else prints one line per commit in
+# trunk()..@, capped at two since one past @ is enough to rule it out.
+#
+# Unlike jjq this snapshots <dir> first: otherwise edits jj has not seen yet
+# leave the commit looking empty, and rm -rf would take them with the directory.
+ws_emptiness() {
+  jj -R "$1" log --no-graph -r 'trunk()..@' --limit 2 \
+    -T 'if(empty && !description && !local_bookmarks, "empty", "nonempty") ++ "\n"'
+}
+
 cmd_new() {
   local revset="" name=""
   while [ $# -gt 0 ]; do
@@ -173,16 +189,15 @@ cmd_new() {
 }
 
 cmd_rm() {
-  local stale_only=false self=false name path
+  # mode is the one bulk flag given (--self, --stale or --empty), if any.
+  local mode="" name path
   local names=()
   while [ $# -gt 0 ]; do
     case $1 in
-      --stale)
-        stale_only=true
-        shift
-        ;;
-      --self)
-        self=true
+      --self | --stale | --empty)
+        [ -z "$mode" ] || [ "$mode" = "$1" ] ||
+          die "rm: $mode cannot be combined with $1"
+        mode=$1
         shift
         ;;
       -*) die "rm: unknown option: $1" ;;
@@ -192,14 +207,13 @@ cmd_rm() {
         ;;
     esac
   done
+  [ -z "$mode" ] || [ ${#names[@]} -eq 0 ] || die "rm: $mode takes no names"
 
   local root current
   root=$(repo_root)
   current=$(jjq workspace root)
 
-  if $self; then
-    ! $stale_only || die "rm: --self cannot be combined with --stale"
-    [ ${#names[@]} -eq 0 ] || die "rm: --self takes no names"
+  if [ "$mode" = --self ]; then
     [ "$current" != "$root" ] || die "rm: refusing to remove the main workspace"
 
     jj -R "$current" workspace forget
@@ -209,8 +223,7 @@ cmd_rm() {
     return 0
   fi
 
-  if $stale_only; then
-    [ ${#names[@]} -eq 0 ] || die "rm: --stale removes every stale workspace and takes no names"
+  if [ "$mode" = --stale ]; then
     local found=false
     while IFS= read -r name; do
       ws_stale "$root" "$name" || continue
@@ -219,6 +232,34 @@ cmd_rm() {
       found=true
     done < <(jjq workspace list -T 'name ++ "\n"')
     $found || note "no stale workspaces"
+    return 0
+  fi
+
+  if [ "$mode" = --empty ]; then
+    local main_name current_name state found=false
+    main_name=$(ws_name_at "$root")
+    current_name=$(ws_name_at "$current")
+    while IFS= read -r name; do
+      [ "$name" != "$main_name" ] && [ "$name" != "$current_name" ] || continue
+      # As when removing by name: no rm -rf without a jj-recorded path.
+      path=$(jjq workspace root --name "$name" 2>/dev/null) || {
+        note "skipping '$name': no recorded path (repo predates jj 0.38)"
+        continue
+      }
+      # A missing directory makes the workspace stale, not empty; --stale
+      # handles those.
+      [ -d "$path" ] || continue
+      state=$(ws_emptiness "$path") || {
+        note "skipping '$name': could not snapshot $path"
+        continue
+      }
+      [ "$state" = empty ] || continue
+      jj -R "$root" workspace forget "$name"
+      rm -rf "$path"
+      note "removed empty workspace '$name' ($path)"
+      found=true
+    done < <(jjq workspace list -T 'name ++ "\n"')
+    $found || note "no empty workspaces"
     return 0
   fi
 

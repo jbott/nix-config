@@ -176,6 +176,7 @@
           rm)
             _arguments -S \
               '--stale[forget every tracked workspace whose directory is gone]' \
+              '--empty[remove every workspace with no work on top of trunk]' \
               '*:workspace:_jjw_workspaces'
             ;;
           ls) _arguments -S '--stale[list only workspaces whose directory is gone]' ;;

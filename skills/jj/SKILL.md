@@ -113,7 +113,7 @@ Defined in `home-manager/programs/jujutsu.nix`. They encode the workflow.
 | `jj lt` | `jj log -r 'trunk()..@' --summary` | Quick stack overview with file-level changes |
 | `jj w ls` | List workspaces as `<name><TAB><path>`. `--stale` lists only those whose directory is gone from disk. | Seeing what workspaces exist and where |
 | `jj w new <name>` (`jj w add <name>`) | Create (or reuse) the workspace for `<name>` at `<parent-of-repo>/.worktrees/<repo>/<name>`, print its path. Creates no bookmark. | Adding a workspace |
-| `jj w rm <ws>...` | Forget each workspace and `rm -rf` its directory. `--stale` (no names) forgets every tracked workspace whose directory is already gone. | Cleaning up a workspace |
+| `jj w rm <ws>...` | Forget each workspace and `rm -rf` its directory. `--stale` (no names) forgets every tracked workspace whose directory is already gone. `--empty` (no names) removes every other workspace whose `@` is empty, undescribed and unbookmarked and sits directly on `trunk()`; it snapshots each one first. | Cleaning up a workspace |
 | `jj stack <rev>` | Insert `<rev>` as a new sibling parent of `closest_merge(@)` — i.e. attach a branch to the megamerge | Adding a single change as a new branch of the megamerge |
 | `jj stage` | Same as `jj stack closest_merge(@)+:: ~ empty()` — folds every non-empty commit above the megamerge into the merge as additional branches | One-shot consolidation of work done on top of a megamerge |
 
