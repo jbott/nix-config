@@ -179,7 +179,11 @@
               '--empty[remove every workspace with no work on top of trunk]' \
               '*:workspace:_jjw_workspaces'
             ;;
-          ls) _arguments -S '--stale[list only workspaces whose directory is gone]' ;;
+          ls)
+            _arguments -S \
+              '--stale[list only workspaces whose directory is gone]' \
+              '--empty[list only workspaces rm --empty would remove]'
+            ;;
           root) (( CURRENT == 2 )) && _jjw_workspaces ;;
         esac
       }

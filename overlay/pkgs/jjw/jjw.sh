@@ -42,9 +42,10 @@ commands:
   rm --self
         Forget and delete the current workspace (or the -R target). Refuses
         the main workspace. Your shell must cd out of the deleted directory.
-  ls [--stale]
+  ls [--stale|--empty]
         List existing workspaces as <name><TAB><path>. --stale lists only those
-        whose directory is gone from disk.
+        whose directory is gone from disk; --empty only those 'rm --empty'
+        would remove (snapshotting each workspace to tell).
   root [<name>]
         Print the root of <name>, or of the main workspace if omitted.
 
@@ -137,6 +138,28 @@ ws_stale() {
 ws_emptiness() {
   jj -R "$1" log --no-graph -r 'trunk()..@' --limit 2 \
     -T 'if(empty && !description && !local_bookmarks, "empty", "nonempty") ++ "\n"'
+}
+
+# Whether workspace <name> is one `rm --empty` removes: not the main or current
+# workspace (named <main-name> and <current-name>), with a jj-recorded path,
+# still on disk, and holding no work by ws_emptiness. `ls --empty` asks the same
+# question, so it previews exactly what rm would delete.
+ws_empty() {
+  local name=$1 main_name=$2 current_name=$3 path state
+  [ "$name" != "$main_name" ] && [ "$name" != "$current_name" ] || return 1
+  # As when removing by name: no rm -rf without a jj-recorded path.
+  path=$(jjq workspace root --name "$name" 2>/dev/null) || {
+    note "skipping '$name': no recorded path (repo predates jj 0.38)"
+    return 1
+  }
+  # A missing directory makes the workspace stale, not empty; --stale handles
+  # those.
+  [ -d "$path" ] || return 1
+  state=$(ws_emptiness "$path") || {
+    note "skipping '$name': could not snapshot $path"
+    return 1
+  }
+  [ "$state" = empty ]
 }
 
 cmd_new() {
@@ -236,24 +259,12 @@ cmd_rm() {
   fi
 
   if [ "$mode" = --empty ]; then
-    local main_name current_name state found=false
+    local main_name current_name found=false
     main_name=$(ws_name_at "$root")
     current_name=$(ws_name_at "$current")
     while IFS= read -r name; do
-      [ "$name" != "$main_name" ] && [ "$name" != "$current_name" ] || continue
-      # As when removing by name: no rm -rf without a jj-recorded path.
-      path=$(jjq workspace root --name "$name" 2>/dev/null) || {
-        note "skipping '$name': no recorded path (repo predates jj 0.38)"
-        continue
-      }
-      # A missing directory makes the workspace stale, not empty; --stale
-      # handles those.
-      [ -d "$path" ] || continue
-      state=$(ws_emptiness "$path") || {
-        note "skipping '$name': could not snapshot $path"
-        continue
-      }
-      [ "$state" = empty ] || continue
+      ws_empty "$name" "$main_name" "$current_name" || continue
+      path=$(jjq workspace root --name "$name")
       jj -R "$root" workspace forget "$name"
       rm -rf "$path"
       note "removed empty workspace '$name' ($path)"
@@ -303,11 +314,14 @@ cmd_rm() {
 }
 
 cmd_ls() {
-  local stale_only=false
+  # filter is the one --stale or --empty given, if any.
+  local filter=""
   while [ $# -gt 0 ]; do
     case $1 in
-      --stale)
-        stale_only=true
+      --stale | --empty)
+        [ -z "$filter" ] || [ "$filter" = "$1" ] ||
+          die "ls: $filter cannot be combined with $1"
+        filter=$1
         shift
         ;;
       -*) die "ls: unknown option: $1" ;;
@@ -315,10 +329,17 @@ cmd_ls() {
     esac
   done
 
-  local root name path
+  local root name path main_name="" current_name=""
   root=$(repo_root)
+  if [ "$filter" = --empty ]; then
+    main_name=$(ws_name_at "$root")
+    current_name=$(ws_name_at "$(jjq workspace root)")
+  fi
   while IFS= read -r name; do
-    ! $stale_only || ws_stale "$root" "$name" || continue
+    case $filter in
+      --stale) ws_stale "$root" "$name" || continue ;;
+      --empty) ws_empty "$name" "$main_name" "$current_name" || continue ;;
+    esac
     # A "-" means jj has no recorded path for the workspace (see cmd_rm).
     path=$(jjq workspace root --name "$name" 2>/dev/null) || path=-
     printf '%s\t%s\n' "$name" "$path"
