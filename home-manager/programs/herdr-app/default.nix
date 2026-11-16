@@ -1,8 +1,8 @@
-# The Herdr app, set up like tmux was. jj support: patched copies of its
-# shipped mods, built from the installed version's defaults so a Herdr update
-# re-applies jj.patch (and fails the build if upstream changed those lines),
-# plus a sidebar of our own (jj-sidebar). Shipped mods can't be edited in
-# place: Herdr restores them on every start.
+# The Herdr app, set up like tmux was. jj support: mods of our own (a sidebar,
+# jj-sidebar, and a worktree dialog for jj workspaces, jj-worktree), plus copies
+# of the shipped menus that open that dialog, built from the installed
+# version's defaults. Shipped mods can't be edited in place: Herdr restores
+# them on every start.
 {
   config,
   lib,
@@ -56,11 +56,13 @@
         '.global += $tmux | ."layout:jj" += $jj' ${pkgs.herdr-app.src}/defaults/keys.macos.json > $out
     '';
 
-  cloned = ["menu" "new-menu" "worktree"];
+  # Copies of the shipped menus, changed only to open jj-worktree.
+  cloned = ["menu" "new-menu"];
   # Ours, not clones: jj-sidebar is the sidebar as a vertical tab list (spaces,
   # their tabs, the tabs' agents), in place of the spaces and agents panels
-  # and the tab bar.
-  own = ["sidebar"];
+  # and the tab bar. jj-worktree is the worktree dialog for jj workspaces; it
+  # hands anything else to the shipped one.
+  own = ["sidebar" "worktree"];
 
   # jj-sidebar names tabs the way tmux named windows.
   jjTitle = pkgs.writeShellScript "jj-title" (builtins.readFile ../tmux/jj-title.sh);
@@ -76,12 +78,21 @@
         chmod -R u+w "$out/mods/jj-$m"
         # As `herdr-app do mod.clone` does: a clone's own assets use its new name.
         sed -i "s#mods/$m/#mods/jj-$m/#g" "$out/mods/jj-$m/main.js"
+        # The menus open the worktree dialog by name: ours instead. Fails if
+        # they stop doing it that way (or start doing it some other way too).
+        sed -i 's#mod: "worktree"#mod: "jj-worktree"#g' "$out/mods/jj-$m/main.js"
+        if grep -En "mod: *[\"']worktree[\"']" "$out/mods/jj-$m/main.js"; then
+          echo "jj-$m still opens the shipped worktree dialog" >&2
+          exit 1
+        fi
+        grep -q 'mod: "jj-worktree"' "$out/mods/jj-$m/main.js" || { echo "jj-$m no longer opens jj-worktree" >&2; exit 1; }
       done
-      patch -p1 --fuzz=0 --no-backup-if-mismatch -d $out/mods < ${./jj.patch}
-      cp -r ${./jj-sidebar} $out/mods/jj-sidebar
-      chmod -R u+w $out/mods/jj-sidebar
-      cp ${./jj.js} $out/mods/jj-sidebar/jj.js
-      cp ${./jj.js} $out/mods/jj-worktree/jj.js
+      ${lib.concatMapStrings (m: ''
+          cp -r ${./. + "/jj-${m}"} $out/mods/jj-${m}
+          chmod -R u+w $out/mods/jj-${m}
+          cp ${./jj.js} $out/mods/jj-${m}/jj.js
+        '')
+        own}
       substituteInPlace $out/mods/jj-sidebar/main.js --replace-fail @jjTitle@ ${jjTitle}
 
       # main, with jj-sidebar in place of the spaces and agents lists (and in
