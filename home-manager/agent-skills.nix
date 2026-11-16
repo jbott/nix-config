@@ -6,6 +6,7 @@
 # Claude Code plugins (see programs/claude-code) are deliberately not mirrored:
 # their agents/ and commands/ are Claude-specific.
 {pkgs}: {
+  commit-scope = ../skills/commit-scope;
   jj = "${pkgs.jj-skill}";
   humanizer = "${pkgs.humanizer-skill}";
   swiftui-pro = "${pkgs.swiftui-pro-skill}";
