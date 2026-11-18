@@ -7,6 +7,7 @@
 # their agents/ and commands/ are Claude-specific.
 {pkgs}: {
   commit-scope = ../skills/commit-scope;
+  herdr-core = "${pkgs.herdr-core}/share/skills/herdr-core/herdr-core";
   jj = "${pkgs.jj-skill}";
   humanizer = "${pkgs.humanizer-skill}";
   swiftui-pro = "${pkgs.swiftui-pro-skill}";
