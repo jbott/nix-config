@@ -40,7 +40,7 @@
 
   # Avahi to enable HAP discovery
   services.avahi.enable = true;
-  services.avahi.publish.enable = true;
+  services.avahi.settings.publish."disable-publishing" = false;
   services.avahi.nssmdns4 = true;
   services.avahi.nssmdns6 = true;
 
