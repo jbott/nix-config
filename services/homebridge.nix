@@ -1,8 +1,8 @@
 {pkgs, ...}: let
   imageName = "docker.io/homebridge/homebridge";
-  imageTag = "2026-05-13";
-  imageDigest = "sha256:36d43ed9711e37fba7a2ab82165c8f3b199398fd6d491c9eeaf289d43850e927";
-  sha256 = "sha256-boHm3odcXklObiJcQMFtQm+K0IDeyUh2crPIew47El0=";
+  imageTag = "2026-11-15";
+  imageDigest = "sha256:5a76d945dd24250b1886f13f14fd65bb3ccc8489eaf57a23dd336cff1cf436ba";
+  sha256 = "sha256-nZdH6NIgjlECshuGeWdRBCv0Lu5TDRRWJaO1IPjMRQ8=";
 
   image = "${imageName}:${imageTag}";
   imageFile = pkgs.dockerTools.pullImage {
