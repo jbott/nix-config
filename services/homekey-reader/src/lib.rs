@@ -5,3 +5,4 @@ pub mod hap;
 pub mod nfc;
 mod secure;
 pub mod state;
+pub mod trigger;
