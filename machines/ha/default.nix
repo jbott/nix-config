@@ -1,7 +1,9 @@
 {
+  config,
   lib,
   currentSystemName,
   modulesPath,
+  pkgs,
   ...
 }: {
   imports = [
@@ -9,6 +11,7 @@
     ../../common/linux/zfs-impermanence.nix
     ../../services/home-assistant.nix
     ../../services/homebridge.nix
+    ./homekey.nix
     ../../services/samba.nix
     ../../services/zigbee2mqtt.nix
   ];
@@ -65,5 +68,27 @@
       MemoryHigh=4G
       MemoryMax=6G
     '';
+  };
+
+  # Keep the Home Key reader on a Python version supported by its pinned native
+  # dependencies. Using the unversioned system Python broke when it moved to 3.14.
+  systemd.user.services.apple-home-key-reader = lib.mkIf (!config.services.homekey-reader.enable) {
+    description = "Apple Home Key Reader Service";
+    after = ["network.target"];
+    wantedBy = ["default.target"];
+
+    serviceConfig = {
+      Type = "simple";
+      WorkingDirectory = "/home/jbo/apple-home-key-reader";
+      ExecStart = "${pkgs.uv}/bin/uv run --python ${pkgs.python312.interpreter} main.py";
+      UMask = "0077";
+      Restart = "always";
+      RestartSec = 5;
+    };
+
+    environment = {
+      PYTHONUNBUFFERED = "1";
+      UV_PYTHON_PREFERENCE = "only-system";
+    };
   };
 }
