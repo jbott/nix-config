@@ -5,3 +5,6 @@ extend-exclude = [
 
 [default.extend-identifiers]
 mosquitto = "mosquitto"
+PN532 = "PN532"
+Pn532 = "Pn532"
+pn532 = "pn532"

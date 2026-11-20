@@ -1,1 +1,1 @@
-//! Home Key reader library.
+pub mod nfc;
