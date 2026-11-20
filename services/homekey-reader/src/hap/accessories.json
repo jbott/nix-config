@@ -1,0 +1,174 @@
+{
+  "accessories": [
+    {
+      "aid": 1,
+      "services": [
+        {
+          "iid": 1,
+          "type": "3E",
+          "characteristics": [
+            {
+              "iid": 2,
+              "type": "14",
+              "perms": [
+                "pw"
+              ],
+              "format": "bool"
+            },
+            {
+              "iid": 3,
+              "type": "20",
+              "perms": [
+                "pr"
+              ],
+              "format": "string",
+              "value": ""
+            },
+            {
+              "iid": 4,
+              "type": "21",
+              "perms": [
+                "pr"
+              ],
+              "format": "string",
+              "value": ""
+            },
+            {
+              "iid": 5,
+              "type": "23",
+              "perms": [
+                "pr"
+              ],
+              "format": "string",
+              "value": "NFC Lock"
+            },
+            {
+              "iid": 6,
+              "type": "30",
+              "perms": [
+                "pr"
+              ],
+              "format": "string",
+              "value": "default"
+            },
+            {
+              "iid": 7,
+              "type": "52",
+              "perms": [
+                "pr"
+              ],
+              "format": "string",
+              "value": ""
+            },
+            {
+              "iid": 8,
+              "type": "26C",
+              "perms": [
+                "pr"
+              ],
+              "format": "tlv8",
+              "value": "AQQAAAAA"
+            }
+          ]
+        },
+        {
+          "iid": 9,
+          "type": "45",
+          "characteristics": [
+            {
+              "iid": 10,
+              "type": "1D",
+              "perms": [
+                "pr",
+                "ev"
+              ],
+              "format": "uint8",
+              "valid-values": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "value": 1
+            },
+            {
+              "iid": 11,
+              "type": "1E",
+              "perms": [
+                "pr",
+                "pw",
+                "ev"
+              ],
+              "format": "uint8",
+              "valid-values": [
+                0,
+                1
+              ],
+              "value": 1
+            }
+          ]
+        },
+        {
+          "iid": 12,
+          "type": "44",
+          "characteristics": [
+            {
+              "iid": 13,
+              "type": "19",
+              "perms": [
+                "pw"
+              ],
+              "format": "tlv8"
+            },
+            {
+              "iid": 14,
+              "type": "37",
+              "perms": [
+                "pr",
+                "ev"
+              ],
+              "format": "string",
+              "value": ""
+            }
+          ]
+        },
+        {
+          "iid": 15,
+          "type": "266",
+          "characteristics": [
+            {
+              "iid": 16,
+              "type": "263",
+              "perms": [
+                "pr",
+                "ev"
+              ],
+              "format": "uint16",
+              "value": 0
+            },
+            {
+              "iid": 17,
+              "type": "264",
+              "perms": [
+                "pr",
+                "pw",
+                "wr"
+              ],
+              "format": "tlv8",
+              "value": ""
+            },
+            {
+              "iid": 18,
+              "type": "265",
+              "perms": [
+                "pr"
+              ],
+              "format": "tlv8",
+              "value": "AQEQAgEQ"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
