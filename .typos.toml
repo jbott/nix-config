@@ -4,6 +4,8 @@ extend-exclude = [
 ]
 
 [default.extend-identifiers]
+COSE = "COSE"
+cose = "cose"
 mosquitto = "mosquitto"
 PN532 = "PN532"
 Pn532 = "Pn532"
