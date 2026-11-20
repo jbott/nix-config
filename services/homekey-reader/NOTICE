@@ -1,0 +1,3 @@
+Home Key NFC and provisioning behavior is based on kormax/apple-home-key-reader
+revision 7266e80, licensed under Apache-2.0. This Rust implementation uses
+RustCrypto primitives and preserves the protocol and wire formats.

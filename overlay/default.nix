@@ -1,4 +1,4 @@
-(self: super: {
+{crane}: (self: super: {
   dd-cli = self.callPackage ./pkgs/dd-cli {};
   deploy-nixos = self.callPackage ./pkgs/deploy-nixos {};
   # cargoSetupHook now forces system libraries, so zstd-sys looks for zstd with
@@ -11,6 +11,9 @@
   ed3d-plugins = self.callPackage ./pkgs/ed3d-plugins {};
   finicky = self.callPackage ./pkgs/finicky {};
   glab-jj = self.callPackage ./pkgs/glab-jj {};
+  homekey-reader = self.callPackage ../services/homekey-reader/package.nix {
+    craneLib = crane.mkLib self;
+  };
   humanizer-skill = self.callPackage ./pkgs/humanizer-skill {};
   jj-hunk-tool = self.callPackage ./pkgs/jj-hunk-tool {};
   jj-skill = self.callPackage ../skills/jj {};

@@ -2,6 +2,7 @@
   description = "NixOS flake-based config by github.com/jbott";
 
   inputs = {
+    crane.url = "github:ipetkov/crane";
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -34,6 +35,7 @@
 
   outputs = {
     self,
+    crane,
     disko,
     fast-nix-gc,
     home-manager,
@@ -65,7 +67,7 @@
     overlays = [
       llmAgentsOverlay
       fastNixGcOverlay
-      (import ./overlay)
+      (import ./overlay {inherit crane;})
     ];
     nixpkgsOverlaysModule = {
       nixpkgs = {
@@ -149,7 +151,7 @@
     # dd-cli (no aarch64-linux binary) don't break evaluation elsewhere.
     packages = forAllSystems ({pkgs, ...}:
       nixpkgs.lib.filterAttrs (_: nixpkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform) {
-        inherit (pkgs) claude-code dd-cli deploy-nixos fast-nix-gc finicky glab-jj jj-hunk-tool jj-skill jjw;
+        inherit (pkgs) claude-code dd-cli deploy-nixos fast-nix-gc finicky glab-jj homekey-reader jj-hunk-tool jj-skill jjw;
       });
 
     devShells = forAllSystems ({
@@ -194,6 +196,7 @@
     in
       {
         formatting = (treefmtEval pkgs).config.build.check self;
+        homekey-reader-deps = pkgs.homekey-reader.cargoArtifacts;
         devshell = self.devShells.${system}.default;
       }
       // lib.mapAttrs' (name: lib.nameValuePair "package-${name}") self.packages.${system}
