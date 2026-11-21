@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MIT OR Apache-2.0 -->
+
 # Home Key reader
 
 The reader runs on Linux with a PN532 in UART mode. It exposes the NFC Lock accessory over HomeKit IP, authenticates iPhone and Apple Watch Wallet presentations, and can pulse an ESPHome switch. The default action logs successful taps. A Home app write to the virtual lock keeps its state locked. Only an authenticated NFC presentation can fire the switch.
@@ -36,3 +38,9 @@ Verify the deployment with `systemctl status homekey-reader` and `journalctl -u 
 For rollback, stop the Rust unit, switch to the recorded Python generation, then run `systemctl --user daemon-reload` and `systemctl --user start apple-home-key-reader` as the reader owner. Python reads its original files. A later switch to Rust resumes its separate saved state. Reconcile any new pairings or revocations before switching back to an older authorization state.
 
 For a new accessory, create a private state directory and run `homekey-reader init STATE_DIR` as its owner. Pair it with the configured setup PIN. Keep the state directory, legacy files, and runtime credential files outside version control and the Nix store.
+
+## License
+
+Files marked `MIT OR Apache-2.0` may be used under either license. Files marked `Apache-2.0` include the Home Key protocol port and adapted HomeKit pairing code. Distributing the complete reader requires following the Apache-2.0 terms for those files. The [upstream notices](NOTICE) identify the source projects.
+
+The full texts are in [MIT](LICENSES/MIT.txt) and [Apache-2.0](LICENSES/Apache-2.0.txt).

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::{collections::BTreeMap, fs::File, path::Path};

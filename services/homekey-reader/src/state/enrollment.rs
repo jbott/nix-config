@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use super::{endpoint_id, fixed};
 use anyhow::{ensure, Result};
 use base64::{engine::general_purpose::STANDARD, Engine};

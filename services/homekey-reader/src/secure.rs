@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Home Key protocol port based on kormax/apple-home-key-reader. See NOTICE.
+
 use aes::{
     cipher::{
         block_padding::Iso7816, BlockDecryptMut, BlockEncrypt, BlockEncryptMut, KeyInit, KeyIvInit,

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use super::*;
 use esphome_client::types::{HelloResponse, ListEntitiesDoneResponse, ListEntitiesSwitchResponse};
 use snow::TransportState;

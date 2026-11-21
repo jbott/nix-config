@@ -1,7 +1,14 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 [package]
 name = "homekey-reader"
 version = "0.1.0"
 edition = "2021"
+authors = ["John Ott"]
+description = "Apple Home Key NFC reader for the PN532 with a HomeKit lock accessory and optional ESPHome switch control"
+repository = "https://github.com/jbott/nix-config"
+readme = "README.md"
+license = "(MIT OR Apache-2.0) AND Apache-2.0"
 publish = false
 
 [dependencies]

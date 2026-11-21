@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 //! PN532 HSU framing and the Apple Enhanced Contactless Polling sequence.
 use anyhow::{bail, ensure, Context, Result};
 use pn532::{

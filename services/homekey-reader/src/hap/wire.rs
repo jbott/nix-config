@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use super::crypto::nonce_counter;
 use anyhow::{bail, ensure, Context, Result};
 use hap_crypto::aead::{chacha20poly1305_open, chacha20poly1305_seal};

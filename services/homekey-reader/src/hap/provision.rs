@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Home Key protocol port based on kormax/apple-home-key-reader. See NOTICE.
+
 use crate::state::{endpoint_id, fixed, key_id, random, Endpoint, Enrollments, HapGrant, State};
 use anyhow::{ensure, Context, Result};
 use hap_tlv8::{Tlv8Map, Tlv8Writer};

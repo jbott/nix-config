@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // Adapted from phunapps/hap-rust. See NOTICE.
 //! The accessory side of HAP Pair Setup (M1–M6) and Pair Verify (M1–M4).
 //!

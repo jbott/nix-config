@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Home Key protocol port based on kormax/apple-home-key-reader. See NOTICE.
+
 //! ISO 18013 handover and issuer verification for a first presentation.
 use crate::{
     apdu::{command, field, fields, parse, select, Card},

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // Adapted from phunapps/hap-rust. See NOTICE.
 //! Shared HAP constants and crypto helpers for the accessory side.
 //!
